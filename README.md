@@ -56,6 +56,10 @@ translates the function calls of the client SDK into http requests and
 automatically generates an http server to implement a service, automatically
 mapping the incoming requests to the Javascript functions.
 
+Moreover, error results from service invocations are turned into Javascript
+exceptions so as to permit using Javascript try-catch contruct to handle
+errors in the usual way.
+
 Instantiating a SolSA service is very easy as demoed in
 [app.js](sample/app/app.js):
 ```javascript
