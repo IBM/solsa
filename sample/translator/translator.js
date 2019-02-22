@@ -10,7 +10,7 @@ module.exports = solsa.service({
     }
   },
 
-  // the parameters of the deployment
+  // the parameters of a service instance
   _parameters (name, language) {
     return Object.assign(
       { target: { name: 'TARGET_LANGUAGE', value: language } }, // desired target language
