@@ -1,0 +1,9 @@
+{
+  "name": "solsa",
+  "main": "solsa.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "js-yaml": "^3.12.1",
+    "needle": "^2.2.4"
+  }
+}
