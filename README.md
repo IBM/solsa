@@ -52,7 +52,7 @@ provides two APIs defined by means of Javascript functions.
 
 In general, SolSA makes API definitions and invocations look like function
 declarations and function calls of the host language. SolSA automatically
-translate the function calls of the client SDK into http requests and
+translates the function calls of the client SDK into http requests and
 automatically generates an http server to implement a service, automatically
 mapping the incoming requests to the Javascript functions.
 
@@ -88,7 +88,7 @@ Try:
 ```
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
-In the future, we intend to automatically package and publish ßthis server as
+In the future, we intend to automatically package and publish this server as
 container image.
 
 SolSA already supports generating the yaml for deploying the service instance
