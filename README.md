@@ -82,7 +82,7 @@ the actual service. The request implementation will be added shortly._
 
 A server implementing the translator service is obtained as follows:
 ```
-bin/solsa-serve sample/translator &
+TARGET_LANGUAGE='en' bin/solsa-serve sample/translator &
 ```
 Try:
 ```
