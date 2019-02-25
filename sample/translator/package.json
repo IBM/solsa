@@ -1,3 +1,6 @@
 {
-  "main": "translator.js"
+  "main": "translator.js",
+  "dependencies": {
+    "solsa": "git+ssh://git@github.ibm.com:solsa/solsa.git"
+  }
 }

@@ -1,6 +1,6 @@
 // define a new class of translator services by composing watson translator apis
 
-let solsa = require('../../solsa')
+let solsa = require('solsa')
 
 module.exports = solsa.service({
   // the required services
