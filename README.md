@@ -103,7 +103,7 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 SolSA already supports generating the yaml for deploying the service instance
 and its dependencies:
 ```
-bin/solsa-yaml sample/app
+bin/solsa-yaml sample/client
 ```
 ```yaml
 apiVersion: cloudservice.seed.ibm.com/v1

@@ -3,6 +3,8 @@
 let solsa = require('solsa')
 
 module.exports = solsa.service({
+  // instantiation time APIs (names start with underscore)
+
   // the required services
   _dependencies (name) {
     return {
@@ -16,6 +18,8 @@ module.exports = solsa.service({
       { target: { name: 'TARGET_LANGUAGE', value: language } }, // desired target language
       this.dependencies.wTranslator.credentials) // watson translation service credentials
   },
+
+  // invocation time APIs
 
   // return the most probable language of { text } as { language }
   async identify (payload) {

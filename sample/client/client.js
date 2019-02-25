@@ -5,3 +5,5 @@ let client = require('../translator').new('my-translator', 'en')
 
 client.identify({ text: 'bonjour' })
 client.translate({ text: 'bonjour' })
+
+module.exports = client
