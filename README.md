@@ -79,6 +79,7 @@ client.translate({ text: 'bonjour' })
 ```
 Try:
 ```
+(cd sample/translator; npm install)
 node sample/client/client.js
 ```
 _For now, the client simply logs the requests being made without connecting to
@@ -92,8 +93,17 @@ Try:
 ```
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
-In the future, we intend to automatically package and publish this server as
-container image.
+
+A container image for the translator service is obtained as follows:
+```
+bin/solsa-build sample/translator -t solsa/translator
+```
+Try:
+```
+docker run -p 8080:8080 -d solsa/translator
+curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
+```
+
 
 SolSA already supports generating the yaml for deploying the service instance
 and its dependencies:
