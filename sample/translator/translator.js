@@ -20,7 +20,7 @@ module.exports = solsa.service({
   // return the most probable language of { text } as { language }
   async identify (payload) {
     let text = payload.text
-    let result = await this.dependencies.wTranslator.client().identify({ text }) // call watson api
+    let result = await this.dependencies.wTranslator.identify({ text }) // call watson api
     return { language: result.languages[0].language } // watson returns an array of probably languages
   },
 
@@ -33,13 +33,14 @@ module.exports = solsa.service({
       let target = this.parameters.target // parameter of the deployment
       let translation
       if (source !== target) {
-        let result = await this.dependencies.wTranslator.client().translate({ source, target, text })
+        let result = await this.dependencies.wTranslator.translate({ source, target, text })
         translation = result.translation
       } else {
         translation = text // no translation needed
       }
       return { text: translation }
     } catch (error) {
+      console.log(this.dependencies.wTranslator)
       return { text: 'Sorry, we cannot translate your text' }
     }
   }

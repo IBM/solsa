@@ -1,7 +1,7 @@
 // example client for our translation service instance
 
-// the client is derived from the service instance
-let client = require('../app').client()
+// define an instance of the translator service
+let client = require('../translator').new('my-translator', 'en')
 
 client.identify({ text: 'bonjour' })
 client.translate({ text: 'bonjour' })

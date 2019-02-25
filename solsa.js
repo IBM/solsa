@@ -2,7 +2,7 @@ let yaml = require('js-yaml')
 
 let port = 8080
 
-let cedar = {
+let solsa = {
   watson: {
     LanguageTranslatorV3 (name) {
       let credentials = {} // TODO handle distinct credentials for multiple instances of the service?
@@ -11,18 +11,16 @@ let cedar = {
       return {
         name,
         credentials,
-        client: () => ({
-          async identify (payload) {
-            // TODO call the watson translator service, faking the result for now
-            console.log(`watson.LanguageTranslatorV3.identify ${JSON.stringify(payload)}`)
-            return { languages: [{ language: 'fr' }] }
-          },
-          async translate (payload) {
-            // TODO call the watson translator service, faking the result for now
-            console.log(`watson.LanguageTranslatorV3.translate ${JSON.stringify(payload)}`)
-            return { translation: 'hello' }
-          }
-        }),
+        async identify (payload) {
+          // TODO call the watson translator service, faking the result for now
+          console.log(`watson.LanguageTranslatorV3.identify ${JSON.stringify(payload)}`)
+          return { languages: [{ language: 'fr' }] }
+        },
+        async translate (payload) {
+          // TODO call the watson translator service, faking the result for now
+          console.log(`watson.LanguageTranslatorV3.translate ${JSON.stringify(payload)}`)
+          return { translation: 'hello' }
+        },
         _yaml () {
           return {
             apiVersion: 'cloudservice.seed.ibm.com/v1',
@@ -63,24 +61,20 @@ function pod (kind, name, dependencies, parameters) {
   return _yaml
 }
 
-cedar.service = def => ({
+solsa.service = def => ({
   new (name) {
     let instance = { dependencies: def._dependencies, parameters: def._parameters }
     instance.dependencies = instance.dependencies(name)
     instance.parameters = instance.parameters(...arguments)
     instance.credentials = {} // TODO
     instance._yaml = () => pod(def._kind, name, instance.dependencies, instance.parameters)
-    instance.client = () => {
-      let client = {}
-      for (let key of Object.keys(def).filter(name => name[0] !== '_')) {
-        client[key] = async payload => {
-          console.log(`request: ${name}.${key} ${JSON.stringify(payload)}`)
-          return {} // TODO post to the endpoint
-        }
-      }
-      return client
-    }
     instance.yaml = () => instance._yaml().map(obj => yaml.safeDump(obj, { noArrayIndent: true })).join('---\n')
+    for (let key of Object.keys(def).filter(name => name[0] !== '_')) {
+      instance[key] = async payload => {
+        console.log(`request: ${name}.${key} ${JSON.stringify(payload)}`)
+        return {} // TODO post to the endpoint
+      }
+    }
     return instance
   },
 
@@ -119,4 +113,4 @@ function server (obj, keys) {
   })
 }
 
-module.exports = cedar
+module.exports = solsa

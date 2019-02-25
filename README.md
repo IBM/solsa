@@ -61,22 +61,17 @@ exceptions so as to permit using Javascript try-catch contruct to handle
 errors in the usual way.
 
 Instantiating a SolSA service is very easy as demoed in
-[app.js](sample/app/app.js):
+[client.js](sample/client/client.js):
 ```javascript
-module.exports = require('../translator').new('my-translator', 'en')
+let client = require('../translator').new('my-translator', 'en')
+
+client.identify({ text: 'bonjour' })
+client.translate({ text: 'bonjour' })
 ```
 We specify the desired name for the service instance (i.e. the name of the
 kubernetes resources managing this service instance) and the desired target
 language.
 
-A client for the service instance is constructed as demoed in
-[client.js](sample/client/client.js):
-```javascript
-let client = require('../app').client()
-
-client.identify({ text: 'bonjour' })
-client.translate({ text: 'bonjour' })
-```
 Try:
 ```
 (cd sample/translator; npm install)
