@@ -56,6 +56,7 @@ class Translator extends solsa.Service {
       WATSON_URL: { valueFrom: this.dep.wTranslator.values.url },
       WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey }
     }
+  }
 
   // return the most probable language of { text } as { language }
   async identify (payload) {
@@ -111,16 +112,19 @@ in the usual way.
 
 We can run this service using command:
 ```
-TARGET_LANGUAGE='en' bin/solsa-serve samples/translator/service &
+TARGET_LANGUAGE='en' \
+WASTON_URL='https://gateway.watsonplatform.net/language-translator/api' \
+WATSON_APIKEY='...' \
+bin/solsa-serve samples/translator/service &
 ```
 When running locally, deployment-time parameters are provided by means of environment variables.
-
-_For now, the calls to Watson translator are emulated, hence the environment
-variables WATSON_URL and WATSON_APIKEY are not needed._
 
 Try:
 ```
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
+```
+```
+{"text":"Hello"}
 ```
 
 ### Containerize the service
@@ -131,9 +135,12 @@ bin/solsa-build samples/translator/service -t solsa/translator
 ```
 Try:
 ```
-docker run -p 8080:8080 -e TARGET_LANGUAGE='en' -d solsa/translator
+docker run -p 8080:8080 -e TARGET_LANGUAGE='en' e WASTON_URL='...' -e WATSON_APIKEY='...' -d solsa/translator
 
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
+```
+```
+{"text":"Hello"}
 ```
 
 ### Deploy the service
