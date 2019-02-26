@@ -135,7 +135,7 @@ bin/solsa-build samples/translator/service -t solsa/translator
 ```
 Try:
 ```
-docker run -p 8080:8080 -e TARGET_LANGUAGE='en' e WASTON_URL='...' -e WATSON_APIKEY='...' -d solsa/translator
+docker run -p 8080:8080 -e TARGET_LANGUAGE='en' -e WASTON_URL='...' -e WATSON_APIKEY='...' -d solsa/translator
 
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
