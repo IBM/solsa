@@ -48,7 +48,7 @@ class Translator extends solsa.Service {
   async translate (payload) { /* ... */ }
 }
 ```
-The new service definition declare Watson translator as a dependency. It
+The new service definition declares Watson translator as a dependency. It
 specifies the desired target language for the translation as a service instance
 parameter (as opposed to, say, a parameter specified in each request). It
 provides two APIs defined by means of Javascript functions.
@@ -63,26 +63,34 @@ Moreover, error results from service invocations are turned into Javascript
 exceptions so as to permit using Javascript try-catch contruct to handle errors
 in the usual way.
 
-A server implementing the translator service is obtained as follows:
+### Run the service locally
+
+We can run this service using command:
 ```
 TARGET_LANGUAGE='en' bin/solsa-serve samples/translator/service &
 ```
+Deployment-time parameters are provided by means of environment variables.
+
 Try:
 ```
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
 
-A container image for the translator service is obtained as follows:
+### Containerize the service
+
+We build a container for the service using command:
 ```
 bin/solsa-build samples/translator/service -t solsa/translator
 ```
 Try:
 ```
-docker run -p 8080:8080 -d solsa/translator
+docker run -p 8080:8080 -e TARGET_LANGUAGE='en' -d solsa/translator
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
 
-Instantiating a SolSA service is very easy as demoed in
+### Deploy the service
+
+To deploy a service we first need to define a service instance as demoed in
 [instance.js](samples/translator/app/instance.js):
 ```javascript
 let Translator = require('../service')
@@ -94,7 +102,7 @@ kubernetes resource managing this service instance) and the desired target
 language.
 
 SolSA can generate the yaml for deploying the service instance and its
-dependencies:
+dependencies using the command:
 ```
 bin/solsa-yaml samples/translator/app/instance.js
 ```
@@ -133,7 +141,12 @@ metadata:
             key: apikey
 ```
 
-We can use this instance to build an application as demoed in
+Assuming the previously build container is pushed to the container registry,
+the above yaml can be applied using `kubectl`.
+
+### Client SDK
+
+We can use the deployed instance to build an application as demoed in
 [app.js](samples/translator/app/app.js):
 ```javascript
 let translator = require('./instance')
@@ -150,6 +163,6 @@ Try:
 node samples/translator/app/app.js
 ```
 _For now, the client SDK simply logs the requests being made without connecting to
-the actual service. The request implementation will be added shortly._
+the actual service instance. The request implementation will be added shortly._
 
 
