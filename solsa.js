@@ -76,33 +76,33 @@ let solsa = {
       // TODO endpoint definition
       return _yaml
     }
-  }
-}
 
-solsa.Service.serve = function () {
-  let service = new this()
+    static serve () {
+      let service = new this()
 
-  for (let key of Object.keys(service.env)) {
-    service.env[key] = process.env[key]
-  }
+      for (let key of Object.keys(service.env)) {
+        service.env[key] = process.env[key]
+      }
 
-  let express = require('express')
-  let app = express()
-  app.use(express.json())
+      let express = require('express')
+      let app = express()
+      app.use(express.json())
 
-  for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
-    app.post('/' + key, (request, response) => {
-      service[key](request.body).then(r => response.send(r), err => response.send(err))
-    })
-  }
+      for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
+        app.post('/' + key, (request, response) => {
+          service[key](request.body).then(r => response.send(r), err => response.send(err))
+        })
+      }
 
-  app.listen(PORT, err => {
-    if (err) {
-      console.log(err)
-    } else {
-      console.log(`server is listening on ${PORT}`)
+      app.listen(PORT, err => {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(`server is listening on ${PORT}`)
+        }
+      })
     }
-  })
+  }
 }
 
 module.exports = solsa
