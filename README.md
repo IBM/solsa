@@ -28,6 +28,8 @@ worry about communication protocols.
 ```
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
+npm install
+(cd samples/translator/service; npm install)
 ```
 
 ## Example
