@@ -4,6 +4,7 @@
   "dependencies": {
     "express": "^4.16.4",
     "js-yaml": "^3.12.1",
-    "needle": "^2.2.4"
+    "needle": "^2.2.4",
+    "watson-developer-cloud": "^3.18.1"
   }
 }

@@ -37,7 +37,7 @@ class Translator extends solsa.Service {
       let translation
       if (source !== target) {
         let result = await this.dep.wTranslator.translate({ source, target, text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-        translation = result.translation
+        translation = result.translations[0].translation
       } else {
         translation = text // no translation needed
       }

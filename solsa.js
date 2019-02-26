@@ -1,3 +1,5 @@
+let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/v3')
+
 const PORT = 8080
 
 let solsa = {
@@ -9,18 +11,19 @@ let solsa = {
           url: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } },
           apikey: { secretKeyRef: { name: `binding-${this.name}`, key: 'apikey' } }
         }
-      }
 
-      async identify (payload, url, apikey) {
-        // TODO call the watson translator service, faking the result for now
-        console.log(`watson.LanguageTranslatorV3.identify ${JSON.stringify(payload)}, ${url}, ${apikey}`)
-        return { languages: [{ language: 'fr' }] }
-      }
-
-      async translate (payload, url, apikey) {
-        // TODO call the watson translator service, faking the result for now
-        console.log(`watson.LanguageTranslatorV3.translate ${JSON.stringify(payload)}, ${url}, ${apikey}`)
-        return { translation: 'hello' }
+        for (let f of ['identify', 'translate']) {
+          this[f] = async function (payload, url, apikey) {
+            if (this.translator === undefined) this.translator = new _LanguageTranslatorV3({ version: '2018-05-01', iam_apikey: apikey, url })
+            return new Promise((resolve, reject) => this.translator[f](
+              payload, (err, res) => {
+                if (err) {
+                  return reject(err)
+                }
+                return resolve(res)
+              }))
+          }
+        }
       }
 
       _yaml () {
