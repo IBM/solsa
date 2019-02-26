@@ -13,10 +13,11 @@ class Translator extends solsa.Service {
     }
 
     // parameters of the deployment
-    this.env = Object.assign(
-      { TARGET_LANGUAGE: { value: language } }, // desired target language
-      { WATSON_URL: { valueFrom: this.dep.wTranslator.values.url } },
-      { WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey } })
+    this.env = {
+      TARGET_LANGUAGE: { value: language }, // desired target language
+      WATSON_URL: { valueFrom: this.dep.wTranslator.values.url },
+      WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey }
+    }
   }
 
   // return the most probable language of { text } as { language }
