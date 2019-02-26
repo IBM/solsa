@@ -39,19 +39,61 @@ identification and language translation) to translate a text from an unknown
 language to a desired language.
 ```javascript
 class Translator extends solsa.Service {
-  constructor (name, language) { /* ... */ }
+  // instantiate the service
+  constructor (name, language) {
+    super(name)
+
+    // dependencies on other services
+    this.dep = {
+      wTranslator: new solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
+    }
+
+    // parameters of the deployment
+    this.env = Object.assign(
+      { TARGET_LANGUAGE: { value: language } }, // desired target language
+      { WATSON_URL: { valueFrom: this.dep.wTranslator.values.url } },
+      { WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey } })
+  }
 
   // return the most probable language of { text } as { language }
-  async identify (payload) { /* ... */ }
+  async identify (payload) {
+    let text = payload.text
+    let result = await this.dep.wTranslator.identify({ text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
+    return { language: result.languages[0].language } // watson returns an array of probably languages
+  }
 
   // translate { text } to target language
-  async translate (payload) { /* ... */ }
+  async translate (payload) {
+    let text = payload.text
+    try {
+      let result = await this.identify({ text }) // call api of this service
+      let source = result.language
+      let target = this.env.TARGET_LANGUAGE // parameter of the deployment
+      let translation
+      if (source !== target) {
+        let result = await this.dep.wTranslator.translate({ source, target, text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
+        translation = result.translation
+      } else {
+        translation = text // no translation needed
+      }
+      return { text: translation }
+    } catch (error) {
+      console.log(this.dep.wTranslator)
+      return { text: 'Sorry, we cannot translate your text' }
+    }
+  }
 }
 ```
-The new service definition declares Watson translator as a dependency. It
-specifies the desired target language for the translation as a service instance
-parameter (as opposed to, say, a parameter specified in each request). It
-provides two APIs defined by means of Javascript functions.
+The new service is defined as a class extending `solsa.Service`. The field names
+`dep` and `env` are reserved to respectively specify dependencies on other
+services and deployment-time parameters. The new service declares Watson
+translator as a dependency. It specifies the desired target language for the
+translation as a deployment parameter (as opposed to, say, a parameter specified
+in each request).  It provides two APIs defined by means of asynchronous
+Javascript functions: `idenfity` and `translate`.
+
+The `WATSON_URL` and `WATSON_APIKEY` parameters are obtained from the Watson
+translator deployment itself (via kubernetes secrets).
 
 In general, SolSA makes API definitions and invocations look like function
 declarations and function calls of the host language. SolSA automatically
@@ -69,7 +111,10 @@ We can run this service using command:
 ```
 TARGET_LANGUAGE='en' bin/solsa-serve samples/translator/service &
 ```
-Deployment-time parameters are provided by means of environment variables.
+When running locally, deployment-time parameters are provided by means of environment variables.
+
+_For now, the calls to Watson translator are emulated, hence the environment
+variables WATSON_URL and WATSON_APIKEY are not needed._
 
 Try:
 ```
@@ -85,26 +130,27 @@ bin/solsa-build samples/translator/service -t solsa/translator
 Try:
 ```
 docker run -p 8080:8080 -e TARGET_LANGUAGE='en' -d solsa/translator
+
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
 
 ### Deploy the service
 
-To deploy a service we first need to define a service instance as demoed in
-[instance.js](samples/translator/app/instance.js):
+To deploy a service on kubernetes we first need to define a service instance as
+demoed in [instance.js](samples/translator/app/instance.js):
 ```javascript
 let Translator = require('../service')
 
 module.exports = new Translator('my-translator', 'en')
 ```
 We specify the desired name for the service instance (i.e. the name of the
-kubernetes resource managing this service instance) and the desired target
+kubernetes resource representing this service instance) and the desired target
 language.
 
 SolSA can generate the yaml for deploying the service instance and its
 dependencies using the command:
 ```
-bin/solsa-yaml samples/translator/app/instance.js
+bin/solsa-yaml samples/translator/app/instance.js | tee translator.yaml
 ```
 ```yaml
 apiVersion: cloudservice.seed.ibm.com/v1
@@ -140,11 +186,15 @@ metadata:
             name: binding-watson-translator-for-my-translator
             key: apikey
 ```
+As expected the desired target language is burned into this configuration.
 
-Assuming the previously build container is pushed to the container registry,
-the above yaml can be applied using `kubectl`.
+Assuming the previously build container is pushed to the container registry, the
+above yaml can be applied using `kubectl`:
+```
+kubectl apply -f translator.yaml
+```
 
-### Client SDK
+### Client SDK and applications
 
 We can use the deployed instance to build an application as demoed in
 [app.js](samples/translator/app/app.js):
@@ -158,11 +208,20 @@ async function main () {
 
 main()
 ```
+The same [instance.js](samples/translator/app/instance.js) code that was used
+earlier to define the service instance to be deployed is now used to specify the
+service instance to connect to, eliminating any risk of error.
+
 Try:
 ```
 node samples/translator/app/app.js
 ```
-_For now, the client SDK simply logs the requests being made without connecting to
-the actual service instance. The request implementation will be added shortly._
+```
+{ request: 'my-translator.identify {"text":"bonjour"}' }
+{ request: 'my-translator.translate {"text":"bonjour"}' }
+```
+_For now, the client SDK simply logs the requests being made without connecting
+to the actual service instance. The request implementation will be added
+shortly._
 
 

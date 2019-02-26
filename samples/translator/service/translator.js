@@ -7,12 +7,12 @@ class Translator extends solsa.Service {
   constructor (name, language) {
     super(name)
 
-    // dependencies
+    // dependencies on other services
     this.dep = {
       wTranslator: new solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
     }
 
-    // deployment parameters
+    // parameters of the deployment
     this.env = Object.assign(
       { TARGET_LANGUAGE: { value: language } }, // desired target language
       { WATSON_URL: { valueFrom: this.dep.wTranslator.values.url } },
