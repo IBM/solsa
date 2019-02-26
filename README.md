@@ -31,19 +31,15 @@ upon several APIs of the Watson translation service (language identification and
 language translation) to translate a text from an unknown language to a desired
 language.
 ```javascript
-module.exports = solsa.service({
-  // the required services
-  _dependencies (name) { /* ... */ },
-
-  // the parameters of a service instance
-  _parameters (name, language) { /* ... */ },
+class Translator extends solsa.Service {
+  constructor (name, language) { /* ... */ }
 
   // return the most probable language of { text } as { language }
-  async identify (payload) { /* ... */ },
+  async identify (payload) { /* ... */ }
 
   // translate { text } to target language
   async translate (payload) { /* ... */ }
-})
+}
 ```
 The new service definition declare Watson translator as a dependency. It
 specifies the desired target language for the translation as a service instance
@@ -63,19 +59,30 @@ errors in the usual way.
 Instantiating a SolSA service is very easy as demoed in
 [client.js](sample/client/client.js):
 ```javascript
-let client = require('../translator').new('my-translator', 'en')
+let Translator = require('../translator')
 
-client.identify({ text: 'bonjour' })
-client.translate({ text: 'bonjour' })
+module.exports = new Translator('my-translator', 'en')
 ```
 We specify the desired name for the service instance (i.e. the name of the
-kubernetes resources managing this service instance) and the desired target
+kubernetes resource managing this service instance) and the desired target
 language.
 
+We can use this client to build an application as demoed in
+[app.js](sample/app/app.js):
+```javascript
+let client = require('../client')
+
+async function main () {
+  console.log(await client.identify({ text: 'bonjour' }))
+  console.log(await client.translate({ text: 'bonjour' }))
+}
+
+main()
+```
 Try:
 ```
 (cd sample/translator; npm install)
-node sample/client/client.js
+node sample/app/app.js
 ```
 _For now, the client simply logs the requests being made without connecting to
 the actual service. The request implementation will be added shortly._
@@ -128,12 +135,12 @@ metadata:
       env:
       - name: TARGET_LANGUAGE
         value: en
-      - name: WATSON_TRANSLATOR_URL
+      - name: WATSON_URL
         valueFrom:
           secretKeyRef:
             name: binding-watson-translator-for-my-translator
             key: url
-      - name: WATSON_TRANSLATOR_APIKEY
+      - name: WATSON_APIKEY
         valueFrom:
           secretKeyRef:
             name: binding-watson-translator-for-my-translator

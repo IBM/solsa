@@ -2,31 +2,29 @@
 
 let solsa = require('solsa')
 
-module.exports = solsa.service({
-  // instantiation time APIs (names start with underscore)
+class Translator extends solsa.Service {
+  // instantiate the service
+  constructor (name, language) {
+    super(name)
 
-  // the required services
-  _dependencies (name) {
-    return {
-      wTranslator: solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
+    // dependencies
+    this.dep = {
+      wTranslator: new solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
     }
-  },
 
-  // the parameters of a service instance
-  _parameters (name, language) {
-    return Object.assign(
-      { target: { name: 'TARGET_LANGUAGE', value: language } }, // desired target language
-      this.dependencies.wTranslator.credentials) // watson translation service credentials
-  },
-
-  // invocation time APIs
+    // deployment parameters
+    this.env = Object.assign(
+      { TARGET_LANGUAGE: { value: language } }, // desired target language
+      { WATSON_URL: { valueFrom: this.dep.wTranslator.values.url } },
+      { WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey } })
+  }
 
   // return the most probable language of { text } as { language }
   async identify (payload) {
     let text = payload.text
-    let result = await this.dependencies.wTranslator.identify({ text }) // call watson api
+    let result = await this.dep.wTranslator.identify({ text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
     return { language: result.languages[0].language } // watson returns an array of probably languages
-  },
+  }
 
   // translate { text } to target language
   async translate (payload) {
@@ -34,18 +32,20 @@ module.exports = solsa.service({
     try {
       let result = await this.identify({ text }) // call api of this service
       let source = result.language
-      let target = this.parameters.target // parameter of the deployment
+      let target = this.env.TARGET_LANGUAGE // parameter of the deployment
       let translation
       if (source !== target) {
-        let result = await this.dependencies.wTranslator.translate({ source, target, text })
+        let result = await this.dep.wTranslator.translate({ source, target, text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
         translation = result.translation
       } else {
         translation = text // no translation needed
       }
       return { text: translation }
     } catch (error) {
-      console.log(this.dependencies.wTranslator)
+      console.log(this.dep.wTranslator)
       return { text: 'Sorry, we cannot translate your text' }
     }
   }
-})
+}
+
+module.exports = Translator

@@ -1,114 +1,103 @@
-let yaml = require('js-yaml')
-
-let port = 8080
+const PORT = 8080
 
 let solsa = {
   watson: {
-    LanguageTranslatorV3 (name) {
-      let credentials = {} // TODO handle distinct credentials for multiple instances of the service?
-      credentials.url = { name: 'WATSON_TRANSLATOR_URL', valueFrom: { secretKeyRef: { name: `binding-${name}`, key: 'url' } } }
-      credentials.key = { name: 'WATSON_TRANSLATOR_APIKEY', valueFrom: { secretKeyRef: { name: `binding-${name}`, key: 'apikey' } } }
-      return {
-        name,
-        credentials,
-        async identify (payload) {
-          // TODO call the watson translator service, faking the result for now
-          console.log(`watson.LanguageTranslatorV3.identify ${JSON.stringify(payload)}`)
-          return { languages: [{ language: 'fr' }] }
-        },
-        async translate (payload) {
-          // TODO call the watson translator service, faking the result for now
-          console.log(`watson.LanguageTranslatorV3.translate ${JSON.stringify(payload)}`)
-          return { translation: 'hello' }
-        },
-        _yaml () {
-          return {
-            apiVersion: 'cloudservice.seed.ibm.com/v1',
-            kind: 'Service',
-            metadata: {
-              name,
-              spec: {
-                service: 'language-translator',
-                plan: 'lite',
-                servicetype: 'IAM'
-              }
+    LanguageTranslatorV3: class LanguageTranslatorV3 {
+      constructor (name) {
+        this.name = name
+        this.values = {
+          url: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } },
+          apikey: { secretKeyRef: { name: `binding-${this.name}`, key: 'apikey' } }
+        }
+      }
+
+      async identify (payload, url, apikey) {
+        // TODO call the watson translator service, faking the result for now
+        console.log(`watson.LanguageTranslatorV3.identify ${JSON.stringify(payload)}, ${url}, ${apikey}`)
+        return { languages: [{ language: 'fr' }] }
+      }
+
+      async translate (payload, url, apikey) {
+        // TODO call the watson translator service, faking the result for now
+        console.log(`watson.LanguageTranslatorV3.translate ${JSON.stringify(payload)}, ${url}, ${apikey}`)
+        return { translation: 'hello' }
+      }
+
+      _yaml () {
+        return {
+          apiVersion: 'cloudservice.seed.ibm.com/v1',
+          kind: 'Service',
+          metadata: {
+            name: this.name,
+            spec: {
+              service: 'language-translator',
+              plan: 'lite',
+              servicetype: 'IAM'
             }
           }
         }
       }
     }
-  }
-}
-
-function pod (kind, name, dependencies, parameters) {
-  let _yaml = Object.keys(dependencies).map(key => dependencies[key]._yaml())
-  _yaml.push({
-    apiVersion: 'v1',
-    kind: 'Pod',
-    metadata: {
-      name,
-      spec: {
-        containers: [{
-          name,
-          image: name,
-          ports: [{ containerPort: port }],
-          env: Object.keys(parameters).map(key => parameters[key])
-        }]
-      }
-    }
-  })
-  // TODO endpoint definition
-  return _yaml
-}
-
-solsa.service = def => ({
-  new (name) {
-    let instance = { dependencies: def._dependencies, parameters: def._parameters }
-    instance.dependencies = instance.dependencies(name)
-    instance.parameters = instance.parameters(...arguments)
-    instance.credentials = {} // TODO
-    instance._yaml = () => pod(def._kind, name, instance.dependencies, instance.parameters)
-    instance.yaml = () => instance._yaml().map(obj => yaml.safeDump(obj, { noArrayIndent: true })).join('---\n')
-    for (let key of Object.keys(def).filter(name => name[0] !== '_')) {
-      instance[key] = async payload => {
-        console.log(`request: ${name}.${key} ${JSON.stringify(payload)}`)
-        return {} // TODO post to the endpoint
-      }
-    }
-    return instance
   },
 
-  serve () {
-    let obj = { dependencies: def._dependencies, parameters: def._parameters }
-    obj.dependencies = obj.dependencies()
-    obj.parameters = obj.parameters()
-    for (let p of Object.keys(obj.parameters)) {
-      obj.parameters[p] = process.env[obj.parameters[p].name]
+  Service: class Service {
+    constructor (name) {
+      if (name !== undefined) {
+        for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
+          this[key] = async function () {
+            return { request: `${name}.${key} ${JSON.stringify(arguments[0])}` }
+            // TODO post to the endpoint
+          }
+        }
+        this.name = name
+      }
     }
-    let keys = Object.keys(def).filter(name => name[0] !== '_')
-    for (let key of keys) {
-      obj[key] = def[key]
-    }
-    server(obj, keys)
-  }
-})
 
-function server (obj, keys) {
+    _yaml () {
+      let _yaml = Object.keys(this.dep).map(key => this.dep[key]._yaml())
+      _yaml.push({
+        apiVersion: 'v1',
+        kind: 'Pod',
+        metadata: {
+          name: this.name,
+          spec: {
+            containers: [{
+              name: this.name,
+              image: this.name,
+              ports: [{ containerPort: PORT }],
+              env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+            }]
+          }
+        }
+      })
+      // TODO endpoint definition
+      return _yaml
+    }
+  }
+}
+
+solsa.Service.serve = function () {
+  let service = new this()
+
+  for (let key of Object.keys(service.env)) {
+    service.env[key] = process.env[key]
+  }
+
   let express = require('express')
   let app = express()
   app.use(express.json())
 
-  for (let key of keys) {
+  for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
     app.post('/' + key, (request, response) => {
-      obj[key](request.body).then(r => response.send(r), err => response.send(err))
+      service[key](request.body).then(r => response.send(r), err => response.send(err))
     })
   }
 
-  app.listen(port, err => {
+  app.listen(PORT, err => {
     if (err) {
       console.log(err)
     } else {
-      console.log(`server is listening on ${port}`)
+      console.log(`server is listening on ${PORT}`)
     }
   })
 }
