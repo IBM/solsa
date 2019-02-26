@@ -19,17 +19,24 @@ instance. SolSA leverages these declarations to construct a complete yaml
 description of a service instance, its (transitive) dependencies, and the
 configurations of all the services involved.
 
-Service APIs are defined by means of Javascript function declarations.
-Service invocations are just function calls. SolSA relieves the developer
-from having to worry about communication protocols.
+Service APIs are defined by means of Javascript function declarations. Service
+invocations are just function calls. SolSA relieves the developer from having to
+worry about communication protocols.
+
+## Installation
+
+```
+git clone https://github.ibm.com/solsa/solsa.git
+cd solsa
+```
 
 ## Example
 
 An example translator service is defined in
-[translator.js](sample/translator/translator.js). This example service builds
-upon several APIs of the Watson translation service (language identification and
-language translation) to translate a text from an unknown language to a desired
-language.
+[translator.js](samples/translator/service/translator.js). This example service
+builds upon several APIs of the Watson translation service (language
+identification and language translation) to translate a text from an unknown
+language to a desired language.
 ```javascript
 class Translator extends solsa.Service {
   constructor (name, language) { /* ... */ }
@@ -53,43 +60,12 @@ automatically generates an http server to implement a service, automatically
 mapping the incoming requests to the Javascript functions.
 
 Moreover, error results from service invocations are turned into Javascript
-exceptions so as to permit using Javascript try-catch contruct to handle
-errors in the usual way.
-
-Instantiating a SolSA service is very easy as demoed in
-[client.js](sample/client/client.js):
-```javascript
-let Translator = require('../translator')
-
-module.exports = new Translator('my-translator', 'en')
-```
-We specify the desired name for the service instance (i.e. the name of the
-kubernetes resource managing this service instance) and the desired target
-language.
-
-We can use this client to build an application as demoed in
-[app.js](sample/app/app.js):
-```javascript
-let client = require('../client')
-
-async function main () {
-  console.log(await client.identify({ text: 'bonjour' }))
-  console.log(await client.translate({ text: 'bonjour' }))
-}
-
-main()
-```
-Try:
-```
-(cd sample/translator; npm install)
-node sample/app/app.js
-```
-_For now, the client simply logs the requests being made without connecting to
-the actual service. The request implementation will be added shortly._
+exceptions so as to permit using Javascript try-catch contruct to handle errors
+in the usual way.
 
 A server implementing the translator service is obtained as follows:
 ```
-TARGET_LANGUAGE='en' bin/solsa-serve sample/translator &
+TARGET_LANGUAGE='en' bin/solsa-serve samples/translator/service &
 ```
 Try:
 ```
@@ -98,7 +74,7 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 
 A container image for the translator service is obtained as follows:
 ```
-bin/solsa-build sample/translator -t solsa/translator
+bin/solsa-build samples/translator/service -t solsa/translator
 ```
 Try:
 ```
@@ -106,11 +82,21 @@ docker run -p 8080:8080 -d solsa/translator
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
 
+Instantiating a SolSA service is very easy as demoed in
+[instance.js](samples/translator/app/instance.js):
+```javascript
+let Translator = require('../service')
 
-SolSA already supports generating the yaml for deploying the service instance
-and its dependencies:
+module.exports = new Translator('my-translator', 'en')
 ```
-bin/solsa-yaml sample/client
+We specify the desired name for the service instance (i.e. the name of the
+kubernetes resource managing this service instance) and the desired target
+language.
+
+SolSA can generate the yaml for deploying the service instance and its
+dependencies:
+```
+bin/solsa-yaml samples/translator/app/instance.js
 ```
 ```yaml
 apiVersion: cloudservice.seed.ibm.com/v1
@@ -146,3 +132,24 @@ metadata:
             name: binding-watson-translator-for-my-translator
             key: apikey
 ```
+
+We can use this instance to build an application as demoed in
+[app.js](samples/translator/app/app.js):
+```javascript
+let translator = require('./instance')
+
+async function main () {
+  console.log(await translator.identify({ text: 'bonjour' }))
+  console.log(await translator.translate({ text: 'bonjour' }))
+}
+
+main()
+```
+Try:
+```
+node samples/translator/app/app.js
+```
+_For now, the client SDK simply logs the requests being made without connecting to
+the actual service. The request implementation will be added shortly._
+
+
