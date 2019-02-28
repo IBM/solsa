@@ -112,9 +112,9 @@ in the usual way.
 
 We can run this service using command:
 ```
-TARGET_LANGUAGE='en' \
-WASTON_URL='https://gateway.watsonplatform.net/language-translator/api' \
-WATSON_APIKEY='...' \
+TARGET_LANGUAGE="en" \
+WASTON_URL="https://gateway.watsonplatform.net/language-translator/api" \
+WATSON_APIKEY="..." \
 bin/solsa-serve samples/translator/service &
 ```
 When running locally, deployment-time parameters are provided by means of environment variables.
@@ -129,13 +129,16 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 
 ### Containerize the service
 
+Assume the docker registry to be used is specified in environment variable
+`REGISTRY`.
+
 We build a container for the service using command:
 ```
-bin/solsa-build samples/translator/service -t solsa/translator
+bin/solsa-build samples/translator/service -t $REGISTRY/solsa-translator
 ```
 Try:
 ```
-docker run -p 8080:8080 -e TARGET_LANGUAGE='en' -e WASTON_URL='...' -e WATSON_APIKEY='...' -d solsa/translator
+docker run -p 8080:8080 -e TARGET_LANGUAGE="en" -e WASTON_URL="..." -e WATSON_APIKEY="..." -d "$REGISTRY"/solsa-translator
 
 curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
 ```
@@ -143,9 +146,28 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 {"text":"Hello"}
 ```
 
-### Deploy the service
+### Push the service image
 
-To deploy a service on kubernetes we first need to define a service instance as
+Acquire a read/write token `CR_RW_TOKEN` and a read token `CR_R_TOKEN` for the
+container registry.
+
+Log in to the container registry.
+```
+echo "$CR_RW_TOKEN" | docker login -u token --password-stdin "$REGISTRY"
+```
+Install the IBM Container Registry token as a secret in the target Kubernetes
+cluster by executing the command:
+````
+kubectl create secret docker-registry solsa-image-pull --docker-server="$REGISTRY" --docker-username=token --docker-email="$EMAIL" --docker-password="$CR_R_TOKEN"
+````
+Push the translator service image to the registry as follows:
+```
+docker push "$REGISTRY"/solsa-translator
+```
+
+### Deploy a service instance
+
+To deploy a service on Kubernetes we first need to define a service instance as
 demoed in [instance.js](samples/translator/app/instance.js):
 ```javascript
 let Translator = require('../service')
