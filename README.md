@@ -1,27 +1,26 @@
 # SolSA
 
-The SolSA programming model is intended to ease the development and deployment
-of cloud-native applications. It makes it possible to compose existing services
-(cloud services, cloud functions, container-based services) into new services
-and applications. In particular, any REST service can be composed over.
+The SolSA programming model is intended to ease the _development_, _deployment_,
+and _consumption_ of cloud-native services and applications.
 
-A SolSA service is defined by means of a Javascript module. From this code,
-SolSA builds and publishes the service as a container image, prepares the
-deployment of the service and its dependencies as a list of kubernetes resource
-definitions (a yaml file), and produces an SDK for invoking the service.
+SolSA makes it possible to compose existing services (cloud services, cloud
+functions, container-based services) into new micro-services and applications. A
+SolSA service is defined by means of a Node.js module. From this code, SolSA
+builds and publishes the service as a container image, prepares the deployment
+of the service and its dependencies as a list of kubernetes resource definitions
+(a yaml file), and produces an SDK for invoking the service.
 
-SolSA leverages kubernetes operators to manage services both inside and outside
-of kubernetes.
+SolSA leverages Kubernetes operators to manage the life cycle of services both
+inside and outside of Kubernetes.
 
-The Javascript code for a service definition includes declarations for the
-service being composed over as well as configuration parameters for a service
-instance. SolSA leverages these declarations to construct a complete yaml
-description of a service instance, its (transitive) dependencies, and the
-configurations of all the services involved.
+The SolSa source code includes declarations for the service being composed over
+as well as configuration parameters. SolSA leverages these declarations to
+construct a complete yaml description of a service instance, its transitive
+dependencies, and the configurations of all the services involved.
 
 Service APIs are defined by means of Javascript function declarations. Service
 invocations are just function calls. SolSA relieves the developer from having to
-worry about communication protocols.
+worry about REST APIs, routes, containers, etc.
 
 ## Installation
 
