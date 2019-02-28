@@ -104,6 +104,7 @@ let solsa = {
           }
         }
       })
+
       array.push({
         apiVersion: 'v1',
         kind: 'Service',
@@ -112,14 +113,42 @@ let solsa = {
           labels: genLabels(this)
         },
         spec: {
-          type: 'NodePort',
+          type: 'ClusterIP',
           ports: [{
             "port": PORT
           }],
           selector: genLabels(this)
         }
       })
-      // TODO: change svc from NodePort to ClusterIP and add IKS Ingress. 
+
+      array.push({
+        apiVersion: 'extensions/v1beta1',
+        kind: 'Ingress',
+        metadata: {
+          name: this.name,
+          labels: genLabels(this)
+        },
+        spec: {
+          tls: [{
+            hosts: [
+              this.name + '.' + HACK_CLUSTER_INGRESS_SUBDOMAIN
+            ],
+            secretName: HACK_CLUSTER_INGRESS_SECRET
+          }],
+          rules: [{
+            host: this.name + '.' + HACK_CLUSTER_INGRESS_SUBDOMAIN,
+            http: {
+              paths: [{
+                path: '/',
+                backend: {
+                  serviceName: this.name,
+                  servicePort: PORT
+                }
+              }]
+            }
+          }]
+        }
+      })
       return array
     }
 
