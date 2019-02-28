@@ -2,10 +2,26 @@ let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/
 
 const PORT = 8080
 
+// BEGIN HACKS:  These should all be provided as inputs by the programming model
+const HACK_IMAGE_NAME = "us.icr.io/groved/solsa-translator"
+const HACK_CLUSTER_INGRESS_SUBDOMAIN = "wsk-dev-useast.us-east.containers.appdomain.cloud"
+const HACK_CLUSTER_INGRESS_SECRET = "wsk-dev-useast"
+// END HACKS
+
+function genLabels(svc) {
+  return {
+    "solsa.ibm.com/name": svc.name
+  }
+}
+
+function imagePullSecret(svc) {
+  return "solsa-image-pull"
+}
+
 let solsa = {
   watson: {
     LanguageTranslatorV3: class LanguageTranslatorV3 {
-      constructor (name) {
+      constructor(name) {
         this.name = name
         this.values = {
           url: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } },
@@ -26,7 +42,7 @@ let solsa = {
         }
       }
 
-      _yaml () {
+      _yaml() {
         return [{
           apiVersion: 'cloudservice.seed.ibm.com/v1',
           kind: 'Service',
@@ -44,7 +60,7 @@ let solsa = {
   },
 
   Service: class Service {
-    constructor (name) {
+    constructor(name) {
       if (name !== undefined) {
         for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
           this[key] = async function () {
@@ -56,28 +72,58 @@ let solsa = {
       }
     }
 
-    _yaml () {
+    _yaml() {
       let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml())
       array.push({
-        apiVersion: 'v1',
-        kind: 'Pod',
+        apiVersion: 'apps/v1',
+        kind: 'Deployment',
         metadata: {
           name: this.name,
-          spec: {
-            containers: [{
-              name: this.name,
-              image: this.name,
-              ports: [{ containerPort: PORT }],
-              env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
-            }]
+          labels: genLabels(this)
+        },
+        spec: {
+          replicas: 1,
+          selector: {
+            matchLabels: genLabels(this),
+          },
+          template: {
+            metadata: {
+              labels: genLabels(this)
+            },
+            spec: {
+              imagePullSecrets: [{
+                name: imagePullSecret(this)
+              }],
+              containers: [{
+                name: this.name,
+                image: HACK_IMAGE_NAME,
+                ports: [{ containerPort: PORT }],
+                env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+              }]
+            }
           }
         }
       })
-      // TODO replace with proper yaml
+      array.push({
+        apiVersion: 'v1',
+        kind: 'Service',
+        metadata: {
+          name: this.name,
+          labels: genLabels(this)
+        },
+        spec: {
+          type: 'NodePort',
+          ports: [{
+            "port": PORT
+          }],
+          selector: genLabels(this)
+        }
+      })
+      // TODO: change svc from NodePort to ClusterIP and add IKS Ingress. 
       return array
     }
 
-    static serve () {
+    static serve() {
       let service = new this()
 
       for (let key of Object.keys(service.env)) {
