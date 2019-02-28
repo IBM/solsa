@@ -4,8 +4,6 @@ const PORT = 8080
 
 // BEGIN HACKS:  These should all be provided as inputs by the programming model
 const HACK_IMAGE_NAME = "us.icr.io/groved/solsa-echo"
-const HACK_CLUSTER_INGRESS_SUBDOMAIN = "wsk-dev-useast.us-east.containers.appdomain.cloud"
-const HACK_CLUSTER_INGRESS_SECRET = "wsk-dev-useast"
 // END HACKS
 
 function genLabels(svc) {
@@ -121,34 +119,6 @@ let solsa = {
         }
       })
 
-      array.push({
-        apiVersion: 'extensions/v1beta1',
-        kind: 'Ingress',
-        metadata: {
-          name: this.name,
-          labels: genLabels(this)
-        },
-        spec: {
-          tls: [{
-            hosts: [
-              this.name + '.' + HACK_CLUSTER_INGRESS_SUBDOMAIN
-            ],
-            secretName: HACK_CLUSTER_INGRESS_SECRET
-          }],
-          rules: [{
-            host: this.name + '.' + HACK_CLUSTER_INGRESS_SUBDOMAIN,
-            http: {
-              paths: [{
-                path: '/',
-                backend: {
-                  serviceName: this.name,
-                  servicePort: PORT
-                }
-              }]
-            }
-          }]
-        }
-      })
       return array
     }
 
