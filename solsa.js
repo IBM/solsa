@@ -27,7 +27,7 @@ let solsa = {
       }
 
       _yaml () {
-        return {
+        return [{
           apiVersion: 'cloudservice.seed.ibm.com/v1',
           kind: 'Service',
           metadata: {
@@ -38,7 +38,7 @@ let solsa = {
               servicetype: 'IAM'
             }
           }
-        }
+        }]
       }
     }
   },
@@ -57,8 +57,8 @@ let solsa = {
     }
 
     _yaml () {
-      let _yaml = Object.keys(this.dep).map(key => this.dep[key]._yaml())
-      _yaml.push({
+      let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml())
+      array.push({
         apiVersion: 'v1',
         kind: 'Pod',
         metadata: {
@@ -73,8 +73,8 @@ let solsa = {
           }
         }
       })
-      // TODO endpoint definition
-      return _yaml
+      // TODO replace with proper yaml
+      return array
     }
 
     static serve () {
