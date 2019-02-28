@@ -3,7 +3,7 @@ let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/
 const PORT = 8080
 
 // BEGIN HACKS:  These should all be provided as inputs by the programming model
-const HACK_IMAGE_NAME = "us.icr.io/groved/solsa-translator"
+const HACK_IMAGE_NAME = "us.icr.io/groved/solsa-echo"
 const HACK_CLUSTER_INGRESS_SUBDOMAIN = "wsk-dev-useast.us-east.containers.appdomain.cloud"
 const HACK_CLUSTER_INGRESS_SECRET = "wsk-dev-useast"
 // END HACKS
