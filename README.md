@@ -38,9 +38,9 @@ For each sample, e.g., `translator`, run:
 
 ### Cluster-wide Setup
 
-1. Install SEED (link to SEED instructions)
+1. Install SEED (Follow the instructions at https://github.ibm.com/seed/charts)
 
-2. Install KNative (use IKS addon; link to those instruction)
+2. Install KNative (For IKS, follow the instrucitons at https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial)
 
 ### Per Namespace Setup
 
@@ -196,6 +196,8 @@ We specify the desired name for the service instance (i.e. the name of the
 kubernetes resource representing this service instance) and the desired target
 language.
 
+#### Deploy on Kubernetes directly
+
 SolSA can generate the yaml for deploying the service instance and its
 dependencies using the command:
 ```
@@ -229,7 +231,7 @@ spec:
     spec:
       containers:
       - name: my-translator
-        image: us.icr.io/groved/solsa-echo
+        image: us.icr.io/groved/solsa-translator
         ports:
         - containerPort: 8080
         env:
@@ -259,6 +261,57 @@ spec:
   selector:
     solsa.ibm.com/name: my-translator
 ```
+As expected the desired target language is burned into this configuration.
+
+Assuming the previously build container is pushed to the container registry, the
+above yaml can be applied using `kubectl`:
+```
+kubectl apply -f translator.yaml
+```
+
+#### Deploy on KNative
+
+SolSA can generate the yaml for deploying the service instance and its
+dependencies on KNative using the command:
+```
+bin/solsa-yaml samples/translator/app/instance.js -t knative | tee translator.yaml
+```
+```yaml
+apiVersion: cloudservice.seed.ibm.com/v1
+kind: Service
+metadata:
+  name: watson-translator-for-my-translator
+  spec:
+    service: language-translator
+    plan: lite
+    servicetype: IAM
+---
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: my-translator
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: us.icr.io/groved/solsa-translator
+            env:
+            - name: TARGET_LANGUAGE
+              value: en
+            - name: WATSON_URL
+              valueFrom:
+                secretKeyRef:
+                  name: binding-watson-translator-for-my-translator
+                  key: url
+            - name: WATSON_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: binding-watson-translator-for-my-translator
+                  key: apikey
+```
+
 As expected the desired target language is burned into this configuration.
 
 Assuming the previously build container is pushed to the container registry, the
