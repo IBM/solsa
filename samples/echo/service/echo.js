@@ -4,7 +4,7 @@ let solsa = require('solsa')
 
 class Echo extends solsa.Service {
   // instantiate the service
-  constructor(name, repeats) {
+  constructor (name, repeats) {
     super(name)
 
     // dependencies on other services
@@ -13,20 +13,20 @@ class Echo extends solsa.Service {
 
     // parameters of the deployment
     this.env = {
-      NUM_REPEATS: { value: repeats }, // desired number of echos
+      NUM_REPEATS: { value: repeats } // desired number of echos
     }
   }
 
   // repeat payload.txt the configured number of times
-  async echo(payload) {
+  async echo (payload) {
     let text = payload.text
-    let echo = new Array()
+    let echo = []
     let limit = parseInt(this.env.NUM_REPEATS, 10)
-    var i;
-    for (i=0; i<this.env.NUM_REPEATS; i++) {
+    var i
+    for (i = 0; i < limit; i++) {
       echo.push(text)
     }
-    return { "text" : echo }
+    return { 'text': echo }
   }
 }
 

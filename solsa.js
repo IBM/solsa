@@ -3,23 +3,23 @@ let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/
 const PORT = 8080
 
 // BEGIN HACKS:  These should all be provided as inputs by the programming model
-const HACK_IMAGE_NAME = "us.icr.io/groved/solsa-echo"
+const HACK_IMAGE_NAME = 'us.icr.io/groved/solsa-echo'
 // END HACKS
 
-function genLabels(svc) {
+function genLabels (svc) {
   return {
-    "solsa.ibm.com/name": svc.name
+    'solsa.ibm.com/name': svc.name
   }
 }
 
-function imagePullSecret(svc) {
-  return "solsa-image-pull"
+function imagePullSecret (svc) {
+  return 'solsa-image-pull'
 }
 
 let solsa = {
   watson: {
     LanguageTranslatorV3: class LanguageTranslatorV3 {
-      constructor(name) {
+      constructor (name) {
         this.name = name
         this.values = {
           url: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } },
@@ -40,7 +40,7 @@ let solsa = {
         }
       }
 
-      _yaml() {
+      _yaml () {
         return [{
           apiVersion: 'cloudservice.seed.ibm.com/v1',
           kind: 'Service',
@@ -58,7 +58,7 @@ let solsa = {
   },
 
   Service: class Service {
-    constructor(name) {
+    constructor (name) {
       if (name !== undefined) {
         for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
           this[key] = async function () {
@@ -70,7 +70,7 @@ let solsa = {
       }
     }
 
-    _yaml() {
+    _yaml () {
       let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml())
       array.push({
         apiVersion: 'apps/v1',
@@ -82,7 +82,7 @@ let solsa = {
         spec: {
           replicas: 1,
           selector: {
-            matchLabels: genLabels(this),
+            matchLabels: genLabels(this)
           },
           template: {
             metadata: {
@@ -113,7 +113,7 @@ let solsa = {
         spec: {
           type: 'ClusterIP',
           ports: [{
-            "port": PORT
+            'port': PORT
           }],
           selector: genLabels(this)
         }
@@ -122,7 +122,7 @@ let solsa = {
       return array
     }
 
-    static serve() {
+    static serve () {
       let service = new this()
 
       for (let key of Object.keys(service.env)) {

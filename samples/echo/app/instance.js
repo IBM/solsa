@@ -2,4 +2,4 @@
 
 let Echo = require('../service/echo')
 
-module.exports = new Echo("my-echo", "7")
+module.exports = new Echo('my-echo', '7')

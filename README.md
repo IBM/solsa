@@ -28,7 +28,7 @@ worry about REST APIs, routes, containers, etc.
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
 npm install
-(cd samples/translator/service; npm install)
+(cd samples/translator/service; npm install --prod)
 ```
 
 ## Example
