@@ -18,6 +18,14 @@ function imagePullSecret (svc) {
   return 'solsa-image-pull'
 }
 
+function isKubernetes (target) {
+  return target === 'kubernetes'
+}
+
+function isKNative (target) {
+  return target === 'knative'
+}
+
 let solsa = {
   watson: {
     LanguageTranslatorV3: class LanguageTranslatorV3 {
@@ -42,7 +50,7 @@ let solsa = {
         }
       }
 
-      _yaml () {
+      _yaml (target) {
         return [{
           apiVersion: 'cloudservice.seed.ibm.com/v1',
           kind: 'Service',
@@ -73,54 +81,78 @@ let solsa = {
       }
     }
 
-    _yaml () {
-      let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml())
-      array.push({
-        apiVersion: 'apps/v1',
-        kind: 'Deployment',
-        metadata: {
-          name: this.name,
-          labels: genLabels(this)
-        },
-        spec: {
-          replicas: 1,
-          selector: {
-            matchLabels: genLabels(this)
+    _yaml (target) {
+      let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml(target))
+      if (isKubernetes(target)) {
+        array.push({
+          apiVersion: 'apps/v1',
+          kind: 'Deployment',
+          metadata: {
+            name: this.name,
+            labels: genLabels(this)
           },
-          template: {
-            metadata: {
-              labels: genLabels(this)
+          spec: {
+            replicas: 1,
+            selector: {
+              matchLabels: genLabels(this)
             },
-            spec: {
-              imagePullSecrets: [{
-                name: imagePullSecret(this)
-              }],
-              containers: [{
-                name: this.name,
-                image: HACK_IMAGE_NAME,
-                ports: [{ containerPort: PORT }],
-                env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
-              }]
+            template: {
+              metadata: {
+                labels: genLabels(this)
+              },
+              spec: {
+                imagePullSecrets: [{
+                  name: imagePullSecret(this)
+                }],
+                containers: [{
+                  name: this.name,
+                  image: HACK_IMAGE_NAME,
+                  ports: [{ containerPort: PORT }],
+                  env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+                }]
+              }
             }
           }
-        }
-      })
+        })
 
-      array.push({
-        apiVersion: 'v1',
-        kind: 'Service',
-        metadata: {
-          name: this.name,
-          labels: genLabels(this)
-        },
-        spec: {
-          type: 'ClusterIP',
-          ports: [{
-            'port': PORT
-          }],
-          selector: genLabels(this)
-        }
-      })
+        array.push({
+          apiVersion: 'v1',
+          kind: 'Service',
+          metadata: {
+            name: this.name,
+            labels: genLabels(this)
+          },
+          spec: {
+            type: 'ClusterIP',
+            ports: [{
+              'port': PORT
+            }],
+            selector: genLabels(this)
+          }
+        })
+      } else if (isKNative(target)) {
+        array.push({
+          apiVersion: 'serving.knative.dev/v1alpha1',
+          kind: 'Service',
+          metadata: {
+            name: this.name
+          },
+          spec: {
+            runLatest: {
+              configuration: {
+                revisionTemplate: {
+                  spec: {
+                    container: {
+                      image: HACK_IMAGE_NAME,
+                      env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+                    }
+                  }
+                }
+              }
+            }
+          }
+        })
+      }
 
       return array
     }
