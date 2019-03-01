@@ -14,10 +14,6 @@ function genLabels (svc) {
   }
 }
 
-function imagePullSecret (svc) {
-  return 'solsa-image-pull'
-}
-
 function isKubernetes (target) {
   return target === 'kubernetes'
 }
@@ -101,9 +97,6 @@ let solsa = {
                 labels: genLabels(this)
               },
               spec: {
-                imagePullSecrets: [{
-                  name: imagePullSecret(this)
-                }],
                 containers: [{
                   name: this.name,
                   image: HACK_IMAGE_NAME,

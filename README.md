@@ -31,6 +31,21 @@ npm install
 (cd samples/translator/service; npm install --prod)
 ```
 
+## Configure a Kubernetes Cluster for SolSA (Persona: Todd)
+
+### Cluster-wide Setup
+
+1. Install SEED (link to SEED instructions)
+
+2. Install KNative (use IKS addon; link to those instruction)
+
+### Per Namespace Setup
+
+1. Create an image pull secret for the IBM Container Registry
+
+2. Edit the namespace's default service account to add the secret to the list of imagePullSecrets
+
+
 ## Example
 
 An example translator service is defined in
