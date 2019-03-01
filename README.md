@@ -24,13 +24,16 @@ worry about REST APIs, routes, containers, etc.
 
 ## Installation
 
+Install SolSA:
 ```
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
 npm install
+```
+For each sample, e.g., `translator`, run:
+```
 (cd samples/translator/service; npm install --prod)
 ```
-
 ## Configure a Kubernetes Cluster for SolSA (Persona: Todd)
 
 ### Cluster-wide Setup
@@ -44,6 +47,13 @@ npm install
 1. Create an image pull secret for the IBM Container Registry
 
 2. Edit the namespace's default service account to add the secret to the list of imagePullSecrets
+
+- Define an environment variable named `REGISTRY` with the name of the container
+  registry to use.
+- Define an environment variable named `CR_RW_TOKEN` with a read/write access
+  token for the container registry.
+- Define an environment variable named `CR_R_TOKEN` with a read access token for
+  the container registry.
 
 
 ## Example
@@ -143,9 +153,6 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 
 ### Containerize the service
 
-Assume the docker registry to be used is specified in environment variable
-`REGISTRY`.
-
 We build a container for the service using command:
 ```
 bin/solsa-build samples/translator/service -t $REGISTRY/solsa-translator
@@ -161,9 +168,6 @@ curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"b
 ```
 
 ### Push the service image
-
-Acquire a read/write token `CR_RW_TOKEN` and a read token `CR_R_TOKEN` for the
-container registry.
 
 Log in to the container registry.
 ```
@@ -207,29 +211,53 @@ metadata:
     plan: lite
     servicetype: IAM
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: my-translator
-  spec:
-    containers:
-    - name: my-translator
-      image: my-translator
-      ports:
-      - containerPort: 8080
-      env:
-      - name: TARGET_LANGUAGE
-        value: en
-      - name: WATSON_URL
-        valueFrom:
-          secretKeyRef:
-            name: binding-watson-translator-for-my-translator
-            key: url
-      - name: WATSON_APIKEY
-        valueFrom:
-          secretKeyRef:
-            name: binding-watson-translator-for-my-translator
-            key: apikey
+  labels:
+    solsa.ibm.com/name: my-translator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/name: my-translator
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/name: my-translator
+    spec:
+      containers:
+      - name: my-translator
+        image: us.icr.io/groved/solsa-echo
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TARGET_LANGUAGE
+          value: en
+        - name: WATSON_URL
+          valueFrom:
+            secretKeyRef:
+              name: binding-watson-translator-for-my-translator
+              key: url
+        - name: WATSON_APIKEY
+          valueFrom:
+            secretKeyRef:
+              name: binding-watson-translator-for-my-translator
+              key: apikey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-translator
+  labels:
+    solsa.ibm.com/name: my-translator
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+  selector:
+    solsa.ibm.com/name: my-translator
 ```
 As expected the desired target language is burned into this configuration.
 
@@ -261,12 +289,5 @@ Try:
 ```
 node samples/translator/app/app.js
 ```
-```
-{ request: 'my-translator.identify {"text":"bonjour"}' }
-{ request: 'my-translator.translate {"text":"bonjour"}' }
-```
-_For now, the client SDK simply logs the requests being made without connecting
-to the actual service instance. The request implementation will be added
-shortly._
 
 
