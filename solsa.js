@@ -1,3 +1,5 @@
+const needle = require('needle')
+
 let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/v3')
 
 const PORT = 8080
@@ -62,8 +64,9 @@ let solsa = {
       if (name !== undefined) {
         for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
           this[key] = async function () {
-            return { request: `${name}.${key} ${JSON.stringify(arguments[0])}` }
-            // TODO post to the endpoint
+            // return { request: `${name}.${key} ${JSON.stringify(arguments[0])}` }
+            return needle('post', `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}/${key}`, arguments[0], { json: true })
+              .then(result => result.body)
           }
         }
         this.name = name
