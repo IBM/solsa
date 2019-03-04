@@ -25,15 +25,15 @@ let watson = {
 
     _yaml (target) {
       return [{
-        apiVersion: 'cloudservice.seed.ibm.com/v1',
+        apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
         kind: 'Service',
         metadata: {
-          name: this.name,
-          spec: {
-            service: 'language-translator',
-            plan: 'lite',
-            servicetype: 'IAM'
-          }
+          name: this.name
+        },
+        spec: {
+          service: 'language-translator',
+          plan: 'lite',
+          servicetype: 'IAM'
         }
       }]
     }
