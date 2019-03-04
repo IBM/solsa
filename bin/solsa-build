@@ -3,5 +3,5 @@
 ABSPATH=$(cd "$(dirname "$0")"; pwd)
 cd $1
 shift
-if [[ -f package.json && ! -d node_modules ]]; then npm install; fi
+if [[ -f package.json && ! -d node_modules ]]; then npm install --prod; fi
 docker build -f $ABSPATH/../Dockerfile . $*
