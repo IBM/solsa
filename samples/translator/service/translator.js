@@ -16,8 +16,8 @@ class Translator extends solsa.Service {
     // parameters of the deployment
     this.env = {
       TARGET_LANGUAGE: { value: language }, // desired target language
-      WATSON_URL: { valueFrom: this.dep.wTranslator.values.url },
-      WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey }
+      WATSON_URL: this.dep.wTranslator.secrets.url,
+      WATSON_APIKEY: this.dep.wTranslator.secrets.apikey
     }
   }
 

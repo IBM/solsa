@@ -4,9 +4,9 @@ let watson = {
   LanguageTranslatorV3: class LanguageTranslatorV3 {
     constructor (name) {
       this.name = name
-      this.values = {
-        url: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } },
-        apikey: { secretKeyRef: { name: `binding-${this.name}`, key: 'apikey' } }
+      this.secrets = {
+        url: { valueFrom: { secretKeyRef: { name: `binding-${this.name}`, key: 'url' } } },
+        apikey: { valueFrom: { secretKeyRef: { name: `binding-${this.name}`, key: 'apikey' } } }
       }
 
       for (let f of ['identify', 'translate']) {
