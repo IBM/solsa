@@ -25,7 +25,7 @@ class Translator extends solsa.Service {
   async identify (payload) {
     let text = payload.text
     let result = await this.dep.wTranslator.identify({ text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-    return { language: result.languages[0].language } // watson returns an array of probably languages
+    return { language: result.languages[0].language } // watson returns an array of probable languages
   }
 
   // translate { text } to target language
