@@ -1,6 +1,7 @@
 // define a new class of translator services by composing watson translator apis
 
 let solsa = require('solsa')
+let watson = require('solsa/watson')
 
 class Translator extends solsa.Service {
   // instantiate the service
@@ -9,7 +10,7 @@ class Translator extends solsa.Service {
 
     // dependencies on other services
     this.dep = {
-      wTranslator: new solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
+      wTranslator: new watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
     }
 
     // parameters of the deployment
