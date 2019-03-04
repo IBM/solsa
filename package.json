@@ -1,6 +1,7 @@
 {
   "name": "solsa",
   "main": "solsa.js",
+  "version": "0.1.0",
   "scripts": {
     "test": "standard"
   },
