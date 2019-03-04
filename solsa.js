@@ -2,10 +2,6 @@ const needle = require('needle')
 
 const PORT = 8080
 
-// BEGIN HACKS:  These should all be provided as inputs by the programming model
-const HACK_IMAGE_NAME = 'us.icr.io/groved/solsa-echo'
-// END HACKS
-
 function genLabels (svc) {
   return {
     'solsa.ibm.com/name': svc.name
@@ -57,7 +53,7 @@ let solsa = {
               spec: {
                 containers: [{
                   name: this.name,
-                  image: HACK_IMAGE_NAME,
+                  image: (process.env.REGISTRY ? process.env.REGISTRY + '/' : '') + 'solsa-' + this.constructor.name.toLowerCase(),
                   ports: [{ containerPort: PORT }],
                   env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                 }]
@@ -94,7 +90,7 @@ let solsa = {
                 revisionTemplate: {
                   spec: {
                     container: {
-                      image: HACK_IMAGE_NAME,
+                      image: (process.env.REGISTRY ? process.env.REGISTRY + '/' : '') + 'solsa-' + this.constructor.name.toLowerCase(),
                       env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                     }
                   }
