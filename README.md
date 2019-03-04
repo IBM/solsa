@@ -71,14 +71,14 @@ class Translator extends solsa.Service {
 
     // dependencies on other services
     this.dep = {
-      wTranslator: new solsa.watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
+      wTranslator: new watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
     }
 
     // parameters of the deployment
     this.env = {
       TARGET_LANGUAGE: { value: language }, // desired target language
-      WATSON_URL: { valueFrom: this.dep.wTranslator.values.url },
-      WATSON_APIKEY: { valueFrom: this.dep.wTranslator.values.apikey }
+      WATSON_URL: this.dep.wTranslator.secrets.url,
+      WATSON_APIKEY: this.dep.wTranslator.secrets.apikey
     }
   }
 
@@ -86,7 +86,7 @@ class Translator extends solsa.Service {
   async identify (payload) {
     let text = payload.text
     let result = await this.dep.wTranslator.identify({ text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-    return { language: result.languages[0].language } // watson returns an array of probably languages
+    return { language: result.languages[0].language } // watson returns an array of probable languages
   }
 
   // translate { text } to target language
@@ -99,7 +99,7 @@ class Translator extends solsa.Service {
       let translation
       if (source !== target) {
         let result = await this.dep.wTranslator.translate({ source, target, text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-        translation = result.translation
+        translation = result.translations[0].translation
       } else {
         translation = text // no translation needed
       }
