@@ -40,10 +40,11 @@ function setupArchiver(chartName) {
   return archive
 }
 
-function generateChartSkeleton(archive, app) {
+function generateChartSkeleton(archive, app, version) {
   const c = {
     apiVersion: 'v1',
     name: app.name,
+    version: version
   }
   archive.append(yaml.safeDump(c, { noArrayIndent: true }), { name: app.name+'/Chart.yaml' })
 
@@ -51,14 +52,14 @@ function generateChartSkeleton(archive, app) {
 }
 
 const argv = minimist(process.argv.slice(2), {
-  default: { target: 'kubernetes', output: 'my-chart' },
-  alias: { target: 't', output: 'o' },
-  string: ['target', 'output']
+  default: { target: 'kubernetes', output: 'my-chart', version: '1.0.0'},
+  alias: { target: 't', output: 'o', version: 'v'},
+  string: ['target', 'output', 'version']
 });
 
 const archive = setupArchiver(argv.output);
 const theApp = require(require('path').resolve(argv._[0]));
-const templateDir = generateChartSkeleton(archive, theApp);
+const templateDir = generateChartSkeleton(archive, theApp, argv.version);
 theApp._helm(archive, argv.target, templateDir);
 
 archive.finalize();
