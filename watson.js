@@ -1,4 +1,5 @@
 let _LanguageTranslatorV3 = require('watson-developer-cloud/language-translator/v3')
+let yaml = require('js-yaml')
 
 let watson = {
   LanguageTranslatorV3: class LanguageTranslatorV3 {
@@ -23,8 +24,8 @@ let watson = {
       }
     }
 
-    _yaml (target) {
-      return [{
+    _helm (archive, target, templateDir) {
+      const svc = {
         apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
         kind: 'Service',
         metadata: {
@@ -35,7 +36,9 @@ let watson = {
           plan: 'lite',
           servicetype: 'IAM'
         }
-      }]
+      }
+      archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
+        { name: templateDir + this.name + '-svc' })
     }
   }
 }

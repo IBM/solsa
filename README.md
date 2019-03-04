@@ -198,126 +198,30 @@ language.
 
 #### Deploy on Kubernetes directly
 
-SolSA can generate the yaml for deploying the service instance and its
-dependencies using the command:
+SolSA can generate a Helm chart for deploying the service instance and its
+dependencies as standard Kubernetes resources using the command:
+```sh
+bin/solsa-helm samples/translator/app/instance.js -o translator
 ```
-bin/solsa-yaml samples/translator/app/instance.js | tee translator.yaml
-```
-```yaml
-apiVersion: cloudservice.seed.ibm.com/v1
-kind: Service
-metadata:
-  name: watson-translator-for-my-translator
-  spec:
-    service: language-translator
-    plan: lite
-    servicetype: IAM
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: my-translator
-  labels:
-    solsa.ibm.com/name: my-translator
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      solsa.ibm.com/name: my-translator
-  template:
-    metadata:
-      labels:
-        solsa.ibm.com/name: my-translator
-    spec:
-      containers:
-      - name: my-translator
-        image: us.icr.io/groved/solsa-translator
-        ports:
-        - containerPort: 8080
-        env:
-        - name: TARGET_LANGUAGE
-          value: en
-        - name: WATSON_URL
-          valueFrom:
-            secretKeyRef:
-              name: binding-watson-translator-for-my-translator
-              key: url
-        - name: WATSON_APIKEY
-          valueFrom:
-            secretKeyRef:
-              name: binding-watson-translator-for-my-translator
-              key: apikey
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: my-translator
-  labels:
-    solsa.ibm.com/name: my-translator
-spec:
-  type: ClusterIP
-  ports:
-  - port: 8080
-  selector:
-    solsa.ibm.com/name: my-translator
-```
-As expected the desired target language is burned into this configuration.
-
-Assuming the previously build container is pushed to the container registry, the
-above yaml can be applied using `kubectl`:
-```
-kubectl apply -f translator.yaml
+Assuming the previously built container has already been pushed to
+the container registry, the generated chart can be deployed using the command:
+```sh
+helm install translator.tar.gz
 ```
 
 #### Deploy on KNative
 
-SolSA can generate the yaml for deploying the service instance and its
-dependencies on KNative using the command:
-```
-bin/solsa-yaml samples/translator/app/instance.js -t knative | tee translator.yaml
-```
-```yaml
-apiVersion: cloudservice.seed.ibm.com/v1
-kind: Service
-metadata:
-  name: watson-translator-for-my-translator
-  spec:
-    service: language-translator
-    plan: lite
-    servicetype: IAM
----
-apiVersion: serving.knative.dev/v1alpha1
-kind: Service
-metadata:
-  name: my-translator
-spec:
-  runLatest:
-    configuration:
-      revisionTemplate:
-        spec:
-          container:
-            image: us.icr.io/groved/solsa-translator
-            env:
-            - name: TARGET_LANGUAGE
-              value: en
-            - name: WATSON_URL
-              valueFrom:
-                secretKeyRef:
-                  name: binding-watson-translator-for-my-translator
-                  key: url
-            - name: WATSON_APIKEY
-              valueFrom:
-                secretKeyRef:
-                  name: binding-watson-translator-for-my-translator
-                  key: apikey
+SolSA can generate a Helm chart for deploying the service instance and its
+dependencies as KNative resources using the command:
+
+```sh
+bin/solsa-helm samples/translator/app/instance.js -o translator -t knative
 ```
 
-As expected the desired target language is burned into this configuration.
-
-Assuming the previously build container is pushed to the container registry, the
-above yaml can be applied using `kubectl`:
-```
-kubectl apply -f translator.yaml
+Assuming the previously built container has already been pushed to
+the container registry, the generated chart can be deployed using the command:
+```sh
+helm install translator.tar.gz
 ```
 
 ### Client SDK and applications

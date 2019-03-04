@@ -1,4 +1,5 @@
 const needle = require('needle')
+let yaml = require('js-yaml')
 
 const PORT = 8080
 
@@ -31,10 +32,11 @@ let solsa = {
       }
     }
 
-    _yaml (target) {
-      let array = Object.keys(this.dep).flatMap(key => this.dep[key]._yaml(target))
+    _helm (archive, target, templateDir) {
+      Object.keys(this.dep).flatMap(key => this.dep[key]._helm(archive, target, templateDir))
+
       if (isKubernetes(target)) {
-        array.push({
+        const deployment = {
           apiVersion: 'apps/v1',
           kind: 'Deployment',
           metadata: {
@@ -60,9 +62,11 @@ let solsa = {
               }
             }
           }
-        })
+        }
+        archive.append(yaml.safeDump(deployment, { noArrayIndent: true }),
+          { name: templateDir + this.name + '-deployment' })
 
-        array.push({
+        const svc = {
           apiVersion: 'v1',
           kind: 'Service',
           metadata: {
@@ -76,9 +80,11 @@ let solsa = {
             }],
             selector: genLabels(this)
           }
-        })
+        }
+        archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
+          { name: templateDir + this.name + '-svc' })
       } else if (isKNative(target)) {
-        array.push({
+        const svc = {
           apiVersion: 'serving.knative.dev/v1alpha1',
           kind: 'Service',
           metadata: {
@@ -98,10 +104,10 @@ let solsa = {
               }
             }
           }
-        })
+        }
+        archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
+          { name: templateDir + this.name + '-svc' })
       }
-
-      return array
     }
 
     static serve () {
