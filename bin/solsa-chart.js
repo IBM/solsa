@@ -48,6 +48,15 @@ function generateChartSkeleton (archive, app, version) {
   }
   archive.append(yaml.safeDump(c, { noArrayIndent: true }), { name: app.name + '/Chart.yaml' })
 
+  const v = {
+    solsa: {
+      docker: {
+        registry: 'us.icr.io/solsa'
+      }
+    }
+  }
+  archive.append(yaml.safeDump(v, { noArrayIndent: true }), { name: app.name + '/values.yaml' })
+
   return app.name + '/templates/'
 }
 

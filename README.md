@@ -206,7 +206,7 @@ bin/solsa-chart samples/translator/app/instance.js -o translator
 Assuming the previously built container has already been pushed to
 the container registry, the generated chart can be deployed using the command:
 ```sh
-helm install translator.tar.gz
+helm install translator.tar.gz --set solsa.docker.registry="$REGISTRY"
 ```
 
 #### Deploy on KNative
@@ -221,7 +221,7 @@ bin/solsa-chart samples/translator/app/instance.js -o translator -t knative
 Assuming the previously built container has already been pushed to
 the container registry, the generated chart can be deployed using the command:
 ```sh
-helm install translator.tar.gz
+helm install translator.tar.gz --set solsa.docker.registry="$REGISTRY"
 ```
 
 ### Client SDK and applications

@@ -55,7 +55,7 @@ let solsa = {
               spec: {
                 containers: [{
                   name: this.name,
-                  image: (process.env.REGISTRY ? process.env.REGISTRY + '/' : '') + 'solsa-' + this.constructor.name.toLowerCase(),
+                  image: '{{ .Values.solsa.docker.registry }}/' + 'solsa-' + this.constructor.name.toLowerCase(),
                   ports: [{ containerPort: PORT }],
                   env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                 }]
@@ -96,7 +96,7 @@ let solsa = {
                 revisionTemplate: {
                   spec: {
                     container: {
-                      image: (process.env.REGISTRY ? process.env.REGISTRY + '/' : '') + 'solsa-' + this.constructor.name.toLowerCase(),
+                      image: '{{ .Values.solsa.docker.registry }}/' + 'solsa-' + this.constructor.name.toLowerCase(),
                       env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                     }
                   }
