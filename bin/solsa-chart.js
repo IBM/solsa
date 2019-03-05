@@ -6,7 +6,7 @@ const fs = require('fs')
 const archiver = require('archiver')
 
 function setupArchiver (chartName) {
-  var output = fs.createWriteStream('chartName' + '.tar.gz')
+  var output = fs.createWriteStream(chartName + '.tar.gz')
   var archive = archiver('tar', {
     gzip: true,
     zlib: { level: 9 }
