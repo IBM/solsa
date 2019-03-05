@@ -52,6 +52,10 @@ function generateChartSkeleton (archive, app, version) {
     solsa: {
       docker: {
         registry: 'us.icr.io/solsa'
+      },
+      ingress: {
+        subdomain: null,
+        secret: null
       }
     }
   }
@@ -62,6 +66,7 @@ function generateChartSkeleton (archive, app, version) {
 
 const argv = minimist(process.argv.slice(2), {
   default: { target: 'kubernetes', output: 'my-chart', version: '1.0.0' },
+  boolean: ['ingress'],
   alias: { target: 't', output: 'o', version: 'v' },
   string: ['target', 'output', 'version']
 })
@@ -69,6 +74,6 @@ const argv = minimist(process.argv.slice(2), {
 const archive = setupArchiver(argv.output)
 const theApp = require(require('path').resolve(argv._[0]))
 const templateDir = generateChartSkeleton(archive, theApp, argv.version)
-theApp._helm(archive, argv.target, templateDir)
+theApp._helm(archive, argv.target, templateDir, argv.ingress)
 
 archive.finalize()

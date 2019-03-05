@@ -32,7 +32,7 @@ let solsa = {
       }
     }
 
-    _helm (archive, target, templateDir) {
+    _helm (archive, target, templateDir, ingress) {
       Object.keys(this.dep).flatMap(key => this.dep[key]._helm(archive, target, templateDir))
 
       if (isKubernetes(target)) {
@@ -83,6 +83,39 @@ let solsa = {
         }
         archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
           { name: templateDir + this.name + '-svc' })
+
+        if (ingress) {
+          const ingress = {
+            apiVersion: 'extensions/v1beta1',
+            kind: 'Ingress',
+            metadata: {
+              name: this.name,
+              labels: genLabels(this)
+            },
+            spec: {
+              tls: [{
+                hosts: [
+                  this.name + '.{{ .Values.solsa.ingress.subdomain }}'
+                ],
+                secretName: '{{ .Values.solsa.ingress.secret }}'
+              }],
+              rules: [{
+                host: this.name + '.{{ .Values.solsa.ingress.subdomain }}',
+                http: {
+                  paths: [{
+                    path: '/',
+                    backend: {
+                      serviceName: this.name,
+                      servicePort: PORT
+                    }
+                  }]
+                }
+              }]
+            }
+          }
+          archive.append(yaml.safeDump(ingress, { noArrayIndent: true }),
+            { name: templateDir + this.name + '-ingress' })
+        }
       } else if (isKNative(target)) {
         const svc = {
           apiVersion: 'serving.knative.dev/v1alpha1',
