@@ -1,22 +1,23 @@
 # SolSA
 
 The SolSA programming model is intended to ease the _development_, _deployment_,
-and _consumption_ of cloud-native services and applications.
+and _integration_ of cloud-native services and applications. SolSA makes it
+possible to compose existing services (cloud services, cloud functions,
+container-based services) into new micro-services and applications.
 
-SolSA makes it possible to compose existing services (cloud services, cloud
-functions, container-based services) into new micro-services and applications. A
-SolSA service is defined by means of a Node.js module. From this code, SolSA
+A SolSA service is defined by means of a Node.js module. From this code, SolSA
 builds and publishes the service as a container image, prepares the deployment
-of the service and its dependencies as a list of kubernetes resource definitions
-(a yaml file), and produces an SDK for invoking the service.
+of the service and its dependencies as an Helm chart and produces an SDK for
+instantiating and invoking the service.
 
 SolSA leverages Kubernetes operators to manage the life cycle of services both
 inside and outside of Kubernetes.
 
 The SolSa source code includes declarations for the service being composed over
 as well as configuration parameters. SolSA leverages these declarations to
-construct a complete yaml description of a service instance, its transitive
-dependencies, and the configurations of all the services involved.
+construct a complete chart including not only the service instance but also its
+transitive dependencies, as well as the configurations of all the services
+involved.
 
 Service APIs are defined by means of Javascript function declarations. Service
 invocations are just function calls. SolSA relieves the developer from having to
@@ -29,32 +30,30 @@ Install SolSA:
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
 npm install
+npm link
 ```
-For each sample, e.g., `translator`, run:
-```
-(cd samples/translator/service; npm install --prod)
-```
-## Configure a Kubernetes Cluster for SolSA (Persona: Todd)
+
+## Configure a Kubernetes Cluster for SolSA
 
 ### Cluster-wide Setup
 
 1. Install SEED (Follow the instructions at https://github.ibm.com/seed/charts)
 
-2. Install KNative (For IKS, follow the instrucitons at https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial)
+2. Install KNative (For IKS, follow the instructions at
+   https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial)
 
 ### Per Namespace Setup
 
 1. Create an image pull secret for the IBM Container Registry
 
-2. Edit the namespace's default service account to add the secret to the list of imagePullSecrets
+2. Edit the namespace's default service account to add the secret to the list of
+   imagePullSecrets
 
-- Define an environment variable named `REGISTRY` with the name of the container
-  registry to use.
-- Define an environment variable named `CR_RW_TOKEN` with a read/write access
-  token for the container registry.
-- Define an environment variable named `CR_R_TOKEN` with a read access token for
-  the container registry.
+## Local Setup
 
+1. Login to the IBM cloud and IBM container registry
+
+2. Configure access to the Kubernetes cluster (KUBECONFIG)
 
 ## Example
 
@@ -132,56 +131,14 @@ Moreover, error results from service invocations are turned into Javascript
 exceptions so as to permit using Javascript try-catch contruct to handle errors
 in the usual way.
 
-### Run the service locally
-
-We can run this service using command:
-```
-TARGET_LANGUAGE="en" \
-WASTON_URL="https://gateway.watsonplatform.net/language-translator/api" \
-WATSON_APIKEY="..." \
-bin/solsa-serve samples/translator/service &
-```
-When running locally, deployment-time parameters are provided by means of environment variables.
-
-Try:
-```
-curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
-```
-```
-{"text":"Hello"}
-```
-
 ### Containerize the service
 
-We build a container for the service using command:
 ```
-bin/solsa-build samples/translator/service -t $REGISTRY/solsa-translator
+NAME=us.icr.io/tardieu/`solsa-name samples/translator/service`
+solsa-build samples/translator/service -t "$NAME"
+docker push "$NAME"
 ```
-Try:
-```
-docker run -p 8080:8080 -e TARGET_LANGUAGE="en" -e WASTON_URL="..." -e WATSON_APIKEY="..." -d "$REGISTRY"/solsa-translator
-
-curl -H "Content-Type: application/json" localhost:8080/translate -d '{"text":"bonjour"}'
-```
-```
-{"text":"Hello"}
-```
-
-### Push the service image
-
-Log in to the container registry.
-```
-echo "$CR_RW_TOKEN" | docker login -u token --password-stdin "$REGISTRY"
-```
-Install the IBM Container Registry token as a secret in the target Kubernetes
-cluster by executing the command:
-````
-kubectl create secret docker-registry solsa-image-pull --docker-server="$REGISTRY" --docker-username=token --docker-email="$EMAIL" --docker-password="$CR_R_TOKEN"
-````
-Push the translator service image to the registry as follows:
-```
-docker push "$REGISTRY"/solsa-translator
-```
+Replace `us.icr.io/tardieu` with the desired container registy.
 
 ### Deploy a service instance
 
@@ -203,10 +160,10 @@ dependencies as standard Kubernetes resources using the command:
 ```sh
 bin/solsa-chart samples/translator/app/instance.js -o translator
 ```
-Assuming the previously built container has already been pushed to
-the container registry, the generated chart can be deployed using the command:
+Assuming the previously built container has already been pushed to the container
+registry, the generated chart can be deployed using the command:
 ```sh
-helm install translator.tar.gz --set solsa.docker.registry="$REGISTRY"
+helm install translator.tar.gz --set solsa.docker.registry=us.icr.io/tardieu
 ```
 
 #### Deploy on KNative
@@ -218,10 +175,10 @@ dependencies as KNative resources using the command:
 bin/solsa-chart samples/translator/app/instance.js -o translator -t knative
 ```
 
-Assuming the previously built container has already been pushed to
-the container registry, the generated chart can be deployed using the command:
+Assuming the previously built container has already been pushed to the container
+registry, the generated chart can be deployed using the command:
 ```sh
-helm install translator.tar.gz --set solsa.docker.registry="$REGISTRY"
+helm install translator.tar.gz --set solsa.docker.registry=us.icr.io/tardieu
 ```
 
 ### Client SDK and applications
@@ -246,5 +203,4 @@ Try:
 ```
 node samples/translator/app/app.js
 ```
-
 
