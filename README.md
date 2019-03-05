@@ -7,11 +7,12 @@ container-based services) into new micro-services and applications.
 
 A SolSA service is defined by means of a Node.js module. From this code, SolSA
 builds and publishes the service as a container image, prepares the deployment
-of the service and its dependencies as an Helm chart and produces an SDK for
+of the service and its dependencies as a Helm chart and produces an SDK for
 instantiating and invoking the service.
 
 SolSA leverages Kubernetes operators to manage the life cycle of services both
-inside and outside of Kubernetes.
+inside and outside of Kubernetes. SolSA can target a standard Kubernetes cluster
+or a KNative cluster.
 
 The SolSa source code includes declarations for the service being composed over
 as well as configuration parameters. SolSA leverages these declarations to
@@ -23,15 +24,19 @@ Service APIs are defined by means of Javascript function declarations. Service
 invocations are just function calls. SolSA relieves the developer from having to
 worry about REST APIs, routes, containers, etc.
 
-## Installation
+## Components
 
-Install SolSA:
-```
-git clone https://github.ibm.com/solsa/solsa.git
-cd solsa
-npm install
-npm link
-```
+SolSA consists of:
+- A main `solsa` module that defines the basic architecture and capabilities of
+  a SolSA service.
+- Helper modules like the `watson` module that make it easier to leverage
+  existing IBM cloud services.
+- Helper tools:
+  - `solsa-build` builds a container image for a given SolSA service.
+  - `solsa-chart` synthesizes a Helm chart for deploying a SolSA service and
+    its dependencies.
+  - `solsa-name` is used to ensure consistent naming of container images.
+  - `solsa-serve` starts a local server implementing a given SolSa service.
 
 ## Configure a Kubernetes Cluster for SolSA
 
@@ -39,7 +44,7 @@ npm link
 
 1. Install SEED (Follow the instructions at https://github.ibm.com/seed/charts)
 
-2. Install KNative (For IKS, follow the instructions at
+2. Optionally install KNative (For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial)
 
 ### Per Namespace Setup
@@ -51,156 +56,19 @@ npm link
 
 ## Local Setup
 
-1. Login to the IBM cloud and IBM container registry
+1. Configure access to the Kubernetes cluster (KUBECONFIG)
 
-2. Configure access to the Kubernetes cluster (KUBECONFIG)
-
-## Example
-
-An example translator service is defined in
-[translator.js](samples/translator/service/translator.js). This example service
-builds upon several APIs of the Watson translation service (language
-identification and language translation) to translate a text from an unknown
-language to a desired language.
-```javascript
-class Translator extends solsa.Service {
-  // instantiate the service
-  constructor (name, language) {
-    super(name)
-
-    // dependencies on other services
-    this.dep = {
-      wTranslator: new watson.LanguageTranslatorV3(`watson-translator-for-${name}`)
-    }
-
-    // parameters of the deployment
-    this.env = {
-      TARGET_LANGUAGE: { value: language }, // desired target language
-      WATSON_URL: this.dep.wTranslator.secrets.url,
-      WATSON_APIKEY: this.dep.wTranslator.secrets.apikey
-    }
-  }
-
-  // return the most probable language of { text } as { language }
-  async identify (payload) {
-    let text = payload.text
-    let result = await this.dep.wTranslator.identify({ text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-    return { language: result.languages[0].language } // watson returns an array of probable languages
-  }
-
-  // translate { text } to target language
-  async translate (payload) {
-    let text = payload.text
-    try {
-      let result = await this.identify({ text }) // call api of this service
-      let source = result.language
-      let target = this.env.TARGET_LANGUAGE // parameter of the deployment
-      let translation
-      if (source !== target) {
-        let result = await this.dep.wTranslator.translate({ source, target, text }, this.env.WATSON_URL, this.env.WATSON_APIKEY)
-        translation = result.translations[0].translation
-      } else {
-        translation = text // no translation needed
-      }
-      return { text: translation }
-    } catch (error) {
-      console.log(this.dep.wTranslator)
-      return { text: 'Sorry, we cannot translate your text' }
-    }
-  }
-}
+1. Clone and initialize this repository
 ```
-The new service is defined as a class extending `solsa.Service`. The field names
-`dep` and `env` are reserved to respectively specify dependencies on other
-services and deployment-time parameters. The new service declares Watson
-translator as a dependency. It specifies the desired target language for the
-translation as a deployment parameter (as opposed to, say, a parameter specified
-in each request).  It provides two APIs defined by means of asynchronous
-Javascript functions: `idenfity` and `translate`.
-
-The `WATSON_URL` and `WATSON_APIKEY` parameters are obtained from the Watson
-translator deployment itself (via kubernetes secrets).
-
-In general, SolSA makes API definitions and invocations look like function
-declarations and function calls of the host language. SolSA automatically
-translates the function calls of the client SDK into http requests and
-automatically generates an http server to implement a service, automatically
-mapping the incoming requests to the Javascript functions.
-
-Moreover, error results from service invocations are turned into Javascript
-exceptions so as to permit using Javascript try-catch contruct to handle errors
-in the usual way.
-
-### Containerize the service
-
-```
-NAME=us.icr.io/tardieu/`solsa-name samples/translator/service`
-solsa-build samples/translator/service -t "$NAME"
-docker push "$NAME"
-```
-Replace `us.icr.io/tardieu` with the desired container registy.
-
-### Deploy a service instance
-
-To deploy a service on Kubernetes we first need to define a service instance as
-demoed in [instance.js](samples/translator/app/instance.js):
-```javascript
-let Translator = require('../service')
-
-module.exports = new Translator('my-translator', 'en')
-```
-We specify the desired name for the service instance (i.e. the name of the
-kubernetes resource representing this service instance) and the desired target
-language.
-
-#### Deploy on Kubernetes directly
-
-SolSA can generate a Helm chart for deploying the service instance and its
-dependencies as standard Kubernetes resources using the command:
-```sh
-bin/solsa-chart samples/translator/app/instance.js -o translator
-```
-Assuming the previously built container has already been pushed to the container
-registry, the generated chart can be deployed using the command:
-```sh
-helm install translator.tar.gz --set solsa.docker.registry=us.icr.io/tardieu
+git clone https://github.ibm.com/solsa/solsa.git
+cd solsa
+npm install
+npm link
 ```
 
-#### Deploy on KNative
+3. Login to the IBM container registry
 
-SolSA can generate a Helm chart for deploying the service instance and its
-dependencies as KNative resources using the command:
+## Examples
 
-```sh
-bin/solsa-chart samples/translator/app/instance.js -o translator -t knative
-```
-
-Assuming the previously built container has already been pushed to the container
-registry, the generated chart can be deployed using the command:
-```sh
-helm install translator.tar.gz --set solsa.docker.registry=us.icr.io/tardieu
-```
-
-### Client SDK and applications
-
-We can use the deployed instance to build an application as demoed in
-[app.js](samples/translator/app/app.js):
-```javascript
-let translator = require('./instance')
-
-async function main () {
-  console.log(await translator.identify({ text: 'bonjour' }))
-  console.log(await translator.translate({ text: 'bonjour' }))
-}
-
-main()
-```
-The same [instance.js](samples/translator/app/instance.js) code that was used
-earlier to define the service instance to be deployed is now used to specify the
-service instance to connect to, eliminating any risk of error.
-
-Try:
-```
-node samples/translator/app/app.js
-```
-
+The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
+collects examples of SolSA services.
