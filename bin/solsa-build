@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ABSPATH=$(cd "$(dirname "$0")"; pwd)
 cd $1
+if [[ ! -f package.json ]]; then echo "Missing package.json in $1"; exit; fi
+if [[ ! -d node_modules ]]; then npm install --prod; fi
 shift
-if [[ -f package.json && ! -d node_modules ]]; then npm install --prod; fi
-docker build -f $ABSPATH/../Dockerfile . $*
+docker build -f node_modules/solsa/Dockerfile . $*
