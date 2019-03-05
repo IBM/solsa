@@ -3,6 +3,7 @@
   "main": "solsa.js",
   "version": "0.1.0",
   "bin": {
+    "solsa-build": "./bin/solsa-build",
     "solsa-chart": "./bin/solsa-chart.js",
     "solsa-serve": "./bin/solsa-serve.js"
   },
