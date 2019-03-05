@@ -2,6 +2,10 @@
   "name": "solsa",
   "main": "solsa.js",
   "version": "0.1.0",
+  "bin": {
+    "solsa-chart": "./bin/solsa-chart.js",
+    "solsa-serve": "./bin/solsa-serve.js"
+  },
   "scripts": {
     "test": "standard"
   },
