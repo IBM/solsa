@@ -201,7 +201,7 @@ language.
 SolSA can generate a Helm chart for deploying the service instance and its
 dependencies as standard Kubernetes resources using the command:
 ```sh
-bin/solsa-helm samples/translator/app/instance.js -o translator
+bin/solsa-chart samples/translator/app/instance.js -o translator
 ```
 Assuming the previously built container has already been pushed to
 the container registry, the generated chart can be deployed using the command:
@@ -215,7 +215,7 @@ SolSA can generate a Helm chart for deploying the service instance and its
 dependencies as KNative resources using the command:
 
 ```sh
-bin/solsa-helm samples/translator/app/instance.js -o translator -t knative
+bin/solsa-chart samples/translator/app/instance.js -o translator -t knative
 ```
 
 Assuming the previously built container has already been pushed to
