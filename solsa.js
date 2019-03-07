@@ -33,7 +33,7 @@ let solsa = {
     }
 
     _helm (archive, target, templateDir, ingress) {
-      Object.keys(this.dep).flatMap(key => this.dep[key]._helm(archive, target, templateDir))
+      Object.keys(this.dep).map(key => this.dep[key]._helm(archive, target, templateDir)).reduce((x, y) => x.concat(y), [])
 
       if (isKubernetes(target)) {
         const deployment = {
