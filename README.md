@@ -56,13 +56,14 @@ SolSA consists of:
 
 ## Local Setup
 
-1. Configure access to the Kubernetes cluster (`KUBECONFIG)
+1. Configure access to the Kubernetes cluster (`KUBECONFIG`)
 
 2. Retrieve the cluster ingress subdomain an secret and export them as
    environment variables `CLUSTER_INGRESS_SUBDOMAIN` and
    `CLUSTER_INGRESS_SECRET`
 
-3. Login to the IBM container registry
+3. Login to the IBM container registry and export the registry name as
+   environment variable `REGISTRY`
 
 4. Clone and initialize this repository
 ```
