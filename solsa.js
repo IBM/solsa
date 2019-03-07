@@ -140,6 +140,42 @@ let solsa = {
         }
         archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
           { name: templateDir + this.name + '-svc' })
+
+        if (ingress) {
+          const ingress = {
+            apiVersion: 'extensions/v1beta1',
+            kind: 'Ingress',
+            metadata: {
+              name: this.name,
+              labels: genLabels(this),
+              annotations: {
+                'ingress.bluemix.net/proxy-add-headers': `serviceName=istio-ingressgateway.istio-system.svc.cluster.local {\n 'Host' '${this.name}.default.example.com'; \n}`
+              }
+            },
+            spec: {
+              tls: [{
+                hosts: [
+                  this.name + '.{{ .Values.solsa.ingress.subdomain }}'
+                ],
+                secretName: '{{ .Values.solsa.ingress.secret }}'
+              }],
+              rules: [{
+                host: this.name + '.{{ .Values.solsa.ingress.subdomain }}',
+                http: {
+                  paths: [{
+                    path: '/',
+                    backend: {
+                      serviceName: 'istio-ingressgateway',
+                      servicePort: 80
+                    }
+                  }]
+                }
+              }]
+            }
+          }
+          archive.append(yaml.safeDump(ingress, { noArrayIndent: true }),
+            { name: templateDir + this.name + '-ingress' })
+        }
       }
     }
 
