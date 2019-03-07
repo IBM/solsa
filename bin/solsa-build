@@ -1,7 +1,11 @@
 #!/bin/sh
 
-cd $1
-if [[ ! -f package.json ]]; then echo "Missing package.json in $1"; exit; fi
-if [[ ! -d node_modules ]]; then npm install --prod; fi
+cd "$1"
+if [ ! -f package.json ]; then echo "Missing package.json in $1"; exit 1; fi
+if [ ! -d node_modules ]; then npm install --prod --no-save; fi
+TMPDIR=$(mktemp -d)
+if [ $? -ne 0 ]; then echo "Cannot create temp folder"; exit 1; fi
+rsync -rL --exclude=.git . "$TMPDIR"
 shift
-docker build -f node_modules/solsa/Dockerfile . $*
+docker build -f node_modules/solsa/Dockerfile "$TMPDIR" $*
+rm -R "$TMPDIR"
