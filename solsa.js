@@ -147,9 +147,10 @@ let solsa = {
             kind: 'Ingress',
             metadata: {
               name: this.name,
+              namespace: 'istio-system',
               labels: genLabels(this),
               annotations: {
-                'ingress.bluemix.net/proxy-add-headers': `serviceName=istio-ingressgateway.istio-system.svc.cluster.local {\n 'Host' '${this.name}.default.example.com'; \n}`
+                'ingress.bluemix.net/proxy-add-headers': `serviceName=istio-ingressgateway {\n 'Host' '${this.name}.default.svc.cluster.local'; \n}`
               }
             },
             spec: {
