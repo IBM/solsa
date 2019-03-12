@@ -63,16 +63,16 @@ SolSA consists of:
    is a solsa-config.yaml that defines two deployment envionments, a
    local dev environment and an IKS cluster.
    ```yaml
-clusters:
-- name: 'localdev'
-  ingress:
-    nodePort:
-      fixedPort: 32323
-- name: 'mycluster123'
-  ingress:
-    iks:
-      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-      tlssecret: 'mycluster123'
+    clusters:
+    - name: 'localdev'
+      ingress:
+        nodePort:
+          fixedPort: 32323
+    - name: 'mycluster123'
+      ingress:
+        iks:
+          subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+          tlssecret: 'mycluster123'
    ```
 
 3. Login to the IBM container registry and export the registry name as
