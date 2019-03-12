@@ -1,4 +1,3 @@
-let yaml = require('js-yaml')
 let needle = require('needle')
 
 let streams = {
@@ -13,7 +12,7 @@ let streams = {
         .then(result => result.body)
     }
 
-    _helm (archive, target, templateDir) {
+    _yaml (archive, target, yamlDir) {
       const j = {
         apiVersion: 'streams.ibm.com/v1alpha1',
         kind: 'Job',
@@ -28,8 +27,7 @@ let streams = {
           restartFailedPods: true
         }
       }
-      archive.append(yaml.safeDump(j, { noArrayIndent: true }),
-        { name: templateDir + this.name + '-job' })
+      archive.addYaml(j, this.name + '-job.yaml')
 
       const svc = {
         apiVersion: 'v1',
@@ -47,8 +45,7 @@ let streams = {
           }
         }
       }
-      archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
-        { name: templateDir + this.name + '-svc' })
+      archive.addYaml(svc, this.name + '-svc.yaml')
     }
   }
 }

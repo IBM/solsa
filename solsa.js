@@ -1,5 +1,4 @@
 const needle = require('needle')
-let yaml = require('js-yaml')
 
 const PORT = 8080
 
@@ -32,8 +31,8 @@ let solsa = {
       }
     }
 
-    _helm (archive, target, templateDir, ingress) {
-      Object.keys(this.dep).map(key => this.dep[key]._helm(archive, target, templateDir)).reduce((x, y) => x.concat(y), [])
+    _yaml (archive, target, ingress) {
+      Object.keys(this.dep).map(key => this.dep[key]._yaml(archive, target)).reduce((x, y) => x.concat(y), [])
 
       if (isKubernetes(target)) {
         const deployment = {
@@ -55,16 +54,15 @@ let solsa = {
               spec: {
                 containers: [{
                   name: this.name,
-                  image: '{{ .Values.solsa.docker.registry }}/' + 'solsa-' + this.constructor.name.toLowerCase(),
-                  ports: [{ containerPort: PORT }],
+                  image: 'solsa-' + this.constructor.name.toLowerCase(),
+                  ports: [{ name: 'solsa', containerPort: PORT }],
                   env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                 }]
               }
             }
           }
         }
-        archive.append(yaml.safeDump(deployment, { noArrayIndent: true }),
-          { name: templateDir + this.name + '-deployment' })
+        archive.addYaml(deployment, this.name + '-deployment.yaml')
 
         const svc = {
           apiVersion: 'v1',
@@ -75,47 +73,11 @@ let solsa = {
           },
           spec: {
             type: 'ClusterIP',
-            ports: [{
-              'port': PORT
-            }],
+            ports: [{ name: 'solsa', port: PORT }],
             selector: genLabels(this)
           }
         }
-        archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
-          { name: templateDir + this.name + '-svc' })
-
-        if (ingress) {
-          const ingress = {
-            apiVersion: 'extensions/v1beta1',
-            kind: 'Ingress',
-            metadata: {
-              name: this.name,
-              labels: genLabels(this)
-            },
-            spec: {
-              tls: [{
-                hosts: [
-                  this.name + '.{{ .Values.solsa.ingress.subdomain }}'
-                ],
-                secretName: '{{ .Values.solsa.ingress.secret }}'
-              }],
-              rules: [{
-                host: this.name + '.{{ .Values.solsa.ingress.subdomain }}',
-                http: {
-                  paths: [{
-                    path: '/',
-                    backend: {
-                      serviceName: this.name,
-                      servicePort: PORT
-                    }
-                  }]
-                }
-              }]
-            }
-          }
-          archive.append(yaml.safeDump(ingress, { noArrayIndent: true }),
-            { name: templateDir + this.name + '-ingress' })
-        }
+        archive.addYaml(svc, this.name + '-svc.yaml')
       } else if (isKNative(target)) {
         const svc = {
           apiVersion: 'serving.knative.dev/v1alpha1',
@@ -138,45 +100,7 @@ let solsa = {
             }
           }
         }
-        archive.append(yaml.safeDump(svc, { noArrayIndent: true }),
-          { name: templateDir + this.name + '-svc' })
-
-        if (ingress) {
-          const ingress = {
-            apiVersion: 'extensions/v1beta1',
-            kind: 'Ingress',
-            metadata: {
-              name: this.name,
-              namespace: 'istio-system',
-              labels: genLabels(this),
-              annotations: {
-                'ingress.bluemix.net/proxy-add-headers': `serviceName=istio-ingressgateway {\n 'Host' '${this.name}.default.svc.cluster.local'; \n}`
-              }
-            },
-            spec: {
-              tls: [{
-                hosts: [
-                  this.name + '.{{ .Values.solsa.ingress.subdomain }}'
-                ],
-                secretName: '{{ .Values.solsa.ingress.secret }}'
-              }],
-              rules: [{
-                host: this.name + '.{{ .Values.solsa.ingress.subdomain }}',
-                http: {
-                  paths: [{
-                    path: '/',
-                    backend: {
-                      serviceName: 'istio-ingressgateway',
-                      servicePort: 80
-                    }
-                  }]
-                }
-              }]
-            }
-          }
-          archive.append(yaml.safeDump(ingress, { noArrayIndent: true }),
-            { name: templateDir + this.name + '-ingress' })
-        }
+        archive.addYaml(svc, this.name + '-svc.yaml')
       }
     }
 

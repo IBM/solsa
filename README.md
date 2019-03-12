@@ -7,7 +7,7 @@ container-based services) into new micro-services and applications.
 
 A SolSA service is defined by means of a Node.js module. From this code, SolSA
 builds and publishes the service as a container image, prepares the deployment
-of the service and its dependencies as a Helm chart and produces an SDK for
+of the service and its dependencies as "Kustomizable" yaml and produces an SDK for
 instantiating and invoking the service.
 
 SolSA leverages Kubernetes operators to manage the life cycle of services both
@@ -33,8 +33,8 @@ SolSA consists of:
   existing IBM cloud services.
 - Helper tools:
   - `solsa-build` builds a container image for a given SolSA service.
-  - `solsa-chart` synthesizes a Helm chart for deploying a SolSA service and
-    its dependencies.
+  - `solsa-yaml` synthesizes "Kustomizable" yaml for deploying a SolSA
+     service and its dependencies.
   - `solsa-name` is used to ensure consistent naming of container images.
   - `solsa-serve` starts a local server implementing a given SolSa service.
 
@@ -58,9 +58,22 @@ SolSA consists of:
 
 1. Configure access to the Kubernetes cluster (`KUBECONFIG`)
 
-2. Retrieve the cluster ingress subdomain an secret and export them as
-   environment variables `CLUSTER_INGRESS_SUBDOMAIN` and
-   `CLUSTER_INGRESS_SECRET`
+2. Create a solsa-config.yaml file that describes each Kubernetes cluster
+   for which you want SolSA to generate a Kustomize overlay.  For example, here
+   is a solsa-config.yaml that defines two deployment envionments, a
+   local dev environment and an IKS cluster.
+   ```yaml
+clusters:
+- name: 'localdev'
+  ingress:
+    nodePort:
+      fixedPort: 32323
+- name: 'mycluster123'
+  ingress:
+    iks:
+      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+      tlssecret: 'mycluster123'
+   ```
 
 3. Login to the IBM container registry and export the registry name as
    environment variable `REGISTRY`
