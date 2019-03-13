@@ -31,7 +31,7 @@ let solsa = {
       }
     }
 
-    _yaml (archive, target, ingress) {
+    _yaml (archive, target) {
       Object.keys(this.dep).map(key => this.dep[key]._yaml(archive, target)).reduce((x, y) => x.concat(y), [])
 
       if (isKubernetes(target)) {

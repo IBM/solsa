@@ -143,7 +143,7 @@ class SolsaArchiver {
 
 function main () {
   const argv = minimist(process.argv.slice(2), {
-    default: { target: 'kubernetes', output: 'solsa-yaml' },
+    default: { target: 'kubernetes', output: 'solsa-yaml', config: process.env.SOSLA_CONFIG },
     alias: { target: 't', output: 'o', config: 'c' },
     string: ['target', 'output', 'config']
   })
@@ -155,7 +155,7 @@ function main () {
 
   const theApp = require(require('path').resolve(argv._[0]))
   const sa = new SolsaArchiver(theApp, argv.output)
-  theApp._yaml(sa, argv.target, argv.ingress)
+  theApp._yaml(sa, argv.target)
   sa.finalize(userConfig)
 }
 
