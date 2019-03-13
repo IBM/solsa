@@ -55,6 +55,7 @@ let solsa = {
                 containers: [{
                   name: this.name,
                   image: 'solsa-' + this.constructor.name.toLowerCase(),
+                  imagePullPolicy: 'IfNotPresent',
                   ports: [{ name: 'solsa', containerPort: PORT }],
                   env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
                 }]

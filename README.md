@@ -61,18 +61,25 @@ SolSA consists of:
 2. Create a solsa-config.yaml file that describes each Kubernetes cluster
    for which you want SolSA to generate a Kustomize overlay.  For example, here
    is a solsa-config.yaml that defines two deployment envionments, a
-   local dev environment and an IKS cluster.
+   local dev environment and an IKS cluster. The IKS cluster definition
+   demonstrates how to instruct solsa to generate a Kustomize overlay that
+   will rename docker images to change from a local dev registry to
+   a specific namespace in the IBM Container Registry.
    ```yaml
     clusters:
     - name: 'localdev'
       ingress:
-        nodePort:
-          fixedPort: 32323
+        nodePort: 32323
     - name: 'mycluster123'
       ingress:
         iks:
           subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
           tlssecret: 'mycluster123'
+      images:
+      - name: solsa-echo
+        newName: us.icr.io/groved/solsa-echo
+      - name: solsa-translator
+        newName: us.icr.io/groved/solsa-translator
    ```
 
 3. Login to the IBM container registry and export the registry name as

@@ -42,13 +42,13 @@ class SolsaArchiver {
 
   addYaml (obj, fname) {
     this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: this.app.name + '/base/' + fname })
+      { name: 'solsa-' + this.app.name.toLowerCase() + '/base/' + fname })
     this.files.push(fname)
   }
 
   addKustomizeYaml (obj, path, fname) {
     this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: this.app.name + path + fname })
+      { name: 'solsa-' + this.app.name.toLowerCase() + path + fname })
   }
 
   finalize (userConfig) {
@@ -110,7 +110,7 @@ class SolsaArchiver {
               }, {
                 op: 'add',
                 path: '/spec/ports/0/nodePort',
-                value: c.ingress.nodePort.fixedPort
+                value: c.ingress.nodePort
               }
             ]
             this.addKustomizeYaml(nodePortPatch, '/' + c.name + '/', 'expose-svc.yaml')
@@ -130,7 +130,8 @@ class SolsaArchiver {
           kind: 'Kustomization',
           bases: ['./../base'],
           resources: additionalFiles,
-          patchesJson6902: jsonPatches
+          patchesJson6902: jsonPatches,
+          images: c.images ? c.images : []
         }
         this.addKustomizeYaml(kc, '/' + c.name + '/', 'kustomization.yaml')
       }
