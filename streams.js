@@ -16,9 +16,7 @@ let streams = {
       const j = {
         apiVersion: 'streams.ibm.com/v1alpha1',
         kind: 'Job',
-        metadata: {
-          name: this.name
-        },
+        metadata: { name: this.name },
         spec: {
           requestedPes: 1,
           peImagePullPolicy: 'IfNotPresent',
@@ -32,13 +30,9 @@ let streams = {
       const svc = {
         apiVersion: 'v1',
         kind: 'Service',
-        metadata: {
-          name: this.name + '-svc'
-        },
+        metadata: { name: this.name + '-svc' },
         spec: {
-          ports: [{
-            port: 8080
-          }],
+          ports: [{ port: 8080 }],
           selector: {
             app: 'streams',
             svc: 'pe'
