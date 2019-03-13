@@ -62,9 +62,10 @@ SolSA consists of:
    for which you want SolSA to generate a Kustomize overlay.  For example, here
    is a solsa-config.yaml that defines two deployment envionments, a
    local dev environment and an IKS cluster. The IKS cluster definition
-   demonstrates how to instruct solsa to generate a Kustomize overlay that
-   will rename docker images to change from a local dev registry to
-   a specific namespace in the IBM Container Registry.
+   demonstrates how to instruct SolSA to generate a Kustomize overlay that
+   will rename docker images so that instead of being pulled from the local
+   registry on the dev machine, the images will instead be pulled from a
+   specific namespace in the IBM Container Registry .
    ```yaml
     clusters:
     - name: 'localdev'
