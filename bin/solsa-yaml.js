@@ -55,8 +55,8 @@ class SolsaArchiver {
     const kustom = {
       apiVersion: 'kustomize.config.k8s.io/v1beta1',
       kind: 'Kustomization',
-      commonLabels: {
-        'solsa.ibm.com/name': this.app.name
+      commonAnnotations: {
+        'solsa.ibm.com/app': this.app.name
       },
       resources: this.files
     }
