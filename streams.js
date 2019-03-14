@@ -1,5 +1,10 @@
 let needle = require('needle')
 
+// FIXME: Streams.knative limitation -- must be in same namespace as the Streams.knative controller pod
+//        So we hardwire that in the yaml and also hardwire a cross-NS service reference in all needle
+//        calls from the wrapper service to the service in the streams NS that wraps the StreamsJob
+const StreamsKNativeNS = 'streams'
+
 let streams = {
   StreamsJob: class StreamsJob {
     constructor (name, sab) {
@@ -8,7 +13,7 @@ let streams = {
     }
 
     listOperators () {
-      return needle('post', `https://${this.name}-svc/list`, { json: true })
+      return needle('post', `https://${this.name}-svc` + '.' + StreamsKNativeNS + '/list', { json: true })
         .then(result => result.body)
     }
 
@@ -18,7 +23,7 @@ let streams = {
         kind: 'Job',
         metadata: {
           name: this.name,
-          namespace: 'streams' // FIXME: Streams.knative limitation -- must be in same namespace as the streams controller pod
+          namespace: StreamsKNativeNS
         },
         spec: {
           requestedPes: 1,
@@ -37,7 +42,7 @@ let streams = {
         kind: 'Service',
         metadata: {
           name: this.name + '-svc',
-          namespace: 'streams' // FIXME: Streams.knative limitation -- must be in same namespace as the streams controller pod
+          namespace: StreamsKNativeNS
         },
         spec: {
           ports: [{ port: 8080 }],
