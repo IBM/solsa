@@ -16,13 +16,18 @@ let streams = {
       const j = {
         apiVersion: 'streams.ibm.com/v1alpha1',
         kind: 'Job',
-        metadata: { name: this.name },
+        metadata: {
+          name: this.name,
+          namespace: 'streams' // FIXME: Streams.knative limitation -- must be in same namespace as the streams controller pod
+        },
         spec: {
           requestedPes: 1,
-          peImagePullPolicy: 'IfNotPresent',
-          runtimeTraceLevel: 'DEBUG',
-          sabName: this.sab,
-          restartFailedPods: true
+          processingElement: {
+            imagePullPolicy: 'IfNotPresent',
+            runtimeTraceLevel: 'DEBUG',
+            sabName: this.sab,
+            restartFailedPod: true
+          }
         }
       }
       archive.addYaml(j, this.name + '-job.yaml')
@@ -30,7 +35,10 @@ let streams = {
       const svc = {
         apiVersion: 'v1',
         kind: 'Service',
-        metadata: { name: this.name + '-svc' },
+        metadata: {
+          name: this.name + '-svc',
+          namespace: 'streams' // FIXME: Streams.knative limitation -- must be in same namespace as the streams controller pod
+        },
         spec: {
           ports: [{ port: 8080 }],
           selector: {
