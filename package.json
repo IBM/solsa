@@ -9,7 +9,8 @@
     "solsa-serve": "./bin/solsa-serve.js"
   },
   "scripts": {
-    "test": "standard"
+    "test": "standard",
+    "make:watson": "trash watson && mkdir watson && cd watson && watson"
   },
   "dependencies": {
     "archiver": "^3.0.0",
@@ -19,7 +20,9 @@
     "watson-developer-cloud": "^3.18.1"
   },
   "devDependencies": {
+    "@solsa/service-gen": "git+ssh://git@github.ibm.com:solsa/service-gen.git",
     "pre-commit": "^1.2.2",
-    "standard": "^12.0.1"
+    "standard": "^12.0.1",
+    "trash-cli": "^1.4.0"
   }
 }
