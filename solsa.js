@@ -1,3 +1,4 @@
+const Events = require('events')
 const needle = require('needle')
 
 const PORT = 8080
@@ -22,12 +23,25 @@ let solsa = {
       if (name !== undefined) {
         for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
           this[key] = async function () {
-            // return { request: `${name}.${key} ${JSON.stringify(arguments[0])}` }
-            return needle('post', `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}/${key}`, arguments[0], { json: true })
+            return needle('post', (process.env.SOLSA_URL || `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
               .then(result => result.body)
           }
         }
         this.name = name
+      }
+
+      let events = new Events()
+      this.events = events
+
+      if (name !== undefined) {
+        (function hack () {
+          events.once('newListener', key => {
+            events.on(key, function () {
+              needle('post', (process.env.SOLSA_URL || `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
+            })
+            hack()
+          })
+        })()
       }
     }
 
@@ -119,6 +133,13 @@ let solsa = {
       for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
         app.post('/' + key, (request, response) => {
           service[key](request.body).then(r => response.send(r), err => response.send(err))
+        })
+      }
+
+      for (let key of service.events.eventNames()) {
+        app.post('/' + key, (request, response) => {
+          service.events.emit(key, request.body)
+          response.send('OK')
         })
       }
 
