@@ -46,7 +46,9 @@ let solsa = {
     }
 
     async _yaml (archive, target) {
-      await Object.keys(this.dep).map(async key => this.dep[key]._yaml(archive, target)).reduce(async (x, y) => (await x).concat(await y), [])
+      for (let key of Object.keys(this.dep)) {
+        await this.dep[key]._yaml(archive, target)
+      }
 
       if (isKubernetes(target)) {
         const deployment = {
