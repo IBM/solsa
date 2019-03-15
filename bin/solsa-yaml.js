@@ -8,7 +8,7 @@ const archiver = require('archiver')
 class SolsaArchiver {
   constructor (app, archiveName) {
     this.app = app
-    var output = fs.createWriteStream(archiveName + '.tar.gz')
+    var output = fs.createWriteStream(archiveName + '.tgz')
     this.archive = archiver('tar', {
       gzip: true,
       zlib: { level: 9 }
