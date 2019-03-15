@@ -134,14 +134,14 @@ let solsa = {
 
       for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
         app.post('/' + key, (request, response) => {
-          service[key](request.body).then(r => response.send(r), err => response.send(err))
+          service[key](request.body).then(r => response.send(r), err => response.status(500).send(err.message || err.toString() || 'Internal error'))
         })
       }
 
       for (let key of service.events.eventNames()) {
         app.post('/' + key, (request, response) => {
           service.events.emit(key, request.body)
-          response.send('OK')
+          response.status(202).send('ACCEPTED')
         })
       }
 
