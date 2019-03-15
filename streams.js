@@ -20,6 +20,19 @@ let streams = {
         .then(result => result.body)
     }
 
+    // FIXME: We should generate all of the invoke routes at runtime by asking the
+    //        Streams service we are connected to what operators it has and then
+    //        generate the matching routes.
+    //     OR We should generate all of the invoke routes at build time by taking
+    //        a yaml file that describes the exposed routes from the argument SAB
+    //        and generating a StreamsJob with exactly those routes.
+    async invoke (name, operator, payload) {
+      const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + operator
+      console.log('invoke: ' + url + ' ' + JSON.stringify(payload))
+      return needle('put', url, payload, { json: true })
+        .then(result => result.body)
+    }
+
     _yaml (archive, target, yamlDir) {
       const j = {
         apiVersion: 'streams.ibm.com/v1alpha1',
