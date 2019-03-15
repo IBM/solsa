@@ -4,6 +4,7 @@ let needle = require('needle')
 //        So we hardwire that in the yaml and also hardwire a cross-NS service reference in all needle
 //        calls from the wrapper service to the service in the streams NS that wraps the StreamsJob
 const StreamsKNativeNS = 'streams'
+const SVC_PORT = 8080
 
 let streams = {
   StreamsJob: class StreamsJob {
@@ -12,8 +13,10 @@ let streams = {
       this.sab = sab
     }
 
-    listOperators () {
-      return needle('post', `https://${this.name}-svc` + '.' + StreamsKNativeNS + '/list', { json: true })
+    async listOperators (name) {
+      const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/list'
+      console.log('listOperators: ' + url)
+      return needle('get', url, { json: true })
         .then(result => result.body)
     }
 
@@ -45,7 +48,7 @@ let streams = {
           namespace: StreamsKNativeNS
         },
         spec: {
-          ports: [{ port: 8080 }],
+          ports: [{ port: SVC_PORT }],
           selector: {
             app: 'streams',
             svc: 'pe'
