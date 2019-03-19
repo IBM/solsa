@@ -30,6 +30,7 @@ let streams = {
         }
         this.initialized = true
       }
+      return this
     }
 
     async _listOperators () {
