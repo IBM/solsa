@@ -14,13 +14,13 @@ let streams = {
       this.initialized = false
     }
 
-    async ensureInit (name) {
+    async _ensureInit (name) {
       if (this.initialized === false) {
-        const endpoints = ['runningaverage', 'source0', 'source1', 'source2'] // TODO: get from listOperators!
-        for (let ep of endpoints) {
-          console.log('initializing ' + ep)
-          this[ep] = async function () {
-            const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + ep
+        const opList = await this._listOperators(name)
+        for (let op of opList) {
+          console.log('initializing ' + op)
+          this[op] = async function () {
+            const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + op
             console.log('invoking StreamsJob: ' + url + ' ' + JSON.stringify(arguments[1]))
             return needle('put', url, arguments[1], { json: true })
               .then(result => result.body)
@@ -30,11 +30,11 @@ let streams = {
       }
     }
 
-    async listOperators (name) {
+    async _listOperators (name) {
       const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/list'
       console.log('listOperators: ' + url)
       return needle('get', url, { json: true })
-        .then(result => result.body)
+        .then(result => result.body.operators)
     }
 
     _yaml (archive, target, yamlDir) {
