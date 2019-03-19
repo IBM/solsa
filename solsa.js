@@ -19,35 +19,55 @@ function isKNative (target) {
 
 let solsa = {
   Service: class Service {
-    constructor (name) {
-      if (name !== undefined) {
-        for (let key of Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor')) {
-          this[key] = async function () {
-            return needle('post', (process.env.SOLSA_URL || `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
-              .then(result => result.body)
-          }
+    static make () {
+      let svc = new this(...arguments)
+      svc.solsa.options.push(...arguments)
+      if (svc.solsa.raw) return svc
+
+      for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
+        svc[key] = async function () {
+          return needle('post', (process.env.SOLSA_URL || `https://${svc.name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
+            .then(result => result.body)
         }
-        this.name = name
       }
 
-      let events = new Events()
-      this.events = events
-
-      if (name !== undefined) {
-        (function hack () {
-          events.once('newListener', key => {
-            events.on(key, function () {
-              needle('post', (process.env.SOLSA_URL || `https://${name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
-            })
-            hack()
-          })
-        })()
+      for (let event of svc.events.eventNames()) {
+        svc.events.removeAllListeners(event)
+        svc.events.on(event, function () {
+          needle('post', (process.env.SOLSA_URL || `https://${svc.name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + event, arguments[0], { json: true })
+        })
       }
+
+      return svc
+    }
+
+    constructor (name, raw) {
+      this.name = name
+      this.events = new Events()
+      this.solsa = { raw, dependencies: [], secrets: {}, options: [] }
+    }
+
+    addDependency (dep) {
+      this.solsa.dependencies.push(dep)
+      return dep
+    }
+
+    addSecret (name, key) {
+      let v = `SOLSA_${name}_SOLSA_${key}`.toUpperCase().replace(/-/g, '_')
+      this.solsa.secrets[v] = { valueFrom: { secretKeyRef: { name, key } } }
+      return process.env[v]
     }
 
     async _yaml (archive, target) {
-      for (let key of Object.keys(this.dep)) {
-        await this.dep[key]._yaml(archive, target)
+      let env = {
+        SOLSA_NAME: { value: this.name },
+        SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }
+      }
+      for (let svc of this.solsa.dependencies) {
+        await svc._yaml(archive, target)
+        for (let k of Object.keys(svc.solsa.secrets)) {
+          env[k] = svc.solsa.secrets[k]
+        }
       }
 
       if (isKubernetes(target)) {
@@ -73,7 +93,7 @@ let solsa = {
                   image: 'solsa-' + this.constructor.name.toLowerCase(),
                   imagePullPolicy: 'IfNotPresent',
                   ports: [{ name: 'solsa', containerPort: PORT }],
-                  env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+                  env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
                 }]
               }
             }
@@ -109,7 +129,7 @@ let solsa = {
                   spec: {
                     container: {
                       image: '{{ .Values.solsa.docker.registry }}/' + 'solsa-' + this.constructor.name.toLowerCase(),
-                      env: Object.keys(this.env).map(key => Object.assign({ name: key }, this.env[key]))
+                      env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
                     }
                   }
                 }
@@ -122,11 +142,9 @@ let solsa = {
     }
 
     static serve () {
-      let service = new this()
+      let options = JSON.parse(process.env.SOLSA_OPTIONS)
 
-      for (let key of Object.keys(service.env)) {
-        service.env[key] = process.env[key]
-      }
+      let svc = new this(...options)
 
       let express = require('express')
       let app = express()
@@ -134,13 +152,13 @@ let solsa = {
 
       for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
         app.post('/' + key, (request, response) => {
-          service[key](request.body).then(r => response.send(r), err => response.status(500).send(err.message || err.toString() || 'Internal error'))
+          svc[key](request.body).then(r => response.send(r), err => response.status(500).send(err.message || err.toString() || 'Internal error'))
         })
       }
 
-      for (let key of service.events.eventNames()) {
+      for (let key of svc.events.eventNames()) {
         app.post('/' + key, (request, response) => {
-          service.events.emit(key, request.body)
+          svc.events.emit(key, request.body)
           response.status(202).send('ACCEPTED')
         })
       }
