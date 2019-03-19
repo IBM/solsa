@@ -1,4 +1,5 @@
 let needle = require('needle')
+let solsa = require('./solsa')
 
 // FIXME: Streams.knative limitation -- must be in same namespace as the Streams.knative controller pod
 //        So we hardwire that in the yaml and also hardwire a cross-NS service reference in all needle
@@ -7,22 +8,23 @@ const StreamsKNativeNS = 'streams'
 const SVC_PORT = 8080
 
 let streams = {
-  StreamsJob: class StreamsJob {
+  StreamsJob: class StreamsJob extends solsa.Service {
     constructor (name, sab) {
+      super(name, true)
       this.name = name
       this.sab = sab
       this.initialized = false
     }
 
-    async _ensureInit (name) {
+    async _ensureInit () {
       if (this.initialized === false) {
-        const opList = await this._listOperators(name)
+        const opList = await this._listOperators()
         for (let op of opList) {
           console.log('initializing ' + op)
           this[op] = async function () {
-            const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + op
-            console.log('invoking StreamsJob: ' + url + ' ' + JSON.stringify(arguments[1]))
-            return needle('put', url, arguments[1], { json: true })
+            const url = `http://${this.name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + op
+            console.log('invoking StreamsJob: ' + url + ' ' + JSON.stringify(arguments[0]))
+            return needle('put', url, arguments[0], { json: true })
               .then(result => result.body)
           }
         }
@@ -30,8 +32,8 @@ let streams = {
       }
     }
 
-    async _listOperators (name) {
-      const url = `http://${name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/list'
+    async _listOperators () {
+      const url = `http://${this.name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/list'
       console.log('listOperators: ' + url)
       return needle('get', url, { json: true })
         .then(result => result.body.operators)
