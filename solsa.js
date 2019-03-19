@@ -93,7 +93,18 @@ let solsa = {
                   image: 'solsa-' + this.constructor.name.toLowerCase(),
                   imagePullPolicy: 'IfNotPresent',
                   ports: [{ name: 'solsa', containerPort: PORT }],
-                  env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
+                  env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
+                  livenessProbe: {
+                    tcpSocket: {
+                      port: PORT
+                    }
+                  },
+                  readinessProbe: {
+                    httpGet: {
+                      path: '/solsa/readinessProbe',
+                      port: PORT
+                    }
+                  }
                 }]
               }
             }
@@ -162,6 +173,10 @@ let solsa = {
           response.status(202).send('ACCEPTED')
         })
       }
+
+      app.get('/solsa/readinessProbe', (_request, response) => {
+        response.status(200).send('OK')
+      })
 
       app.listen(PORT, err => {
         if (err) {
