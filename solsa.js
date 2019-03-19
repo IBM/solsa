@@ -26,7 +26,7 @@ let solsa = {
 
       for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
         svc[key] = async function () {
-          return needle('post', (process.env.SOLSA_URL || `https://${svc.name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + key, arguments[0], { json: true })
+          return needle('post', (process.env.SOLSA_URL || `http://${svc.name}:${PORT}`) + '/' + key, arguments[0], { json: true })
             .then(result => result.body)
         }
       }
@@ -34,7 +34,7 @@ let solsa = {
       for (let event of svc.events.eventNames()) {
         svc.events.removeAllListeners(event)
         svc.events.on(event, function () {
-          needle('post', (process.env.SOLSA_URL || `https://${svc.name}.${process.env.CLUSTER_INGRESS_SUBDOMAIN}`) + '/' + event, arguments[0], { json: true })
+          needle('post', (process.env.SOLSA_URL || `http://${svc.name}:${PORT}`) + '/' + event, arguments[0], { json: true })
         })
       }
 
