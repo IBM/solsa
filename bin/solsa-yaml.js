@@ -52,7 +52,71 @@ class SolsaArchiver {
       { name: 'solsa-' + this.app.name.toLowerCase() + path + fname })
   }
 
-  finalize (userConfig) {
+  _finalizeIngress (cluster, target, additionalFiles, jsonPatches) {
+    switch (target) {
+      case utils.targets.KUBERNETES:
+        if (cluster.ingress.iks) {
+          const ingress = {
+            apiVersion: 'extensions/v1beta1',
+            kind: 'Ingress',
+            metadata: {
+              name: this.app.name + '-ing-iks',
+              labels: {
+                'solsa.ibm.com/name': this.app.name
+              }
+            },
+            spec: {
+              tls: [{
+                hosts: [
+                  this.app.name + '.' + cluster.ingress.iks.subdomain
+                ],
+                secretName: cluster.ingress.iks.tlssecret
+              }],
+              rules: [{
+                host: this.app.name + '.' + cluster.ingress.iks.subdomain,
+                http: {
+                  paths: [{
+                    path: '/',
+                    backend: {
+                      serviceName: this.app.name,
+                      servicePort: 'solsa'
+                    }
+                  }]
+                }
+              }]
+            }
+          }
+          this.addKustomizeYaml(ingress, '/' + cluster.name + '/', 'ingress.yaml')
+          additionalFiles.push('ingress.yaml')
+        } else if (cluster.ingress.nodePort) {
+          const nodePortPatch = [
+            {
+              op: 'replace',
+              path: '/spec/type',
+              value: 'NodePort'
+            }, {
+              op: 'add',
+              path: '/spec/ports/0/nodePort',
+              value: cluster.ingress.nodePort
+            }
+          ]
+          this.addKustomizeYaml(nodePortPatch, '/' + cluster.name + '/', 'expose-svc.yaml')
+          jsonPatches.push({
+            target: {
+              version: 'v1',
+              kind: 'Service',
+              name: this.app.name
+            },
+            path: 'expose-svc.yaml'
+          })
+        }
+        break
+      case utils.targets.KNATIVE:
+        console.log('Ingress not supported for KNative target. Not added to overlay for ' + cluster.name)
+    }
+  }
+
+  finalize (userConfig, target) {
     const kustom = {
       apiVersion: 'kustomize.config.k8s.io/v1beta1',
       kind: 'Kustomization',
@@ -69,63 +133,8 @@ class SolsaArchiver {
         const jsonPatches = []
 
         if (c.ingress) {
-          if (c.ingress.iks) {
-            const ingress = {
-              apiVersion: 'extensions/v1beta1',
-              kind: 'Ingress',
-              metadata: {
-                name: this.app.name + '-ing-iks',
-                labels: {
-                  'solsa.ibm.com/name': this.app.name
-                }
-              },
-              spec: {
-                tls: [{
-                  hosts: [
-                    this.app.name + '.' + c.ingress.iks.subdomain
-                  ],
-                  secretName: c.ingress.iks.tlssecret
-                }],
-                rules: [{
-                  host: this.app.name + '.' + c.ingress.iks.subdomain,
-                  http: {
-                    paths: [{
-                      path: '/',
-                      backend: {
-                        serviceName: this.app.name,
-                        servicePort: 'solsa'
-                      }
-                    }]
-                  }
-                }]
-              }
-            }
-            this.addKustomizeYaml(ingress, '/' + c.name + '/', 'ingress.yaml')
-            additionalFiles.push('ingress.yaml')
-          } else if (c.ingress.nodePort) {
-            const nodePortPatch = [
-              {
-                op: 'replace',
-                path: '/spec/type',
-                value: 'NodePort'
-              }, {
-                op: 'add',
-                path: '/spec/ports/0/nodePort',
-                value: c.ingress.nodePort
-              }
-            ]
-            this.addKustomizeYaml(nodePortPatch, '/' + c.name + '/', 'expose-svc.yaml')
-            jsonPatches.push({
-              target: {
-                version: 'v1',
-                kind: 'Service',
-                name: this.app.name
-              },
-              path: 'expose-svc.yaml'
-            })
-          }
+          this._finalizeIngress(c, target, additionalFiles, jsonPatches)
         }
-
         const kc = {
           apiVersion: 'kustomize.config.k8s.io/v1beta1',
           kind: 'Kustomization',
