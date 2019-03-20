@@ -46,6 +46,7 @@ let solsa = {
 
     addDependency (dep) {
       this.solsa.dependencies.push(dep)
+      dep.solsa.parent = this
       return dep
     }
 
@@ -177,6 +178,13 @@ let solsa = {
 
       app.get('/solsa/readinessProbe', (_request, response) => {
         response.status(200).send('OK')
+      })
+
+      app.post('/', (request, response) => {
+        console.log(request.body.Body)
+        let Body = JSON.parse(request.body.Body)
+        svc.events.emit(Body.event, Body.payload)
+        response.status(202).send('ACCEPTED')
       })
 
       app.listen(PORT, err => {
