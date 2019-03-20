@@ -1,5 +1,6 @@
 const Events = require('events')
 const needle = require('needle')
+const utils = require('./utils.js')
 
 const PORT = 8080
 
@@ -11,14 +12,6 @@ function genLabels (svc) {
 
 function solsaImage (str) {
   return 'solsa-' + str.toLowerCase()
-}
-
-function isKubernetes (target) {
-  return target === 'kubernetes'
-}
-
-function isKNative (target) {
-  return target === 'knative'
 }
 
 let solsa = {
@@ -74,85 +67,89 @@ let solsa = {
         }
       }
 
-      if (isKubernetes(target)) {
-        const deployment = {
-          apiVersion: 'apps/v1',
-          kind: 'Deployment',
-          metadata: {
-            name: this.name,
-            labels: genLabels(this)
-          },
-          spec: {
-            replicas: 1,
-            selector: {
-              matchLabels: genLabels(this)
+      switch (target) {
+        case utils.targets.KUBERNETES: {
+          const deployment = {
+            apiVersion: 'apps/v1',
+            kind: 'Deployment',
+            metadata: {
+              name: this.name,
+              labels: genLabels(this)
             },
-            template: {
-              metadata: {
-                labels: genLabels(this)
+            spec: {
+              replicas: 1,
+              selector: {
+                matchLabels: genLabels(this)
               },
-              spec: {
-                containers: [{
-                  name: this.name,
-                  image: solsaImage(this.constructor.name),
-                  imagePullPolicy: 'IfNotPresent',
-                  ports: [{ name: 'solsa', containerPort: PORT }],
-                  env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
-                  livenessProbe: {
-                    tcpSocket: {
-                      port: PORT
+              template: {
+                metadata: {
+                  labels: genLabels(this)
+                },
+                spec: {
+                  containers: [{
+                    name: this.name,
+                    image: solsaImage(this.constructor.name),
+                    imagePullPolicy: 'IfNotPresent',
+                    ports: [{ name: 'solsa', containerPort: PORT }],
+                    env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
+                    livenessProbe: {
+                      tcpSocket: {
+                        port: PORT
+                      }
+                    },
+                    readinessProbe: {
+                      httpGet: {
+                        path: '/solsa/readinessProbe',
+                        port: PORT
+                      }
                     }
-                  },
-                  readinessProbe: {
-                    httpGet: {
-                      path: '/solsa/readinessProbe',
-                      port: PORT
-                    }
-                  }
-                }]
+                  }]
+                }
               }
             }
           }
-        }
-        archive.addYaml(deployment, this.name + '-deployment.yaml')
+          archive.addYaml(deployment, this.name + '-deployment.yaml')
 
-        const svc = {
-          apiVersion: 'v1',
-          kind: 'Service',
-          metadata: {
-            name: this.name,
-            labels: genLabels(this)
-          },
-          spec: {
-            type: 'ClusterIP',
-            ports: [{ name: 'solsa', port: PORT }],
-            selector: genLabels(this)
+          const svc = {
+            apiVersion: 'v1',
+            kind: 'Service',
+            metadata: {
+              name: this.name,
+              labels: genLabels(this)
+            },
+            spec: {
+              type: 'ClusterIP',
+              ports: [{ name: 'solsa', port: PORT }],
+              selector: genLabels(this)
+            }
           }
+          archive.addYaml(svc, this.name + '-svc.yaml')
+          break
         }
-        archive.addYaml(svc, this.name + '-svc.yaml')
-      } else if (isKNative(target)) {
-        const svc = {
-          apiVersion: 'serving.knative.dev/v1alpha1',
-          kind: 'Service',
-          metadata: {
-            name: this.name
-          },
-          spec: {
-            runLatest: {
-              configuration: {
-                revisionTemplate: {
-                  spec: {
-                    container: {
-                      image: solsaImage(this.constructor.name),
-                      env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
+        case utils.targets.KNATIVE: {
+          const svc = {
+            apiVersion: 'serving.knative.dev/v1alpha1',
+            kind: 'Service',
+            metadata: {
+              name: this.name
+            },
+            spec: {
+              runLatest: {
+                configuration: {
+                  revisionTemplate: {
+                    spec: {
+                      container: {
+                        image: solsaImage(this.constructor.name),
+                        env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
+                      }
                     }
                   }
                 }
               }
             }
           }
+          archive.addYaml(svc, this.name + '-svc.yaml')
         }
-        archive.addYaml(svc, this.name + '-svc.yaml')
       }
     }
 

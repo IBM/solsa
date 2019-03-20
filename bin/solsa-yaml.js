@@ -4,6 +4,7 @@ let yaml = require('js-yaml')
 const minimist = require('minimist')
 const fs = require('fs')
 const archiver = require('archiver')
+const utils = require('../utils.js')
 
 class SolsaArchiver {
   constructor (app, archiveName) {
@@ -152,11 +153,19 @@ async function main () {
   if (argv.config) {
     userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
   }
+  var target
+  if (argv.target.toLowerCase() === 'kubernetes') {
+    target = utils.targets.KUBERNETES
+  } else if (argv.target.toLowerCase() === 'knative') {
+    target = utils.targets.KNATIVE
+  } else {
+    console.log('Warning: unrecognized target ' + argv.target)
+  }
 
   const theApp = require(require('path').resolve(argv._[0]))
   const sa = new SolsaArchiver(theApp, argv.output)
-  await theApp._yaml(sa, argv.target)
-  sa.finalize(userConfig)
+  await theApp._yaml(sa, target)
+  sa.finalize(userConfig, target)
 }
 
 main()
