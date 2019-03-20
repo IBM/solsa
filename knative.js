@@ -1,4 +1,5 @@
 let solsa = require('./solsa')
+const utils = require('./utils.js')
 
 let knative = {
   CronJobSource: class CronJobSource extends solsa.Service {
@@ -19,7 +20,7 @@ let knative = {
           schedule: this.schedule,
           data: this.data,
           sink: {
-            apiVersion: 'serving.knative.dev/v1alpha1',
+            apiVersion: target === utils.targets.KNATIVE ? 'serving.knative.dev/v1alpha1' : 'v1',
             kind: 'Service',
             name: this.solsa.parent.name
           }
