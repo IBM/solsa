@@ -9,6 +9,10 @@ function genLabels (svc) {
   }
 }
 
+function solsaImage (str) {
+  return 'solsa-' + str.toLowerCase()
+}
+
 function isKubernetes (target) {
   return target === 'kubernetes'
 }
@@ -90,7 +94,7 @@ let solsa = {
               spec: {
                 containers: [{
                   name: this.name,
-                  image: 'solsa-' + this.constructor.name.toLowerCase(),
+                  image: solsaImage(this.constructor.name),
                   imagePullPolicy: 'IfNotPresent',
                   ports: [{ name: 'solsa', containerPort: PORT }],
                   env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
@@ -139,7 +143,7 @@ let solsa = {
                 revisionTemplate: {
                   spec: {
                     container: {
-                      image: '{{ .Values.solsa.docker.registry }}/' + 'solsa-' + this.constructor.name.toLowerCase(),
+                      image: solsaImage(this.constructor.name),
                       env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
                     }
                   }
