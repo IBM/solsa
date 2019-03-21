@@ -177,4 +177,6 @@ async function main () {
   sa.finalize(userConfig, target)
 }
 
+global.__yaml = true
+
 main()

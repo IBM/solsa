@@ -14,12 +14,18 @@ function solsaImage (str) {
   return 'solsa-' + str.toLowerCase()
 }
 
+global.__level = global.__level || 0
+
 let solsa = {
   Service: class Service {
     static make () {
+      // console.log(' '.repeat(global.__level) + 'make', this.name)
+      if (!global.__yaml && global.__level) return null
+      global.__level++
       let svc = new this(...arguments)
+      global.__level--
       svc.solsa.options.push(...arguments)
-      if (svc.solsa.raw) return svc
+      if (svc.solsa.raw || global.__yaml) return svc
 
       for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
         svc[key] = async function () {
@@ -39,14 +45,17 @@ let solsa = {
     }
 
     constructor (name, raw) {
+      // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
       this.name = name
       this.events = new Events()
       this.solsa = { raw, dependencies: [], secrets: {}, options: [] }
     }
 
     addDependency (dep) {
-      this.solsa.dependencies.push(dep)
-      dep.solsa.parent = this
+      if (dep) {
+        this.solsa.dependencies.push(dep)
+        dep.solsa.parent = this
+      }
       return dep
     }
 
