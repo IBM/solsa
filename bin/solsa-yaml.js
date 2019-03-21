@@ -153,7 +153,7 @@ class SolsaArchiver {
 
 async function main () {
   const argv = minimist(process.argv.slice(2), {
-    default: { target: 'kubernetes', output: 'solsa-yaml', config: process.env.SOSLA_CONFIG },
+    default: { target: 'kubernetes', output: 'solsa-yaml', config: process.env.SOLSA_CONFIG },
     alias: { target: 't', output: 'o', config: 'c' },
     string: ['target', 'output', 'config']
   })

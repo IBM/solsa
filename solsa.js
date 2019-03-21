@@ -57,10 +57,7 @@ let solsa = {
     }
 
     async _yaml (archive, target) {
-      let env = {
-        SOLSA_NAME: { value: this.name },
-        SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }
-      }
+      let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) } }
       for (let svc of this.solsa.dependencies) {
         await svc._yaml(archive, target)
         for (let k of Object.keys(svc.solsa.secrets)) {
@@ -154,7 +151,7 @@ let solsa = {
     }
 
     static serve () {
-      let options = JSON.parse(process.env.SOLSA_OPTIONS)
+      let options = JSON.parse(process.env.SOLSA_OPTIONS || '{}')
 
       let svc = new this(...options)
 
@@ -164,14 +161,13 @@ let solsa = {
 
       for (let key of Object.getOwnPropertyNames(this.prototype).filter(name => name !== 'constructor')) {
         app.post('/' + key, (request, response) => {
-          svc[key](request.body).then(r => response.send(r), err => response.status(500).send(err.message || err.toString() || 'Internal error'))
+          Promise.resolve().then(() => svc[key](request.body)).then(r => response.send(r), err => response.status(500).send((err && err.message) || 'Internal error'))
         })
       }
 
       for (let key of svc.events.eventNames()) {
         app.post('/' + key, (request, response) => {
-          svc.events.emit(key, request.body)
-          response.status(202).send('ACCEPTED')
+          Promise.resolve().then(() => svc.events.emit(key, request.body)).then(() => response.status(200).send('OK'), err => response.status(500).send((err && err.message) || 'Internal error'))
         })
       }
 
@@ -180,15 +176,15 @@ let solsa = {
       })
 
       app.post('/', (request, response) => {
-        console.log(request.body.Body)
-        let Body = JSON.parse(request.body.Body)
-        svc.events.emit(Body.event, Body.payload)
-        response.status(202).send('ACCEPTED')
+        Promise.resolve().then(() => {
+          let Body = JSON.parse(request.body.Body)
+          svc.events.emit(Body.event, Body.payload)
+        }).then(() => response.status(200).send('OK'), err => response.status(500).send((err && err.message) || 'Internal error'))
       })
 
       app.listen(PORT, err => {
         if (err) {
-          console.log(err)
+          console.error(err)
         } else {
           console.log(`server is listening on ${PORT}`)
         }
