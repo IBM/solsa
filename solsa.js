@@ -90,7 +90,6 @@ let solsa = {
                   containers: [{
                     name: this.name,
                     image: solsaImage(this.constructor.name),
-                    imagePullPolicy: 'IfNotPresent',
                     ports: [{ name: 'solsa', containerPort: PORT }],
                     env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
                     livenessProbe: {
