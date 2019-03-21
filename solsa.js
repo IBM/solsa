@@ -151,7 +151,7 @@ let solsa = {
     }
 
     static serve () {
-      let options = JSON.parse(process.env.SOLSA_OPTIONS || '{}')
+      let options = JSON.parse(process.env.SOLSA_OPTIONS || '[]')
 
       let svc = new this(...options)
 
