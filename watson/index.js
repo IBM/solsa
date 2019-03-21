@@ -1,5 +1,4 @@
 module.exports = {
-  AssistantV1: require('./assistant-v1'),
   AssistantV2: require('./assistant-v2'),
   CompareComplyV1: require('./compare-comply-v1'),
   DiscoveryV1: require('./discovery-v1'),
