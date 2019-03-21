@@ -112,7 +112,20 @@ class SolsaArchiver {
         }
         break
       case utils.targets.KNATIVE:
-        console.log('Ingress not supported for KNative target. Not added to overlay for ' + cluster.name)
+        console.log('Ingress not supported for KNative target. Not added to ' + cluster.name + ' overlay.')
+    }
+  }
+
+  _finalizeImageRenames (cluster, target, additionalFiles, jsonPatches) {
+    if (!cluster.images) return []
+    switch (target) {
+      case utils.targets.KUBERNETES: {
+        return cluster.images
+      }
+      case utils.targets.KNATIVE: {
+        // NOTE: This assumes a patch to Kustomize that has not yet been merged upstream
+        return cluster.images
+      }
     }
   }
 
@@ -128,22 +141,24 @@ class SolsaArchiver {
     this.addKustomizeYaml(kustom, '/base/', 'kustomization.yaml')
 
     if (userConfig.clusters) {
-      for (const c of userConfig.clusters) {
+      for (const cluster of userConfig.clusters) {
         const additionalFiles = []
         const jsonPatches = []
 
-        if (c.ingress) {
-          this._finalizeIngress(c, target, additionalFiles, jsonPatches)
+        if (cluster.ingress) {
+          this._finalizeIngress(cluster, target, additionalFiles, jsonPatches)
         }
+        const images = this._finalizeImageRenames(cluster, target, additionalFiles, jsonPatches)
+
         const kc = {
           apiVersion: 'kustomize.config.k8s.io/v1beta1',
           kind: 'Kustomization',
           bases: ['./../base'],
           resources: additionalFiles,
           patchesJson6902: jsonPatches,
-          images: c.images ? c.images : []
+          images: images
         }
-        this.addKustomizeYaml(kc, '/' + c.name + '/', 'kustomization.yaml')
+        this.addKustomizeYaml(kc, '/' + cluster.name + '/', 'kustomization.yaml')
       }
     }
 
