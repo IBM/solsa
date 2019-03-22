@@ -59,13 +59,13 @@ SolSA consists of:
 1. Configure access to the Kubernetes cluster (`KUBECONFIG`)
 
 2. Create a solsa-config.yaml file that describes each Kubernetes cluster
-   for which you want SolSA to generate a Kustomize overlay.  For example, here
-   is a solsa-config.yaml that defines two deployment envionments, a
+   for which you want SolSA to generate a Kustomize overlay.
+   The example file below defines two deployment envionments, a
    local dev environment and an IKS cluster. The IKS cluster definition
    demonstrates how to instruct SolSA to generate a Kustomize overlay that
    will rename docker images so that instead of being pulled from the local
    registry on the dev machine, the images will instead be pulled from a
-   specific namespace in the IBM Container Registry .
+   specific namespace in the IBM Container Registry.
    ```yaml
     clusters:
     - name: 'localdev'

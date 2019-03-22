@@ -112,7 +112,7 @@ class SolsaArchiver {
         }
         break
       case utils.targets.KNATIVE:
-        console.log('Ingress not supported for KNative target. Not added to ' + cluster.name + ' overlay.')
+        // NOTHING TO DO FOR IKS (Ingress automatically configured for KNative Services)
     }
   }
 
