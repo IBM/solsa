@@ -53,9 +53,9 @@ class SolsaArchiver {
   }
 
   _finalizeIngress (cluster, target, additionalFiles, jsonPatches) {
-    switch (target) {
-      case utils.targets.KUBERNETES:
-        if (cluster.ingress.iks) {
+    if (cluster.ingress.iks) {
+      switch (target) {
+        case utils.targets.KUBERNETES: {
           const ingress = {
             apiVersion: 'extensions/v1beta1',
             kind: 'Ingress',
@@ -88,7 +88,14 @@ class SolsaArchiver {
           }
           this.addKustomizeYaml(ingress, '/' + cluster.name + '/', 'ingress.yaml')
           additionalFiles.push('ingress.yaml')
-        } else if (cluster.ingress.nodePort) {
+          break
+        }
+        case utils.targets.KNATIVE:
+        // NOTHING TO DO FOR IKS (Ingress automatically configured for KNative Services)
+      }
+    } else if (cluster.ingress.nodePort) {
+      switch (target) {
+        case utils.targets.KUBERNETES: {
           const nodePortPatch = [
             {
               op: 'replace',
@@ -109,10 +116,12 @@ class SolsaArchiver {
             },
             path: 'expose-svc.yaml'
           })
+          break
         }
-        break
-      case utils.targets.KNATIVE:
-        // NOTHING TO DO FOR IKS (Ingress automatically configured for KNative Services)
+        case utils.targets.KNATIVE: {
+          console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
+        }
+      }
     }
   }
 
