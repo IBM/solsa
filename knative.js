@@ -22,12 +22,16 @@ let knative = {
           sink: {
             apiVersion: target === utils.targets.KNATIVE ? 'serving.knative.dev/v1alpha1' : 'v1',
             kind: 'Service',
-            name: this.solsa.parent.name
+            name: this.sink.name
           }
         }
       }
       archive.addYaml(svc, this.name + '-source.yaml')
     }
+  },
+
+  connect (source, sink) {
+    source.sink = sink
   }
 }
 

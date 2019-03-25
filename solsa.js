@@ -74,6 +74,8 @@ let solsa = {
         }
       }
 
+      if (Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor').length === 0) return
+
       switch (target) {
         case utils.targets.KUBERNETES: {
           const deployment = {
