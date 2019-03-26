@@ -48,7 +48,11 @@ let solsa = {
       // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
       this.name = name
       this.events = new Events()
-      this.solsa = { raw, dependencies: [], secrets: {}, options: [] }
+      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [] }
+    }
+
+    async initializeService () {
+      this.serviceReady = true
     }
 
     addDependency (dep) {
@@ -166,6 +170,8 @@ let solsa = {
 
       let svc = new this(...options)
 
+      svc.initializeService()
+
       let express = require('express')
       let app = express()
       app.use(express.json())
@@ -183,7 +189,11 @@ let solsa = {
       }
 
       app.get('/solsa/readinessProbe', (_request, response) => {
-        response.status(200).send('OK')
+        if (svc.serviceReady) {
+          response.status(200).send('OK')
+        } else {
+          response.status(503).send('Service not ready')
+        }
       })
 
       app.post('/', (request, response) => {
