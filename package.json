@@ -3,7 +3,7 @@
   "main": "solsa.js",
   "version": "0.1.0",
   "bin": {
-    "solsa-build": "./bin/solsa-build",
+    "solsa-build": "./bin/solsa-build.js",
     "solsa-yaml": "./bin/solsa-yaml.js",
     "solsa-name": "./bin/solsa-name.js",
     "solsa-serve": "./bin/solsa-serve.js"
@@ -16,7 +16,9 @@
     "archiver": "^3.0.0",
     "express": "^4.16.4",
     "js-yaml": "^3.13.0",
+    "minimist": "^1.2.0",
     "needle": "^2.2.4",
+    "tmp": "^0.1.0",
     "watson-developer-cloud": "^3.18.1"
   },
   "devDependencies": {
