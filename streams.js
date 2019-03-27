@@ -18,7 +18,7 @@ let streams = {
 
     async _ensureInit () {
       if (this.initialized === false) {
-        const opList = await this._listOperators()
+        const opList = await this._retryingListOperators()
         for (let op of opList) {
           console.log('initializing ' + op)
           this[op] = async function () {
@@ -29,6 +29,18 @@ let streams = {
           }
         }
         this.initialized = true
+      }
+    }
+
+    async _retryingListOperators () {
+      const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+      while (true) {
+        try {
+          return await this._listOperators()
+        } catch (err) {
+          console.log('_retryingListOperators: StreamsJob not ready; waiting 1 second')
+          await delay(1000)
+        }
       }
     }
 
