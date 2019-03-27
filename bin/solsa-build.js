@@ -73,12 +73,11 @@ for (let image of Object.values(images)) {
     const match = cluster.images && cluster.images.find(x => x.name === image.name)
     let tag
     if (match) {
-      tag = match.newName
+      tag = `${match.newName || image.name}:${match.newTag || argv.tag}`
     } else if (cluster.registry) {
-      tag = `${cluster.registry}/${image.name}`
+      tag = `${cluster.registry}/${image.name}:${argv.tag}`
     }
     if (tag) {
-      if (tag.indexOf(':') === -1) tag += `:${argv.tag}`
       tags.push(tag)
       if (cluster.name === argv.push) push = tag
     }
