@@ -3,6 +3,7 @@
 const cp = require('child_process')
 const fs = require('fs')
 const minimist = require('minimist')
+const os = require('os')
 const path = require('path')
 const tmp = require('tmp')
 const yaml = require('js-yaml')
@@ -10,7 +11,7 @@ const yaml = require('js-yaml')
 tmp.setGracefulCleanup()
 
 const argv = minimist(process.argv.slice(2), {
-  default: { config: process.env.SOLSA_CONFIG, tag: 'latest' },
+  default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml'), tag: 'latest' },
   alias: { config: 'c', tag: 't' },
   string: ['config', 'push', 'tag']
 })
@@ -59,7 +60,7 @@ global.__yaml = true
 
 const images = require(path.resolve(argv._[0]))._images()
 
-const config = argv.config ? yaml.safeLoad(fs.readFileSync(argv.config, 'utf8')) : { clusters: [] }
+const config = fs.existsSync(argv.config) ? yaml.safeLoad(fs.readFileSync(argv.config, 'utf8')) : { clusters: [] }
 
 if (argv.push && !config.clusters.find(cluster => cluster.name === argv.push)) {
   console.error(`Cannot find cluster "${argv.push}" in configuration file`)

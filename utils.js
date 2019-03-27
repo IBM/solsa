@@ -1,7 +1,7 @@
 let utils = {
   targets: {
     KUBERNETES: 'Kubernetes',
-    KNATIVE: 'KNative'
+    KNATIVE: 'Knative'
   }
 }
 

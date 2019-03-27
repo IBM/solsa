@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-let yaml = require('js-yaml')
-const minimist = require('minimist')
-const fs = require('fs')
 const archiver = require('archiver')
+const fs = require('fs')
+const minimist = require('minimist')
+const os = require('os')
+const path = require('path')
 const utils = require('../utils.js')
+const yaml = require('js-yaml')
 
 class SolsaArchiver {
   constructor (app, archiveName) {
@@ -177,7 +179,7 @@ class SolsaArchiver {
 
 async function main () {
   const argv = minimist(process.argv.slice(2), {
-    default: { target: 'kubernetes', output: 'solsa-yaml', config: process.env.SOLSA_CONFIG },
+    default: { target: 'kubernetes', output: 'solsa-yaml', config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
     alias: { target: 't', output: 'o', config: 'c' },
     string: ['target', 'output', 'config']
   })
