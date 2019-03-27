@@ -5,7 +5,6 @@
   "bin": {
     "solsa-build": "./bin/solsa-build.js",
     "solsa-yaml": "./bin/solsa-yaml.js",
-    "solsa-name": "./bin/solsa-name.js",
     "solsa-serve": "./bin/solsa-serve.js"
   },
   "scripts": {
