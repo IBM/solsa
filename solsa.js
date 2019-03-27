@@ -48,7 +48,7 @@ let solsa = {
       // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
       this.name = name
       this.events = new Events()
-      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [] }
+      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], pkg: require('pkg-dir').sync(require('caller-path')()) }
     }
 
     async initializeService () {
@@ -67,6 +67,13 @@ let solsa = {
       let v = `SOLSA_${name}_SOLSA_${key}`.toUpperCase().replace(/-/g, '_')
       this.solsa.secrets[v] = { valueFrom: { secretKeyRef: { name, key } } }
       return process.env[v]
+    }
+
+    _images () {
+      if (this.solsa.raw) return {}
+      const me = {}
+      me[this.constructor.name] = { name: solsaImage(this.constructor.name), dir: this.solsa.pkg }
+      return Object.assign(me, ...this.solsa.dependencies.filter(svc => svc._images).map(svc => svc._images()))
     }
 
     async _yaml (archive, target) {
