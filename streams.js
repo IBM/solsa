@@ -48,6 +48,9 @@ let streams = {
           namespace: StreamsKNativeNS
         },
         spec: {
+          fusion: {
+            manual: 1
+          },
           processingElement: {
             imagePullPolicy: 'IfNotPresent',
             runtimeTraceLevel: 'DEBUG',
