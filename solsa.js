@@ -1,5 +1,7 @@
+const callSites = require('callsites')
 const Events = require('events')
 const needle = require('needle')
+const pkgDir = require('pkg-dir')
 const utils = require('./utils.js')
 
 const PORT = 8080
@@ -48,7 +50,7 @@ let solsa = {
       // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
       this.name = name
       this.events = new Events()
-      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], pkg: require('pkg-dir').sync(require('caller-path')()) }
+      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], file: callSites()[1].getFileName() }
     }
 
     async initializeService () {
@@ -72,7 +74,7 @@ let solsa = {
     _images () {
       if (this.solsa.raw) return {}
       const me = {}
-      me[this.constructor.name] = { name: solsaImage(this.constructor.name), dir: this.solsa.pkg }
+      me[this.constructor.name] = { name: solsaImage(this.constructor.name), dir: pkgDir.sync(this.solsa.file) }
       return Object.assign(me, ...this.solsa.dependencies.filter(svc => svc._images).map(svc => svc._images()))
     }
 
