@@ -9,10 +9,11 @@ const SVC_PORT = 8080
 
 let streams = {
   StreamsJob: class StreamsJob extends solsa.Service {
-    constructor (name, sab) {
+    constructor (name, sab, submissionTimeValues) {
       super(name, true)
       this.name = name
       this.sab = sab
+      this.submissionTimeValues = submissionTimeValues
       this.initialized = false
     }
 
@@ -60,15 +61,13 @@ let streams = {
           namespace: StreamsKNativeNS
         },
         spec: {
-          fusion: {
-            manual: 1
-          },
           processingElement: {
             imagePullPolicy: 'IfNotPresent',
             runtimeTraceLevel: 'DEBUG',
             sabName: this.sab,
             restartFailedPod: true
-          }
+          },
+          submissionTimeValues: this.submissionTimeValues
         }
       }
       archive.addYaml(j, this.name + '-job.yaml')
