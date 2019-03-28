@@ -8,19 +8,20 @@ const path = require('path')
 const yaml = require('js-yaml')
 
 class SolsaArchiver {
-  constructor (app, archiveName) {
+  constructor (app, outputRoot) {
     this.app = app
-    var output = fs.createWriteStream(archiveName + '.tgz')
+    var output = fs.createWriteStream(outputRoot + '.tgz')
     this.archive = archiver('tar', {
       gzip: true,
       zlib: { level: 9 }
     })
     this.files = []
+    this.outputRoot = outputRoot
 
     // listen for all archive data to be written
     // 'close' event is fired only when a file descriptor is involved
     output.on('close', function () {
-      console.log('archiver has been finalized and the output file descriptor has closed.')
+      console.log(`Generated application YAML to ${outputRoot}.tgz`)
     })
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors)
@@ -44,13 +45,13 @@ class SolsaArchiver {
 
   addYaml (obj, fname, layer = 'base') {
     this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: path.join('solsa-' + this.app.name.toLowerCase(), layer, fname) })
+      { name: path.join(this.outputRoot, layer, fname) })
     this.files.push({ fname, layer })
   }
 
   addKustomizeYaml (obj, fname, layer = 'base') {
     this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: path.join('solsa-' + this.app.name.toLowerCase(), layer, fname) })
+      { name: path.join(this.outputRoot, layer, fname) })
   }
 
   _finalizeIngress (cluster, additionalFiles, jsonPatches) {
@@ -167,7 +168,7 @@ class SolsaArchiver {
 
 async function main () {
   const argv = minimist(process.argv.slice(2), {
-    default: { output: 'solsa-yaml', config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
+    default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
     alias: { output: 'o', config: 'c' },
     string: ['output', 'config']
   })
@@ -178,6 +179,10 @@ async function main () {
   }
 
   const theApp = require(require('path').resolve(argv._[0]))
+  if (argv.output === undefined) {
+    argv.output = 'solsa-' + theApp.name.toLowerCase()
+  }
+
   const sa = new SolsaArchiver(theApp, argv.output)
   await theApp._yaml(sa)
   sa.finalize(userConfig)
