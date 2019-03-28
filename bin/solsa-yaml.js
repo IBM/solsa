@@ -89,7 +89,7 @@ class SolsaArchiver {
       this.addKustomizeYaml(ingress, 'ingress.yaml', cluster.name)
       additionalFiles.push('ingress.yaml')
 
-      // NOTHING TO DO FOR Knative (Ingress automatically configured for KNative Services on IKS)
+      // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
     } else if (cluster.ingress.nodePort) {
       if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
         const nodePortPatch = [
@@ -179,11 +179,8 @@ async function main () {
   }
 
   const theApp = require(require('path').resolve(argv._[0]))
-  if (argv.output === undefined) {
-    argv.output = 'solsa-' + theApp.name.toLowerCase()
-  }
-
-  const sa = new SolsaArchiver(theApp, argv.output)
+  const outputRoot = argv.output ? argv.output : 'solsa-' + theApp.name.toLowerCase()
+  const sa = new SolsaArchiver(theApp, outputRoot)
   await theApp._yaml(sa)
   sa.finalize(userConfig)
 }

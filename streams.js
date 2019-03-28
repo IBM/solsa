@@ -4,7 +4,7 @@ let solsa = require('./solsa')
 // FIXME: Streams.knative limitation -- must be in same namespace as the Streams.knative controller pod
 //        So we hardwire that in the yaml and also hardwire a cross-NS service reference in all needle
 //        calls from the wrapper service to the service in the streams NS that wraps the StreamsJob
-const StreamsKNativeNS = 'streams'
+const StreamsKnativeNS = 'streams'
 const SVC_PORT = 8080
 
 let streams = {
@@ -23,7 +23,7 @@ let streams = {
         for (let op of opList) {
           console.log('initializing ' + op)
           this[op] = async function () {
-            const url = `http://${this.name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/operator/' + op
+            const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + SVC_PORT + '/operator/' + op
             console.log('invoking StreamsJob: ' + url + ' ' + JSON.stringify(arguments[0]))
             return needle('put', url, arguments[0], { json: true })
               .then(result => result.body)
@@ -46,7 +46,7 @@ let streams = {
     }
 
     async _listOperators () {
-      const url = `http://${this.name}-svc` + '.' + StreamsKNativeNS + ':' + SVC_PORT + '/list'
+      const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + SVC_PORT + '/list'
       console.log('listOperators: ' + url)
       return needle('get', url, { json: true })
         .then(result => result.body.operators)
@@ -58,7 +58,7 @@ let streams = {
         kind: 'Job',
         metadata: {
           name: this.name,
-          namespace: StreamsKNativeNS
+          namespace: StreamsKnativeNS
         },
         spec: {
           processingElement: {
@@ -77,7 +77,7 @@ let streams = {
         kind: 'Service',
         metadata: {
           name: this.name + '-svc',
-          namespace: StreamsKNativeNS
+          namespace: StreamsKnativeNS
         },
         spec: {
           ports: [{ port: SVC_PORT }],

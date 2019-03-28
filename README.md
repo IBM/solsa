@@ -12,7 +12,7 @@ instantiating and invoking the service.
 
 SolSA leverages Kubernetes operators to manage the life cycle of services both
 inside and outside of Kubernetes. SolSA can target a standard Kubernetes cluster
-or a KNative cluster.
+or a Knative cluster.
 
 The SolSa source code includes declarations for the service being composed over
 as well as configuration parameters. SolSA leverages these declarations to
@@ -44,7 +44,7 @@ SolSA consists of:
 
 1. Install SEED (Follow the instructions at https://github.ibm.com/seed/charts)
 
-2. Optionally install KNative (For IKS, follow the instructions at
+2. Optionally install Knative (For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial)
 
 ### Per Namespace Setup
