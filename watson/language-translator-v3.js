@@ -116,6 +116,20 @@ class LanguageTranslatorV3 extends solsa.Service {
       }
     }
     archive.addYaml(svc, this.name + '-svc.yaml')
+    const binding = {
+      apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
+      kind: 'Binding',
+      metadata: {
+        name: `binding-${this.name}`
+      },
+      spec: {
+        bindingFrom: {
+          name: this.name
+        },
+        servicetype: 'IAM'
+      }
+    }
+    archive.addYaml(binding, this.name + '-binding.yaml')
   }
 }
 
