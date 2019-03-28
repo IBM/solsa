@@ -61,8 +61,11 @@ let streams = {
           namespace: StreamsKnativeNS
         },
         spec: {
+          fusion: {
+            manual: 1
+          },
           processingElement: {
-            imagePullPolicy: 'IfNotPresent',
+            imagePullPolicy: 'Always',
             runtimeTraceLevel: 'DEBUG',
             sabName: this.sab,
             restartFailedPod: true

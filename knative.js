@@ -1,5 +1,4 @@
 let solsa = require('./solsa')
-const utils = require('./utils.js')
 
 let knative = {
   CronJobSource: class CronJobSource extends solsa.Service {
@@ -10,7 +9,7 @@ let knative = {
     }
 
     _yaml (archive, target) {
-      const svc = {
+      const svcKubernetes = {
         apiVersion: 'sources.eventing.knative.dev/v1alpha1',
         kind: 'CronJobSource',
         metadata: {
@@ -20,13 +19,17 @@ let knative = {
           schedule: this.schedule,
           data: this.data,
           sink: {
-            apiVersion: target === utils.targets.KNATIVE ? 'serving.knative.dev/v1alpha1' : 'v1',
+            apiVersion: 'v1',
             kind: 'Service',
             name: this.sink.name
           }
         }
       }
-      archive.addYaml(svc, this.name + '-source.yaml')
+      const svcKnative = JSON.parse(JSON.stringify(svcKubernetes))
+      svcKnative.spec.sink.apiVersion = 'serving.knative.dev/v1alpha1'
+
+      archive.addYaml(svcKubernetes, this.name + '-source.yaml', 'kubernetes')
+      archive.addYaml(svcKnative, this.name + '-source.yaml', 'knative')
     }
   },
 
