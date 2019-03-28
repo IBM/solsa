@@ -78,7 +78,7 @@ let solsa = {
     }
 
     async _yaml (archive) {
-      let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) } }
+      let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }, SOLSA_PORT: { value: `${PORT}` } }
       for (let svc of this.solsa.dependencies) {
         await svc._yaml(archive)
         for (let k of Object.keys(svc.solsa.secrets)) {
@@ -169,6 +169,7 @@ let solsa = {
 
     static serve () {
       let options = JSON.parse(process.env.SOLSA_OPTIONS || '[]')
+      let port = parseInt(process.env.SOLSA_PORT, 10)
 
       let svc = new this(...options)
 
@@ -205,11 +206,11 @@ let solsa = {
         }).then(() => response.status(200).send('OK'), err => response.status(500).send((err && err.message) || 'Internal error'))
       })
 
-      app.listen(PORT, err => {
+      app.listen(port, err => {
         if (err) {
           console.error(err)
         } else {
-          console.log(`server is listening on ${PORT}`)
+          console.log(`server is listening on ${port}`)
         }
       })
     }
