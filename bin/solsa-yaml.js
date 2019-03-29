@@ -196,7 +196,8 @@ class SolsaArchiver {
         bases: layer.bases,
         resources: Object.keys(layer.resources),
         patches: Object.keys(layer.patches),
-        patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target)
+        patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target),
+        images: layer.images
       }
       this._writeToFile(kustom, 'kustomization.yaml', layer.name)
     }
