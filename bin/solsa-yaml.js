@@ -119,13 +119,21 @@ class SolsaArchiver {
     }
   }
 
-  _finalizeImageRenames (cluster, additionalFiles, jsonPatches) {
-    if (!cluster.images) return []
-    // NOTE: This assumes a patch to Kustomize that has not yet been merged upstream
-    return cluster.images
+  _finalizeImageRenames (cluster, additionalFiles, jsonPatches, theApp) {
+    let images = cluster.images || []
+    if (!cluster.registry) return images
+
+    // map images to registry if not already mapped
+    const names = Object.values(theApp._images()).map(({ name }) => name)
+    for (let name of names) {
+      if (!images.find(renaming => renaming.name === name)) {
+        images.push({ name, newName: `${cluster.registry}/${name}` })
+      }
+    }
+    return images
   }
 
-  finalize (userConfig) {
+  finalize (userConfig, theApp) {
     const layers = {}
     for (let entry of this.files) layers[entry.layer] = [entry.fname].concat(layers[entry.layer] || [])
     for (let layer of Object.keys(layers)) {
@@ -148,7 +156,7 @@ class SolsaArchiver {
         if (cluster.ingress) {
           this._finalizeIngress(cluster, additionalFiles, jsonPatches)
         }
-        const images = this._finalizeImageRenames(cluster, additionalFiles, jsonPatches)
+        const images = this._finalizeImageRenames(cluster, additionalFiles, jsonPatches, theApp)
 
         const kc = {
           apiVersion: 'kustomize.config.k8s.io/v1beta1',
@@ -182,7 +190,7 @@ async function main () {
   const outputRoot = argv.output ? argv.output : 'solsa-' + theApp.name.toLowerCase()
   const sa = new SolsaArchiver(theApp, outputRoot)
   await theApp._yaml(sa)
-  sa.finalize(userConfig)
+  sa.finalize(userConfig, theApp)
 }
 
 global.__yaml = true
