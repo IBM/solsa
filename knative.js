@@ -28,8 +28,8 @@ let knative = {
       const svcKnative = JSON.parse(JSON.stringify(svcKubernetes))
       svcKnative.spec.sink.apiVersion = 'serving.knative.dev/v1alpha1'
 
-      archive.addYaml(svcKubernetes, this.name + '-source.yaml', 'kubernetes')
-      archive.addYaml(svcKnative, this.name + '-source.yaml', 'knative')
+      archive.addResource(svcKubernetes, this.name + '-source.yaml', 'kubernetes')
+      archive.addResource(svcKnative, this.name + '-source.yaml', 'knative')
     }
   },
 

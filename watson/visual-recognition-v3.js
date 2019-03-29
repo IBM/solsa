@@ -141,7 +141,7 @@ class VisualRecognitionV3 extends solsa.Service {
         servicetype: 'IAM'
       }
     }
-    archive.addYaml(svc, this.name + '-svc.yaml')
+    archive.addResource(svc, this.name + '-svc.yaml')
     const binding = {
       apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
       kind: 'Binding',
@@ -155,7 +155,7 @@ class VisualRecognitionV3 extends solsa.Service {
         servicetype: 'IAM'
       }
     }
-    archive.addYaml(binding, this.name + '-binding.yaml')
+    archive.addResource(binding, this.name + '-binding.yaml')
   }
 }
 

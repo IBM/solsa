@@ -126,7 +126,7 @@ let solsa = {
           }
         }
       }
-      archive.addYaml(deployment, this.name + '-deployment.yaml', 'kubernetes')
+      archive.addResource(deployment, this.name + '-deployment.yaml', 'kubernetes')
 
       const svc = {
         apiVersion: 'v1',
@@ -141,7 +141,7 @@ let solsa = {
           selector: genLabels(this)
         }
       }
-      archive.addYaml(svc, this.name + '-svc.yaml', 'kubernetes')
+      archive.addResource(svc, this.name + '-svc.yaml', 'kubernetes')
 
       const ksvc = {
         apiVersion: 'serving.knative.dev/v1alpha1',
@@ -164,7 +164,7 @@ let solsa = {
           }
         }
       }
-      archive.addYaml(ksvc, this.name + '-svc.yaml', 'knative')
+      archive.addResource(ksvc, this.name + '-svc.yaml', 'knative')
     }
 
     static serve () {

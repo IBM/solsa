@@ -73,7 +73,7 @@ let streams = {
           submissionTimeValues: this.submissionTimeValues
         }
       }
-      archive.addYaml(j, this.name + '-job.yaml')
+      archive.addResource(j, this.name + '-job.yaml')
 
       const svc = {
         apiVersion: 'v1',
@@ -90,7 +90,7 @@ let streams = {
           }
         }
       }
-      archive.addYaml(svc, this.name + '-svc.yaml')
+      archive.addResource(svc, this.name + '-svc.yaml')
     }
   }
 }

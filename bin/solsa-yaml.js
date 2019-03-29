@@ -7,6 +7,17 @@ const os = require('os')
 const path = require('path')
 const yaml = require('js-yaml')
 
+class KustomizeLayer {
+  constructor (name) {
+    this.name = name
+    this.resources = {}
+    this.bases = []
+    this.patches = {}
+    this.patchesJSON = {}
+    this.images = []
+  }
+}
+
 class SolsaArchiver {
   constructor (app, outputRoot) {
     this.app = app
@@ -15,7 +26,7 @@ class SolsaArchiver {
       gzip: true,
       zlib: { level: 9 }
     })
-    this.files = []
+    this.layers = { base: new KustomizeLayer('base') }
     this.outputRoot = outputRoot
 
     // listen for all archive data to be written
@@ -43,18 +54,39 @@ class SolsaArchiver {
     this.archive.pipe(output)
   }
 
-  addYaml (obj, fname, layer = 'base') {
-    this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: path.join(this.outputRoot, layer, fname) })
-    this.files.push({ fname, layer })
-  }
-
-  addKustomizeYaml (obj, fname, layer = 'base') {
+  _writeToFile (obj, fname, layer) {
     this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
       { name: path.join(this.outputRoot, layer, fname) })
   }
 
-  _finalizeIngress (cluster, additionalFiles, jsonPatches) {
+  _getLayer (layer) {
+    if (this.layers[layer] === undefined) {
+      this.layers[layer] = new KustomizeLayer(layer)
+    }
+    return this.layers[layer]
+  }
+
+  addResource (obj, fname, layer = 'base') {
+    let kl = this._getLayer(layer)
+    kl.resources[fname] = obj
+  }
+
+  addPatch (patch, target, fname, layer = 'base') {
+    let kl = this._getLayer(layer)
+    kl.patches[fname] = { patch: patch, target: target }
+  }
+
+  addJSONPatch (patch, target, layer = 'base') {
+    let kl = this._getLayer(layer)
+    kl.patchesJSON[target.path] = { patch: patch, target: target }
+  }
+
+  addBaseToLayer (base, layer) {
+    let kl = this._getLayer(layer)
+    kl.bases.push(base)
+  }
+
+  _finalizeIngress (cluster) {
     if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
       const ingress = {
         apiVersion: 'extensions/v1beta1',
@@ -86,8 +118,7 @@ class SolsaArchiver {
           }]
         }
       }
-      this.addKustomizeYaml(ingress, 'ingress.yaml', cluster.name)
-      additionalFiles.push('ingress.yaml')
+      this.addResource(ingress, 'ingress.yaml', cluster.name)
 
       // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
     } else if (cluster.ingress.nodePort) {
@@ -103,15 +134,15 @@ class SolsaArchiver {
             value: cluster.ingress.nodePort
           }
         ]
-        this.addKustomizeYaml(nodePortPatch, 'expose-svc.yaml', cluster.name)
-        jsonPatches.push({
+        const nodePortPatchTarget = {
           target: {
             version: 'v1',
             kind: 'Service',
             name: this.app.name
           },
           path: 'expose-svc.yaml'
-        })
+        }
+        this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
       }
       if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
         console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
@@ -119,7 +150,7 @@ class SolsaArchiver {
     }
   }
 
-  _finalizeImageRenames (cluster, additionalFiles, jsonPatches, theApp) {
+  _finalizeImageRenames (cluster, theApp) {
     let images = cluster.images || []
     if (!cluster.registry) return images
 
@@ -134,40 +165,40 @@ class SolsaArchiver {
   }
 
   finalize (userConfig, theApp) {
-    const layers = {}
-    for (let entry of this.files) layers[entry.layer] = [entry.fname].concat(layers[entry.layer] || [])
-    for (let layer of Object.keys(layers)) {
+    if (userConfig.clusters) {
+      for (const cluster of userConfig.clusters) {
+        let clusterLayer = this._getLayer(cluster.name)
+        if (cluster.ingress) {
+          this._finalizeIngress(cluster)
+        }
+        clusterLayer.images = this._finalizeImageRenames(cluster, theApp)
+        clusterLayer.bases.push('./../base', `./../${cluster.nature || 'kubernetes'}`)
+      }
+    }
+
+    for (let lk of Object.keys(this.layers)) {
+      let layer = this.layers[lk]
+      for (let fname of Object.keys(layer.resources)) {
+        this._writeToFile(layer.resources[fname], fname, layer.name)
+      }
+      for (let fname of Object.keys(layer.patches)) {
+        this._writeToFile(layer.patches[fname], fname, layer.name)
+      }
+      for (let fname of Object.keys(layer.patchesJSON)) {
+        this._writeToFile(layer.patchesJSON[fname].patch, fname, layer.name)
+      }
       const kustom = {
         apiVersion: 'kustomize.config.k8s.io/v1beta1',
         kind: 'Kustomization',
         commonAnnotations: {
           'solsa.ibm.com/app': this.app.name
         },
-        resources: layers[layer]
+        bases: layer.bases,
+        resources: Object.keys(layer.resources),
+        patches: Object.keys(layer.patches),
+        patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target)
       }
-      this.addKustomizeYaml(kustom, 'kustomization.yaml', layer)
-    }
-
-    if (userConfig.clusters) {
-      for (const cluster of userConfig.clusters) {
-        const additionalFiles = []
-        const jsonPatches = []
-
-        if (cluster.ingress) {
-          this._finalizeIngress(cluster, additionalFiles, jsonPatches)
-        }
-        const images = this._finalizeImageRenames(cluster, additionalFiles, jsonPatches, theApp)
-
-        const kc = {
-          apiVersion: 'kustomize.config.k8s.io/v1beta1',
-          kind: 'Kustomization',
-          bases: ['./../base', `./../${cluster.nature || 'kubernetes'}`],
-          resources: additionalFiles,
-          patchesJson6902: jsonPatches,
-          images: images
-        }
-        this.addKustomizeYaml(kc, 'kustomization.yaml', cluster.name)
-      }
+      this._writeToFile(kustom, 'kustomization.yaml', layer.name)
     }
 
     this.archive.finalize()
