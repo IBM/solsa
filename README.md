@@ -15,6 +15,9 @@ whether they run inside or outside of a Kubernetes cluster. In particular, SolSA
 transparently manages service credentials. SolSA can target a standard
 Kubernetes cluster or a Knative cluster.
 
+SolSA leverages `kustomize` to permit targeting multiple environments, e.g.,
+local development cluster, Kubernetes cluster, Knative cluster.
+
 At the heart of SolSA is a simple template for declaring service parameters and
 service dependencies. Thanks to this template, SolSA can automatically identify,
 build, deploy, and configure all the services needed by an application.
@@ -54,27 +57,30 @@ SolSA consists of:
 
 3. Create a `.solsa.yaml` file in you home directory that describes each
    Kubernetes cluster for which you want SolSA to generate a Kustomize overlay.
-   The example file below defines two deployment environments, a local dev
-   environment and an IKS cluster. The IKS cluster definition demonstrates how
-   to instruct SolSA to generate a Kustomize overlay that will rename docker
-   images so that instead of being pulled from the local registry on the dev
-   machine, the images will instead be pulled from a specific namespace in the
-   IBM Container Registry.
+   The example file below defines three deployment environments, a local dev
+   environment, an IKS cluster, a Knative cluster.
    ```yaml
-    clusters:
-    - name: 'localdev'
-      ingress:
-        nodePort: 32323
-    - name: 'mycluster'
-      ingress:
-        iks:
-          subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-          tlssecret: 'mycluster123'
-      registry: 'us.icr.io/tardieu'
-    - name: 'myknative'
-      nature: 'knative'
-      registry: 'us.icr.io/tardieu'
+   clusters:
+   - name: 'localdev'
+     ingress:
+       nodePort: 32323
+   - name: 'mycluster'
+     ingress:
+       iks:
+         subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+         tlssecret: 'mycluster123'
+     registry: 'us.icr.io/tardieu'
+     images:
+     - name: solsa-translator
+       newName: us.icr.io/groved/solsa-translator
+   - name: 'myknative'
+     nature: 'knative'
    ```
+   The IKS cluster definition demonstrates how to instruct SolSA to generate a
+   Kustomize overlay that will rename docker images so that instead of being
+   pulled from the local registry on the dev machine, the images will instead be
+   pulled from a specific namespace in the IBM Container Registry. Specific
+   images can be handled. A default registry can also be specified.
 
 4. Clone and initialize this repository:
 ```
