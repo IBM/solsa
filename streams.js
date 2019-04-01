@@ -5,7 +5,6 @@ let solsa = require('./solsa')
 //        So we hardwire that in the yaml and also hardwire a cross-NS service reference in all needle
 //        calls from the wrapper service to the service in the streams NS that wraps the StreamsJob
 const StreamsKnativeNS = 'streams'
-const SVC_PORT = 8080
 
 let streams = {
   StreamsJob: class StreamsJob extends solsa.Service {
@@ -23,7 +22,7 @@ let streams = {
         for (let op of opList) {
           console.log('initializing ' + op)
           this[op] = async function () {
-            const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + SVC_PORT + '/operator/' + op
+            const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + this.port + '/operator/' + op
             console.log('invoking StreamsJob: ' + url + ' ' + JSON.stringify(arguments[0]))
             return needle('put', url, arguments[0], { json: true })
               .then(result => result.body)
@@ -46,7 +45,7 @@ let streams = {
     }
 
     async _listOperators () {
-      const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + SVC_PORT + '/list'
+      const url = `http://${this.name}-svc` + '.' + StreamsKnativeNS + ':' + this.port + '/list'
       console.log('listOperators: ' + url)
       return needle('get', url, { json: true })
         .then(result => result.body.operators)
@@ -83,7 +82,7 @@ let streams = {
           namespace: StreamsKnativeNS
         },
         spec: {
-          ports: [{ port: SVC_PORT }],
+          ports: [{ port: this.port }],
           selector: {
             app: 'streams',
             svc: 'pe'

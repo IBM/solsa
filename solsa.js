@@ -7,8 +7,6 @@ const path = require('path')
 const pkgDir = require('pkg-dir')
 const yaml = require('js-yaml')
 
-const PORT = 8080
-
 function genLabels (svc) {
   return {
     'solsa.ibm.com/name': svc.name
@@ -49,7 +47,7 @@ let solsa = {
           url = `https://${svc.name}.${cluster.ingress.iks.subdomain}`
         }
       } else {
-        url = `http://${svc.name}:${PORT}`
+        url = `http://${svc.name}:${svc.port}`
       }
 
       for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
@@ -69,9 +67,15 @@ let solsa = {
       return svc
     }
 
-    constructor (name, raw) {
+    constructor (solsaServiceArgs, raw) {
       // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
-      this.name = name
+      if (typeof solsaServiceArgs === 'string') {
+        this.name = solsaServiceArgs
+        this.port = 8080
+      } else {
+        this.name = solsaServiceArgs.name
+        this.port = solsaServiceArgs.port || 8080
+      }
       this.events = new Events()
       this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], file: callSites()[1].getFileName() }
     }
@@ -102,7 +106,7 @@ let solsa = {
     }
 
     async _yaml (archive) {
-      let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }, SOLSA_PORT: { value: `${PORT}` } }
+      let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }, SOLSA_PORT: { value: `${this.port}` } }
       for (let svc of this.solsa.dependencies) {
         await svc._yaml(archive)
         for (let k of Object.keys(svc.solsa.secrets)) {
@@ -132,17 +136,17 @@ let solsa = {
               containers: [{
                 name: this.name,
                 image: solsaImage(this.constructor.name),
-                ports: [{ name: 'solsa', containerPort: PORT }],
+                ports: [{ name: 'solsa', containerPort: this.port }],
                 env: Object.keys(env).map(key => Object.assign({ name: key }, env[key])),
                 livenessProbe: {
                   tcpSocket: {
-                    port: PORT
+                    port: this.port
                   }
                 },
                 readinessProbe: {
                   httpGet: {
                     path: '/solsa/readinessProbe',
-                    port: PORT
+                    port: this.port
                   }
                 }
               }]
@@ -161,7 +165,7 @@ let solsa = {
         },
         spec: {
           type: 'ClusterIP',
-          ports: [{ name: 'solsa', port: PORT }],
+          ports: [{ name: 'solsa', port: this.port }],
           selector: genLabels(this)
         }
       }

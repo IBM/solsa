@@ -18,6 +18,4 @@ WORKDIR /solsa
 
 COPY . .
 
-EXPOSE 8080
-
 CMD ["/solsa/node_modules/solsa/bin/solsa-serve.js", "."]
