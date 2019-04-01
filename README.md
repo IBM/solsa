@@ -1,7 +1,7 @@
 # SolSA
 
 The SolSA programming model is intended to ease the _development_, _deployment_,
-and _integration_ of cloud-native services and applications in a multi-cloud environment.
+and _integration_ of cloud-native services and applications.
 SolSA makes it possible to compose existing services (cloud services, cloud functions,
 container-based services) and event sources into new services and applications.
 
