@@ -1,7 +1,11 @@
 const callSites = require('callsites')
 const Events = require('events')
+const fs = require('fs')
 const needle = require('needle')
+const os = require('os')
+const path = require('path')
 const pkgDir = require('pkg-dir')
+const yaml = require('js-yaml')
 
 const PORT = 8080
 
@@ -28,9 +32,28 @@ let solsa = {
       svc.solsa.options.push(...arguments)
       if (svc.solsa.raw || global.__yaml) return svc
 
+      let url
+      const filename = process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
+      const config = fs.existsSync(filename) ? yaml.safeLoad(fs.readFileSync(filename, 'utf8')) : {}
+      const cluster = (config.clusters || []).find(cluster => cluster.name === process.env.SOLSA_CLUSTER) || {}
+      if (cluster.ingress && cluster.ingress.nodePort) {
+        url = `http://localhost:${cluster.ingress.nodePort}`
+      } else if (cluster.ingress && cluster.ingress.iks && cluster.ingress.iks.subdomain) {
+        if (cluster.nature === 'knative') {
+          url = `http://${svc.name}.default.${cluster.ingress.iks.subdomain}`
+        } else {
+          url = `https://${svc.name}.${cluster.ingress.iks.subdomain}`
+        }
+      } else {
+        console.error('Error: no ingress configured')
+        process.exit(1)
+      }
+
+      console.log(url)
+
       for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
         svc[key] = async function () {
-          return needle('post', (process.env.SOLSA_URL || `http://${svc.name}:${PORT}`) + '/' + key, arguments[0], { json: true })
+          return needle('post', url + '/' + key, arguments[0], { json: true })
             .then(result => result.body)
         }
       }
@@ -38,7 +61,7 @@ let solsa = {
       for (let event of svc.events.eventNames()) {
         svc.events.removeAllListeners(event)
         svc.events.on(event, function () {
-          needle('post', (process.env.SOLSA_URL || `http://${svc.name}:${PORT}`) + '/' + event, arguments[0], { json: true })
+          needle('post', url + '/' + event, arguments[0], { json: true })
         })
       }
 

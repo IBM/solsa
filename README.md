@@ -75,6 +75,9 @@ SolSA consists of:
        newName: us.icr.io/groved/solsa-translator
    - name: 'myknative'
      nature: 'knative'
+       iks:
+         subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+         tlssecret: 'mycluster123'
    ```
    The IKS cluster definition demonstrates how to instruct SolSA to generate a
    Kustomize overlay that will rename docker images so that instead of being
