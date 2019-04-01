@@ -49,8 +49,6 @@ let solsa = {
         url = `http://${svc.name}:${PORT}`
       }
 
-      console.log(url)
-
       for (let key of Object.getOwnPropertyNames(svc.constructor.prototype).filter(name => name !== 'constructor')) {
         svc[key] = async function () {
           return needle('post', url + '/' + key, arguments[0], { json: true })
