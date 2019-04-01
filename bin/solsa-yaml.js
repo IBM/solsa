@@ -19,8 +19,7 @@ class KustomizeLayer {
 }
 
 class SolsaArchiver {
-  constructor (app, outputRoot) {
-    this.app = app
+  constructor (outputRoot) {
     var output = fs.createWriteStream(outputRoot + '.tgz')
     this.archive = archiver('tar', {
       gzip: true,
@@ -86,92 +85,98 @@ class SolsaArchiver {
     kl.bases.push(base)
   }
 
-  _finalizeIngress (cluster) {
-    if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-      const ingress = {
-        apiVersion: 'extensions/v1beta1',
-        kind: 'Ingress',
-        metadata: {
-          name: this.app.name + '-ing-iks',
-          labels: {
-            'solsa.ibm.com/name': this.app.name
-          }
-        },
-        spec: {
-          tls: [{
-            hosts: [
-              this.app.name + '.' + cluster.ingress.iks.subdomain
-            ],
-            secretName: cluster.ingress.iks.tlssecret
-          }],
-          rules: [{
-            host: this.app.name + '.' + cluster.ingress.iks.subdomain,
-            http: {
-              paths: [{
-                path: '/',
-                backend: {
-                  serviceName: this.app.name,
-                  servicePort: 'solsa'
-                }
-              }]
+  _finalizeIngress (cluster, apps) {
+    for (let idx in apps) {
+      const exposedApp = apps[idx]
+      if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
+        const ingress = {
+          apiVersion: 'extensions/v1beta1',
+          kind: 'Ingress',
+          metadata: {
+            name: exposedApp.name + '-ing-iks',
+            labels: {
+              'solsa.ibm.com/name': exposedApp.name
             }
-          }]
-        }
-      }
-      this.addResource(ingress, 'ingress.yaml', cluster.name)
-
-      // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
-    } else if (cluster.ingress.nodePort) {
-      if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-        const nodePortPatch = [
-          {
-            op: 'replace',
-            path: '/spec/type',
-            value: 'NodePort'
-          }, {
-            op: 'add',
-            path: '/spec/ports/0/nodePort',
-            value: cluster.ingress.nodePort
-          }
-        ]
-        const nodePortPatchTarget = {
-          target: {
-            version: 'v1',
-            kind: 'Service',
-            name: this.app.name
           },
-          path: 'expose-svc.yaml'
+          spec: {
+            tls: [{
+              hosts: [
+                exposedApp.name + '.' + cluster.ingress.iks.subdomain
+              ],
+              secretName: cluster.ingress.iks.tlssecret
+            }],
+            rules: [{
+              host: exposedApp.name + '.' + cluster.ingress.iks.subdomain,
+              http: {
+                paths: [{
+                  path: '/',
+                  backend: {
+                    serviceName: exposedApp.name,
+                    servicePort: 'solsa'
+                  }
+                }]
+              }
+            }]
+          }
         }
-        this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
-      }
-      if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
-        console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
+        this.addResource(ingress, 'ingress.yaml', cluster.name)
+
+        // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
+      } else if (cluster.ingress.nodePort) {
+        if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
+          const nodePortPatch = [
+            {
+              op: 'replace',
+              path: '/spec/type',
+              value: 'NodePort'
+            }, {
+              op: 'add',
+              path: '/spec/ports/0/nodePort',
+              value: cluster.ingress.nodePort + idx
+            }
+          ]
+          const nodePortPatchTarget = {
+            target: {
+              version: 'v1',
+              kind: 'Service',
+              name: exposedApp.name
+            },
+            path: `expose-svc-${idx}.yaml`
+          }
+          this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
+        }
+        if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
+          console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
+        }
       }
     }
   }
 
-  _finalizeImageRenames (cluster, theApp) {
+  _finalizeImageRenames (cluster, apps) {
     let images = cluster.images || []
     if (!cluster.registry) return images
 
-    // map images to registry if not already mapped
-    const names = Object.values(theApp._images()).map(({ name }) => name)
-    for (let name of names) {
-      if (!images.find(renaming => renaming.name === name)) {
-        images.push({ name, newName: `${cluster.registry}/${name}` })
+    for (let idx in apps) {
+      const app = apps[idx]
+      // map images to registry if not already mapped
+      const names = Object.values(app._images()).map(({ name }) => name)
+      for (let name of names) {
+        if (!images.find(renaming => renaming.name === name)) {
+          images.push({ name, newName: `${cluster.registry}/${name}` })
+        }
       }
     }
     return images
   }
 
-  finalize (userConfig, theApp) {
+  finalize (userConfig, apps) {
     if (userConfig.clusters) {
       for (const cluster of userConfig.clusters) {
         let clusterLayer = this._getLayer(cluster.name)
         if (cluster.ingress) {
-          this._finalizeIngress(cluster)
+          this._finalizeIngress(cluster, apps)
         }
-        clusterLayer.images = this._finalizeImageRenames(cluster, theApp)
+        clusterLayer.images = this._finalizeImageRenames(cluster, apps)
         clusterLayer.bases.push('./../base', `./../${cluster.nature || 'kubernetes'}`)
       }
     }
@@ -191,7 +196,7 @@ class SolsaArchiver {
         apiVersion: 'kustomize.config.k8s.io/v1beta1',
         kind: 'Kustomization',
         commonAnnotations: {
-          'solsa.ibm.com/app': this.app.name
+          'solsa.ibm.com/app': apps[0].name
         },
         bases: layer.bases,
         resources: Object.keys(layer.resources),
@@ -218,11 +223,14 @@ async function main () {
     userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
   }
 
-  const theApp = require(require('path').resolve(argv._[0]))
-  const outputRoot = argv.output ? argv.output : 'solsa-' + theApp.name.toLowerCase()
-  const sa = new SolsaArchiver(theApp, outputRoot)
-  await theApp._yaml(sa)
-  sa.finalize(userConfig, theApp)
+  const apps = require(require('path').resolve(argv._[0]))
+
+  const outputRoot = argv.output ? argv.output : 'solsa-' + apps[0].name.toLowerCase()
+  const sa = new SolsaArchiver(outputRoot)
+  for (let idx in apps) {
+    await apps[idx]._yaml(sa)
+  }
+  sa.finalize(userConfig, apps)
 }
 
 global.__yaml = true
