@@ -32,7 +32,6 @@ let solsa = {
       global.__level--
       if (!global.__level) {
         svc.solsa.rank = global.__count++
-        console.log(svc.name, svc.solsa.rank)
       }
       svc.solsa.options.push(...arguments)
       if (svc.solsa.raw || global.__yaml) return svc
