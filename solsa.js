@@ -20,6 +20,7 @@ function solsaImage (str) {
 }
 
 global.__level = global.__level || 0
+global.__count = global.__count || 0
 
 let solsa = {
   Service: class Service {
@@ -45,8 +46,7 @@ let solsa = {
           url = `https://${svc.name}.${cluster.ingress.iks.subdomain}`
         }
       } else {
-        console.error('Error: no ingress configured')
-        process.exit(1)
+        url = `http://${svc.name}:${PORT}`
       }
 
       console.log(url)
