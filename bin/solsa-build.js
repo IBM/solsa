@@ -65,7 +65,8 @@ if (argv.push && !config.clusters.find(cluster => cluster.name === argv.push)) {
   process.exit(1)
 }
 
-const apps = require(path.resolve(argv._[0]))
+let apps = require(path.resolve(argv._[0]))
+if (!Array.isArray(apps)) apps = [apps]
 for (let idx in apps) {
   const app = apps[idx]
   const images = app._images()

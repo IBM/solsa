@@ -30,6 +30,10 @@ let solsa = {
       global.__level++
       let svc = new this(...arguments)
       global.__level--
+      if (!global.__level) {
+        svc.solsa.rank = global.__count++
+        console.log(svc.name, svc.solsa.rank)
+      }
       svc.solsa.options.push(...arguments)
       if (svc.solsa.raw || global.__yaml) return svc
 
@@ -38,7 +42,7 @@ let solsa = {
       const config = fs.existsSync(filename) ? yaml.safeLoad(fs.readFileSync(filename, 'utf8')) : {}
       const cluster = (config.clusters || []).find(cluster => cluster.name === process.env.SOLSA_CLUSTER) || {}
       if (cluster.ingress && cluster.ingress.nodePort) {
-        url = `http://localhost:${cluster.ingress.nodePort}`
+        url = `http://localhost:${cluster.ingress.nodePort + svc.solsa.rank}`
       } else if (cluster.ingress && cluster.ingress.iks && cluster.ingress.iks.subdomain) {
         if (cluster.nature === 'knative') {
           url = `http://${svc.name}.default.${cluster.ingress.iks.subdomain}`

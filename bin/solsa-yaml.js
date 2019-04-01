@@ -124,6 +124,7 @@ class SolsaArchiver {
         // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
       } else if (cluster.ingress.nodePort) {
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
+          const port = cluster.ingress.nodePort + exposedApp.solsa.rank
           const nodePortPatch = [
             {
               op: 'replace',
@@ -132,7 +133,7 @@ class SolsaArchiver {
             }, {
               op: 'add',
               path: '/spec/ports/0/nodePort',
-              value: cluster.ingress.nodePort + idx
+              value: port
             }
           ]
           const nodePortPatchTarget = {
@@ -141,7 +142,7 @@ class SolsaArchiver {
               kind: 'Service',
               name: exposedApp.name
             },
-            path: `expose-svc-${idx}.yaml`
+            path: `expose-svc-${port}.yaml`
           }
           this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
         }
@@ -223,7 +224,8 @@ async function main () {
     userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
   }
 
-  const apps = require(require('path').resolve(argv._[0]))
+  let apps = require(require('path').resolve(argv._[0]))
+  if (!Array.isArray(apps)) apps = [apps]
 
   const outputRoot = argv.output ? argv.output : 'solsa-' + apps[0].name.toLowerCase()
   const sa = new SolsaArchiver(outputRoot)
