@@ -83,12 +83,12 @@ SolSA consists of:
    images can be handled. A default registry can also be specified.
 
 4. Clone and initialize this repository:
-```
-git clone https://github.ibm.com/solsa/solsa.git
-cd solsa
-npm install
-npm link
-```
+   ```sh
+   git clone https://github.ibm.com/solsa/solsa.git
+   cd solsa
+   npm install
+   npm link
+   ```
 
 ## Examples
 
