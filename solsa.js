@@ -98,6 +98,10 @@ let solsa = {
       return process.env[v]
     }
 
+    _exposedName () { return this.name }
+
+    _exposedService () { return this }
+
     _images () {
       if (this.solsa.raw) return {}
       const me = {}
@@ -241,6 +245,26 @@ let solsa = {
           console.log(`server is listening on ${port}`)
         }
       })
+    }
+  }
+}
+
+solsa.Assembly = class Assembly extends solsa.Service {
+  constructor (name) {
+    super(name, true)
+  }
+
+  addIngress (service) {
+    this.ingress = service
+  }
+
+  _exposedService () {
+    return this.ingress
+  }
+
+  async _yaml (archive) {
+    for (let svc of this.solsa.dependencies) {
+      await svc._yaml(archive)
     }
   }
 }

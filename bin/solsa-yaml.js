@@ -88,6 +88,8 @@ class SolsaArchiver {
   _finalizeIngress (cluster, apps) {
     for (let idx in apps) {
       const exposedApp = apps[idx]
+      const exposedHostName = exposedApp._exposedName()
+      const exposedService = exposedApp._exposedService()
       if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
         const ingress = {
           apiVersion: 'extensions/v1beta1',
@@ -101,27 +103,25 @@ class SolsaArchiver {
           spec: {
             tls: [{
               hosts: [
-                exposedApp.name + '.' + cluster.ingress.iks.subdomain
+                exposedHostName + '.' + cluster.ingress.iks.subdomain
               ],
               secretName: cluster.ingress.iks.tlssecret
             }],
             rules: [{
-              host: exposedApp.name + '.' + cluster.ingress.iks.subdomain,
+              host: exposedHostName + '.' + cluster.ingress.iks.subdomain,
               http: {
                 paths: [{
                   path: '/',
                   backend: {
-                    serviceName: exposedApp.name,
-                    servicePort: 'solsa'
+                    serviceName: exposedService.name,
+                    servicePort: exposedService.port
                   }
                 }]
               }
             }]
           }
         }
-        this.addResource(ingress, 'ingress.yaml', cluster.name)
-
-        // NOTHING TO DO FOR Knative (Ingress automatically configured for Knative Services on IKS)
+        this.addResource(ingress, `ingress-${exposedHostName}.yaml`, cluster.name)
       } else if (cluster.ingress.nodePort) {
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
           const port = cluster.ingress.nodePort + exposedApp.solsa.rank
@@ -140,9 +140,9 @@ class SolsaArchiver {
             target: {
               version: 'v1',
               kind: 'Service',
-              name: exposedApp.name
+              name: exposedService.name
             },
-            path: `expose-svc-${port}.yaml`
+            path: `expose-svc-${exposedService.name}-${port}.yaml`
           }
           this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
         }
