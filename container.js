@@ -8,7 +8,7 @@ function genLabels (svc) {
 }
 
 let container = {
-  Container: class Container extends solsa.Service {
+  Service: class Service extends solsa.Service {
     constructor (solsaServiceArgs, image) {
       super(solsaServiceArgs, true)
       this.image = image
