@@ -54,6 +54,29 @@ let container = {
         }
       }
       archive.addResource(svc, this.name + '-svc.yaml', 'kubernetes')
+
+      const ksvc = {
+        apiVersion: 'serving.knative.dev/v1alpha1',
+        kind: 'Service',
+        metadata: {
+          name: this.name
+        },
+        spec: {
+          runLatest: {
+            configuration: {
+              revisionTemplate: {
+                spec: {
+                  container: {
+                    image: this.image,
+                    ports: [{ name: 'http1', containerPort: this.port }]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      archive.addResource(ksvc, this.name + '-svc.yaml', 'knative')
     }
   },
 
