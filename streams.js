@@ -51,7 +51,7 @@ let streams = {
         .then(result => result.body.operators)
     }
 
-    _yaml (archive, target, yamlDir) {
+    _yaml (archive) {
       const j = {
         apiVersion: 'streams.ibm.com/v1alpha1',
         kind: 'Job',
