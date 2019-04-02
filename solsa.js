@@ -98,9 +98,7 @@ let solsa = {
       return process.env[v]
     }
 
-    _exposedName () { return this.name }
-
-    _exposedService () { return this }
+    _exposedServices () { return [ { name: this.name, service: this } ] }
 
     _images () {
       if (this.solsa.raw) return {}
@@ -252,14 +250,19 @@ let solsa = {
 solsa.Assembly = class Assembly extends solsa.Service {
   constructor (name) {
     super(name, true)
+    this.exposedServices = []
   }
 
   addIngress (service) {
-    this.ingress = service
+    if (service instanceof solsa.Service) {
+      this.exposedServices.push({ name: this.name, service: service })
+    } else {
+      this.exposedServices.push(service)
+    }
   }
 
-  _exposedService () {
-    return this.ingress
+  _exposedServices () {
+    return this.exposedServices
   }
 
   async _yaml (archive) {

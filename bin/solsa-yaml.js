@@ -88,8 +88,7 @@ class SolsaArchiver {
   _finalizeIngress (cluster, apps) {
     for (let idx in apps) {
       const exposedApp = apps[idx]
-      const exposedHostName = exposedApp._exposedName()
-      const exposedService = exposedApp._exposedService()
+      const endpoints = exposedApp._exposedServices()
       if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
         const ingress = {
           apiVersion: 'extensions/v1beta1',
@@ -102,49 +101,52 @@ class SolsaArchiver {
           },
           spec: {
             tls: [{
-              hosts: [
-                exposedHostName + '.' + cluster.ingress.iks.subdomain
-              ],
+              hosts: endpoints.map(ep => ep.name + '.' + cluster.ingress.iks.subdomain),
               secretName: cluster.ingress.iks.tlssecret
             }],
-            rules: [{
-              host: exposedHostName + '.' + cluster.ingress.iks.subdomain,
-              http: {
-                paths: [{
-                  path: '/',
-                  backend: {
-                    serviceName: exposedService.name,
-                    servicePort: exposedService.port
-                  }
-                }]
+            rules: endpoints.map(function (ep) {
+              return {
+                host: ep.name + '.' + cluster.ingress.iks.subdomain,
+                http: {
+                  paths: [{
+                    path: '/',
+                    backend: {
+                      serviceName: ep.service.name,
+                      servicePort: ep.service.port
+                    }
+                  }]
+                }
               }
-            }]
+            })
           }
         }
-        this.addResource(ingress, `ingress-${exposedHostName}.yaml`, cluster.name)
+        this.addResource(ingress, `ingress-${exposedApp.name}.yaml`, cluster.name)
       } else if (cluster.ingress.nodePort) {
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-          const port = cluster.ingress.nodePort + exposedApp.solsa.rank
-          const nodePortPatch = [
-            {
-              op: 'replace',
-              path: '/spec/type',
-              value: 'NodePort'
-            }, {
-              op: 'add',
-              path: '/spec/ports/0/nodePort',
-              value: port
+          for (let idx in endpoints) {
+            let ep = endpoints[idx]
+            const port = cluster.ingress.nodePort + parseInt(idx)
+            const nodePortPatch = [
+              {
+                op: 'replace',
+                path: '/spec/type',
+                value: 'NodePort'
+              }, {
+                op: 'add',
+                path: '/spec/ports/0/nodePort',
+                value: port
+              }
+            ]
+            const nodePortPatchTarget = {
+              target: {
+                version: 'v1',
+                kind: 'Service',
+                name: ep.service.name
+              },
+              path: `expose-svc-${exposedApp.name}-${port}.yaml`
             }
-          ]
-          const nodePortPatchTarget = {
-            target: {
-              version: 'v1',
-              kind: 'Service',
-              name: exposedService.name
-            },
-            path: `expose-svc-${exposedService.name}-${port}.yaml`
+            this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
           }
-          this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
         }
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
           console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
