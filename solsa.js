@@ -261,6 +261,11 @@ solsa.Assembly = class Assembly extends solsa.Service {
     }
   }
 
+  _images () {
+    const me = {}
+    return Object.assign(me, ...this.solsa.dependencies.filter(svc => svc._images).map(svc => svc._images()))
+  }
+
   _exposedServices () {
     return this.exposedServices
   }
