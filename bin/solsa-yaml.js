@@ -223,7 +223,12 @@ async function main () {
 
   var userConfig = {}
   if (argv.config) {
-    userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
+    try {
+      userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
+    } catch (err) {
+      console.log(`Unable to load ${argv.config}`)
+      console.log('Generating base SolSA YAML layers without target clusters')
+    }
   }
 
   let apps = require(require('path').resolve(argv._[0]))
