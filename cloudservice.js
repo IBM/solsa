@@ -1,4 +1,4 @@
-const solsa = require('solsa')
+const solsa = require('./solsa')
 
 let cloudservice = {
   CloudService: class CloudService extends solsa.Service {
