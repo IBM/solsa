@@ -98,7 +98,7 @@ let solsa = {
       return process.env[v]
     }
 
-    _exposedServices () { return [ { name: this.name, service: this } ] }
+    _exposedServices () { return [{ name: this.name, service: this }] }
 
     _images () {
       if (this.solsa.raw) return {}
@@ -107,7 +107,7 @@ let solsa = {
       return Object.assign(me, ...this.solsa.dependencies.filter(svc => svc._images).map(svc => svc._images()))
     }
 
-    async _yaml (archive) {
+    async _yamlMyDependencies (archive) {
       let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }, SOLSA_PORT: { value: `${this.port}` } }
       for (let svc of this.solsa.dependencies) {
         await svc._yaml(archive)
@@ -115,6 +115,11 @@ let solsa = {
           env[k] = svc.solsa.secrets[k]
         }
       }
+      return env
+    }
+
+    async _yaml (archive) {
+      let env = await this._yamlMyDependencies(archive)
 
       if (Object.getOwnPropertyNames(this.constructor.prototype).filter(name => name !== 'constructor').length === 0) return
 
@@ -271,9 +276,53 @@ solsa.Assembly = class Assembly extends solsa.Service {
   }
 
   async _yaml (archive) {
-    for (let svc of this.solsa.dependencies) {
-      await svc._yaml(archive)
+    this._yamlMyDependencies(archive)
+  }
+}
+
+solsa.Job = class Job extends solsa.Service {
+  constructor (name) {
+    super(name, false)
+    this.name = name
+  }
+
+  async _yaml (archive) {
+    let env = await this._yamlMyDependencies(archive)
+
+    const job = {
+      apiVersion: 'batch/v1',
+      kind: 'Job',
+      metadata: {
+        name: this.name,
+        labels: genLabels(this)
+      },
+      spec: {
+        template: {
+          metadata: {
+            name: this.name,
+            labels: genLabels(this)
+          },
+          spec: {
+            containers: [{
+              name: this.name,
+              image: solsaImage(this.constructor.name),
+              env: Object.keys(env).map(key => Object.assign({ name: key }, env[key]))
+            }]
+          }
+        }
+      }
     }
+    archive.addResource(job, this.name + '-job.yaml', 'kubernetes')
+  }
+
+  async myTask () {
+    console.log('Executed Job.myTask()')
+  }
+
+  static async serve () {
+    let options = JSON.parse(process.env.SOLSA_OPTIONS || '[]')
+    let svc = new this(...options)
+    await svc.myTask()
   }
 }
 
