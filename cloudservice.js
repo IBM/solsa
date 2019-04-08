@@ -26,7 +26,7 @@ cloudservice.MessageHub = class MessageHub extends solsa.Service {
     this.topicCount = 0
   }
 
-  createTopic (name, configs) {
+  addTopic (name, configs) {
     let topicName = this.name + '-topic-' + this.topicCount
     this.topicCount += 1
     this.addDependency(new cloudservice.Topic(topicName, name, this.name, configs))
@@ -74,4 +74,21 @@ cloudservice.Redis = class Redis extends solsa.Service {
     this.addDependency(new cloudservice.CloudService(name, { service: 'compose-for-redis', plan: 'Standard', parameters: [{ name: 'tls', value: 'false' }] }))
   }
 }
+
+cloudservice.getSecretRef = function (key, service) {
+  return {
+    secretKeyRef: {
+      name: 'binding-' + service,
+      key: key
+    }
+  }
+}
+
+cloudservice.getValueFromBinding = function (key, service) {
+  return {
+    name: key,
+    valueFrom: cloudservice.getSecretRef(key, service)
+  }
+}
+
 module.exports = cloudservice
