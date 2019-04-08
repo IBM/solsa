@@ -31,7 +31,7 @@ class SolsaArchiver {
     // listen for all archive data to be written
     // 'close' event is fired only when a file descriptor is involved
     output.on('close', function () {
-      console.log(`Generated application YAML to ${outputRoot}.tgz`)
+      console.error(`Generated application YAML to ${outputRoot}.tgz`)
     })
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors)
@@ -149,7 +149,7 @@ class SolsaArchiver {
           }
         }
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
-          console.log(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
+          console.error(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
         }
       }
     }
@@ -226,8 +226,8 @@ async function main () {
     try {
       userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
     } catch (err) {
-      console.log(`Unable to load ${argv.config}`)
-      console.log('Generating base SolSA YAML layers without target clusters')
+      console.error(`Unable to load ${argv.config}`)
+      console.error('Generating base SolSA YAML layers without target clusters')
     }
   }
 
