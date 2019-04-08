@@ -38,7 +38,6 @@ let ow = {
       super(name)
       this.func = spec.func
       this.parameters = spec.parameters
-      console.log(this.parameters)
       this.to = spec.to
       this.addDependency(new ow.Function(name + '-func', {
         code: this.func().toString(),
