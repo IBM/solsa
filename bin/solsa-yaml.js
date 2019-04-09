@@ -161,7 +161,7 @@ class SolsaArchiver {
 
   _finalizeImageRenames (cluster, apps) {
     let images = cluster.images || []
-    if (!cluster.registry) return images
+    if (!cluster.registry && !cluster.imageTag) return images
 
     for (let idx in apps) {
       const app = apps[idx]
@@ -169,7 +169,13 @@ class SolsaArchiver {
       const names = Object.values(app._images()).map(({ name }) => name)
       for (let name of names) {
         if (!images.find(renaming => renaming.name === name)) {
-          images.push({ name, newName: `${cluster.registry}/${name}` })
+          if (cluster.registry && cluster.imageTag) {
+            images.push({ name, newName: `${cluster.registry}/${name}`, newTag: cluster.imageTag })
+          } else if (cluster.registry) {
+            images.push({ name, newName: `${cluster.registry}/${name}` })
+          } else if (cluster.imageTag) {
+            images.push({ name, newTag: cluster.imageTag })
+          }
         }
       }
     }
