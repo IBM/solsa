@@ -286,6 +286,8 @@ solsa.Job = class Job extends solsa.Service {
     this.name = name
   }
 
+  _exposedServices () { return [] }
+
   async _yaml (archive) {
     let env = await this._yamlMyDependencies(archive)
 
@@ -312,7 +314,7 @@ solsa.Job = class Job extends solsa.Service {
         }
       }
     }
-    archive.addResource(job, this.name + '-job.yaml', 'kubernetes')
+    archive.addResource(job, this.name + '-job.yaml')
   }
 
   async myTask () {
