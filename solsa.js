@@ -305,6 +305,7 @@ solsa.Job = class Job extends solsa.Service {
             labels: genLabels(this)
           },
           spec: {
+            restartPolicy: 'Never',
             containers: [{
               name: this.name,
               image: solsaImage(this.constructor.name),
