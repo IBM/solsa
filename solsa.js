@@ -67,7 +67,7 @@ let solsa = {
       return svc
     }
 
-    constructor (solsaServiceArgs, raw) {
+    constructor (solsaServiceArgs, raw, file = callSites()[1].getFileName()) {
       // console.log(' '.repeat(global.__level) + 'new', this.constructor.name)
       if (typeof solsaServiceArgs === 'string') {
         this.name = solsaServiceArgs
@@ -77,7 +77,7 @@ let solsa = {
         this.port = solsaServiceArgs.port || 8080
       }
       this.events = new Events()
-      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], file: callSites()[1].getFileName() }
+      this.solsa = { raw, serviceReady: false, dependencies: [], secrets: {}, options: [], file }
     }
 
     async initializeService () {
@@ -281,8 +281,8 @@ solsa.Assembly = class Assembly extends solsa.Service {
 }
 
 solsa.Job = class Job extends solsa.Service {
-  constructor (name) {
-    super(name, false)
+  constructor (name, raw, file = callSites()[1].getFileName()) {
+    super(name, raw, file)
     this.name = name
   }
 
