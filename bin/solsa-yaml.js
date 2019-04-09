@@ -25,7 +25,11 @@ class SolsaArchiver {
       gzip: true,
       zlib: { level: 9 }
     })
-    this.layers = { base: new KustomizeLayer('base') }
+    this.layers = {
+      base: new KustomizeLayer('base'),
+      knative: new KustomizeLayer('knative'),
+      kubernetes: new KustomizeLayer('kubernetes')
+    }
     this.outputRoot = outputRoot
 
     // listen for all archive data to be written
