@@ -74,9 +74,9 @@ class SolsaArchiver {
     kl.resources[fname] = obj
   }
 
-  addPatch (patch, target, fname, layer = 'base') {
+  addPatch (patch, fname, layer = 'base') {
     let kl = this._getLayer(layer)
-    kl.patches[fname] = { patch: patch, target: target }
+    kl.patches[fname] = { patch: patch }
   }
 
   addJSONPatch (patch, target, layer = 'base') {
@@ -93,67 +93,79 @@ class SolsaArchiver {
     for (let idx in apps) {
       const exposedApp = apps[idx]
       const endpoints = exposedApp._exposedServices()
-      if (cluster.ingress.iks && (cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-        const ingress = {
-          apiVersion: 'extensions/v1beta1',
-          kind: 'Ingress',
-          metadata: {
-            name: exposedApp.name + '-ing-iks',
-            labels: {
-              'solsa.ibm.com/name': exposedApp.name
+      if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
+        for (let idx in endpoints) {
+          let ep = endpoints[idx]
+          const patchAnnotation = {
+            apiVersion: 'v1',
+            kind: 'Service',
+            metadata: {
+              name: ep.name,
+              annotations: { 'solsa.ibm.com/exposed': true }
             }
-          },
-          spec: {
-            tls: [{
-              hosts: endpoints.map(ep => ep.name + '.' + cluster.ingress.iks.subdomain),
-              secretName: cluster.ingress.iks.tlssecret
-            }],
-            rules: endpoints.map(function (ep) {
-              return {
-                host: ep.name + '.' + cluster.ingress.iks.subdomain,
-                http: {
-                  paths: [{
-                    path: '/',
-                    backend: {
-                      serviceName: ep.service.name,
-                      servicePort: ep.service.port
-                    }
-                  }]
+          }
+          this.addPatch(patchAnnotation, `${ep.name}-annotate-exposed-svc.yml`, 'kubernetes')
+        }
+
+        if (cluster.ingress.iks) {
+          const ingress = {
+            apiVersion: 'extensions/v1beta1',
+            kind: 'Ingress',
+            metadata: {
+              name: exposedApp.name + '-ing-iks',
+              labels: {
+                'solsa.ibm.com/name': exposedApp.name
+              }
+            },
+            spec: {
+              tls: [{
+                hosts: endpoints.map(ep => ep.name + '.' + cluster.ingress.iks.subdomain),
+                secretName: cluster.ingress.iks.tlssecret
+              }],
+              rules: endpoints.map(function (ep) {
+                return {
+                  host: ep.name + '.' + cluster.ingress.iks.subdomain,
+                  http: {
+                    paths: [{
+                      path: '/',
+                      backend: {
+                        serviceName: ep.service.name,
+                        servicePort: ep.service.port
+                      }
+                    }]
+                  }
                 }
-              }
-            })
-          }
-        }
-        this.addResource(ingress, `ingress-${exposedApp.name}.yaml`, cluster.name)
-      } else if (cluster.ingress.nodePort) {
-        if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-          for (let idx in endpoints) {
-            let ep = endpoints[idx]
-            const port = cluster.ingress.nodePort + parseInt(idx)
-            const nodePortPatch = [
-              {
-                op: 'replace',
-                path: '/spec/type',
-                value: 'NodePort'
-              }, {
-                op: 'add',
-                path: '/spec/ports/0/nodePort',
-                value: port
-              }
-            ]
-            const nodePortPatchTarget = {
-              target: {
-                version: 'v1',
-                kind: 'Service',
-                name: ep.service.name
-              },
-              path: `expose-svc-${exposedApp.name}-${port}.yaml`
+              })
             }
-            this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
           }
-        }
-        if ((cluster.nature || 'kubernetes').toLowerCase() === 'knative') {
-          console.error(`Warning for cluster ${cluster.name}: NodePort Ingress is not supported with Knative target`)
+          this.addResource(ingress, `ingress-${exposedApp.name}.yaml`, cluster.name)
+        } else if (cluster.ingress.nodePort) {
+          if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
+            for (let idx in endpoints) {
+              let ep = endpoints[idx]
+              const port = cluster.ingress.nodePort + parseInt(idx)
+              const nodePortPatch = [
+                {
+                  op: 'replace',
+                  path: '/spec/type',
+                  value: 'NodePort'
+                }, {
+                  op: 'add',
+                  path: '/spec/ports/0/nodePort',
+                  value: port
+                }
+              ]
+              const nodePortPatchTarget = {
+                target: {
+                  version: 'v1',
+                  kind: 'Service',
+                  name: ep.service.name
+                },
+                path: `expose-svc-${exposedApp.name}-${port}.yaml`
+              }
+              this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
+            }
+          }
         }
       }
     }
@@ -200,7 +212,7 @@ class SolsaArchiver {
         this._writeToFile(layer.resources[fname], fname, layer.name)
       }
       for (let fname of Object.keys(layer.patches)) {
-        this._writeToFile(layer.patches[fname], fname, layer.name)
+        this._writeToFile(layer.patches[fname].patch, fname, layer.name)
       }
       for (let fname of Object.keys(layer.patchesJSON)) {
         this._writeToFile(layer.patchesJSON[fname].patch, fname, layer.name)
