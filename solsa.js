@@ -103,6 +103,9 @@ let solsa = {
 
     async _yamlMyDependencies (archive) {
       let env = { SOLSA_OPTIONS: { value: JSON.stringify(this.solsa.options) }, SOLSA_PORT: { value: `${this.port}` } }
+      for (let k of Object.keys(this.solsa.secrets)) {
+        env[k] = this.solsa.secrets[k]
+      }
       for (let svc of this.solsa.dependencies) {
         await svc._yaml(archive)
         for (let k of Object.keys(svc.solsa.secrets)) {
