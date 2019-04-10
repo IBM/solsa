@@ -20,7 +20,8 @@
     "needle": "^2.2.4",
     "pkg-dir": "^4.0.0",
     "tmp": "^0.1.0",
-    "watson-developer-cloud": "^3.18.1"
+    "watson-developer-cloud": "^3.18.1",
+    "@kubernetes/client-node": "^0.8.2"
   },
   "devDependencies": {
     "@solsa/service-gen": "git+ssh://git@github.ibm.com:solsa/service-gen.git",
