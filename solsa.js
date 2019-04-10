@@ -7,12 +7,6 @@ const path = require('path')
 const pkgDir = require('pkg-dir')
 const yaml = require('js-yaml')
 
-function genLabels (svc) {
-  return {
-    'solsa.ibm.com/name': svc.name
-  }
-}
-
 function solsaImage (str) {
   return 'solsa-' + str.toLowerCase()
 }
@@ -128,16 +122,16 @@ let solsa = {
         kind: 'Deployment',
         metadata: {
           name: this.name,
-          labels: genLabels(this)
+          labels: { 'solsa.ibm.com/name': this.name }
         },
         spec: {
           replicas: 1,
           selector: {
-            matchLabels: genLabels(this)
+            matchLabels: { 'solsa.ibm.com/name': this.name }
           },
           template: {
             metadata: {
-              labels: genLabels(this)
+              labels: { 'solsa.ibm.com/name': this.name }
             },
             spec: {
               containers: [{
@@ -168,12 +162,12 @@ let solsa = {
         kind: 'Service',
         metadata: {
           name: this.name,
-          labels: genLabels(this)
+          labels: { 'solsa.ibm.com/name': this.name }
         },
         spec: {
           type: 'ClusterIP',
           ports: [{ name: 'solsa', port: this.port }],
-          selector: genLabels(this)
+          selector: { 'solsa.ibm.com/name': this.name }
         }
       }
       archive.addResource(svc, this.name + '-svc.yaml', 'kubernetes')
@@ -296,13 +290,13 @@ solsa.Job = class Job extends solsa.Service {
       kind: 'Job',
       metadata: {
         name: this.name,
-        labels: genLabels(this)
+        labels: { 'solsa.ibm.com/name': this.name }
       },
       spec: {
         template: {
           metadata: {
             name: this.name,
-            labels: genLabels(this)
+            labels: { 'solsa.ibm.com/name': this.name }
           },
           spec: {
             restartPolicy: 'Never',
