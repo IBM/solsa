@@ -255,9 +255,9 @@ solsa.Assembly = class Assembly extends solsa.Service {
     this.exposedServices = []
   }
 
-  addIngress (service) {
+  addIngress (service, paths = ['/']) {
     if (service instanceof solsa.Service) {
-      this.exposedServices.push({ name: this.name, service: service })
+      this.exposedServices.push({ name: this.name, service: service, paths: paths })
     } else {
       this.exposedServices.push(service)
     }

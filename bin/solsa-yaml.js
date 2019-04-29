@@ -167,6 +167,61 @@ class SolsaArchiver {
             }
           }
         }
+      } else if (cluster.ingress.istio) {
+        const gw = {
+          apiVersion: 'networking.istio.io/v1alpha3',
+          kind: 'Gateway',
+          metadata: {
+            name: exposedApp.name + '-gw',
+            labels: {
+              'solsa.ibm.com/name': exposedApp.name
+            }
+          },
+          spec: {
+            selector: {
+              istio: 'ingressgateway'
+            },
+            servers: [{
+              port: {
+                number: 80,
+                name: 'http',
+                protocol: 'HTTP'
+              },
+              hosts: ['*']
+            }]
+          }
+        }
+        this.addResource(gw, `gw-${exposedApp.name}.yaml`, cluster.name)
+        const vs = {
+          apiVersion: 'networking.istio.io/v1alpha3',
+          kind: 'VirtualService',
+          metadata: {
+            name: exposedApp.name + '-vs',
+            labels: {
+              'solsa.ibm.com/name': exposedApp.name
+            }
+          },
+          spec: {
+            hosts: ['*'],
+            gateways: [exposedApp.name + '-gw'],
+            http: endpoints.map(function (ep) {
+              return {
+                match: ep.paths.map(function (p) {
+                  return {
+                    uri: { exact: p }
+                  }
+                }),
+                route: [{
+                  destination: {
+                    host: ep.service.name,
+                    port: { number: ep.service.port }
+                  }
+                }]
+              }
+            })
+          }
+        }
+        this.addResource(vs, `vs-${exposedApp.name}.yaml`, cluster.name)
       }
     }
   }
