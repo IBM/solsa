@@ -273,7 +273,7 @@ solsa.Assembly = class Assembly extends solsa.Service {
   }
 
   async _yaml (archive) {
-    this._yamlMyDependencies(archive)
+    await this._yamlMyDependencies(archive)
   }
 }
 
