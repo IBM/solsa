@@ -42,6 +42,10 @@ SolSA consists of:
 2. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial.
 
+   NOTE: There is a bug in the IKS installation of KNative 0.4.1 that results in a misconfigured istio ingress.
+   After installing KNative, execute `kubectl edit ing iks-knative-ingress -n istio-system` and change `_place_holder_for_ingress_secret`
+   to the real value of your Ingress Secret obtained via `bx cs cluster-get <MY_CLUSTER_NAME>`
+
 ### Per Namespace Setup
 
 1. Create an image pull secret for the IBM Container Registry.
