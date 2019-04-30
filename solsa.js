@@ -233,8 +233,7 @@ let solsa = {
 
       app.post('/', (request, response) => {
         Promise.resolve().then(() => {
-          let Body = JSON.parse(request.body.Body)
-          svc.events.emit(Body.event, Body.payload)
+          svc.events.emit(request.body.event || 'any', request.body.payload)
         }).then(() => response.status(200).send('OK'), err => response.status(500).send((err && err.message) || 'Internal error'))
       })
 
