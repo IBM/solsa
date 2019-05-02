@@ -14,7 +14,17 @@ let cloudservice = {
       ret.kind = 'Service'
       ret.metadata = { name: this.name }
       ret.spec = this.spec
+
+      let retBinding = {}
+      retBinding.apiVersion = 'ibmcloud.seed.ibm.com/v1beta1'
+      retBinding.kind = 'Binding'
+      retBinding.metadata = { name: 'binding-' + this.name }
+      retBinding.spec = { bindingFrom: { name: this.name } }
+      if (ret.spec.servicetype === 'IAM') {
+        retBinding.spec.servicetype = 'IAM'
+      }
       archive.addResource(ret, this.name + '-cloudservice.yaml')
+      archive.addResource(retBinding, this.name + '-cloudservice-binding.yaml')
     }
   }
 }
