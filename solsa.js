@@ -334,7 +334,7 @@ solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
   }
 }
 
-solsa.Assembly = class Assembly extends solsa.Service {
+solsa.App = class App extends solsa.Service {
   constructor (name) {
     super(name, true)
     this.exposedServices = []
