@@ -248,6 +248,92 @@ let solsa = {
   }
 }
 
+/*
+ * A SolSA Service whose internal implementation is provided by a
+ * container produceed via some non-SolSA build process.
+ * SolSA is used to configure the container's environment, manage its
+ * deployment and dependencies, but does not provide any of the logic
+ * that is actually executing inside the container.
+ */
+solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
+  constructor (solsaServiceArgs, image) {
+    super(solsaServiceArgs, true)
+    this.image = image
+  }
+
+  async _yaml (archive) {
+    for (let svc of this.solsa.dependencies) {
+      await svc._yaml(archive)
+    }
+
+    const deployment = {
+      apiVersion: 'apps/v1',
+      kind: 'Deployment',
+      metadata: {
+        name: this.name,
+        labels: { 'solsa.ibm.com/name': this.name }
+      },
+      spec: {
+        replicas: 1,
+        selector: {
+          matchLabels: { 'solsa.ibm.com/name': this.name }
+        },
+        template: {
+          metadata: {
+            labels: { 'solsa.ibm.com/name': this.name }
+          },
+          spec: {
+            containers: [{
+              name: this.name,
+              image: this.image,
+              ports: [{ name: 'solsa', containerPort: this.port }]
+            }]
+          }
+        }
+      }
+    }
+    archive.addResource(deployment, this.name + '-deployment.yaml', 'kubernetes')
+
+    const svc = {
+      apiVersion: 'v1',
+      kind: 'Service',
+      metadata: {
+        name: this.name,
+        labels: { 'solsa.ibm.com/name': this.name }
+      },
+      spec: {
+        type: 'ClusterIP',
+        ports: [{ name: 'solsa', port: this.port }],
+        selector: { 'solsa.ibm.com/name': this.name }
+      }
+    }
+    archive.addResource(svc, this.name + '-svc.yaml', 'kubernetes')
+
+    const ksvc = {
+      apiVersion: 'serving.knative.dev/v1alpha1',
+      kind: 'Service',
+      metadata: {
+        name: this.name
+      },
+      spec: {
+        runLatest: {
+          configuration: {
+            revisionTemplate: {
+              spec: {
+                container: {
+                  image: this.image,
+                  ports: [{ name: 'http1', containerPort: this.port }]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    archive.addResource(ksvc, this.name + '-svc.yaml', 'knative')
+  }
+}
+
 solsa.Assembly = class Assembly extends solsa.Service {
   constructor (name) {
     super(name, true)
