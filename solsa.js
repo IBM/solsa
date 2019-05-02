@@ -248,6 +248,12 @@ let solsa = {
   }
 }
 
+function valueWrap (val) {
+  if (val.valueFrom) return val
+  if (val.value) return val
+  return { value: val }
+}
+
 /*
  * A SolSA Service whose internal implementation is provided by a
  * container produceed via some non-SolSA build process.
@@ -256,9 +262,10 @@ let solsa = {
  * that is actually executing inside the container.
  */
 solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
-  constructor (solsaServiceArgs, image) {
-    super(solsaServiceArgs, true)
-    this.image = image
+  constructor (params) {
+    super(params, true)
+    this.image = params.image
+    this.env = params.env || { }
   }
 
   async _yaml (archive) {
@@ -286,7 +293,8 @@ solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
             containers: [{
               name: this.name,
               image: this.image,
-              ports: [{ name: 'solsa', containerPort: this.port }]
+              ports: [{ name: 'solsa', containerPort: this.port }],
+              env: Object.keys(this.env).map(key => Object.assign({ name: key }, valueWrap(this.env[key])))
             }]
           }
         }
