@@ -257,6 +257,7 @@ function valueWrap (val) {
 /*
  * A SolSA Service whose internal implementation is provided by a
  * container produceed via some non-SolSA build process.
+ * The provided container will be deployed as a Kubernetes Deployment + Service.
  * SolSA is used to configure the container's environment, manage its
  * deployment and dependencies, but does not provide any of the logic
  * that is actually executing inside the container.
@@ -300,7 +301,7 @@ solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
         }
       }
     }
-    archive.addResource(deployment, this.name + '-deployment.yaml', 'kubernetes')
+    archive.addResource(deployment, this.name + '-deployment.yaml', 'base')
 
     const svc = {
       apiVersion: 'v1',
@@ -315,7 +316,29 @@ solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
         selector: { 'solsa.ibm.com/name': this.name }
       }
     }
-    archive.addResource(svc, this.name + '-svc.yaml', 'kubernetes')
+    archive.addResource(svc, this.name + '-svc.yaml', 'base')
+  }
+}
+
+/*
+ * A SolSA Service whose internal implementation is provided by a
+ * container produceed via some non-SolSA build process.
+ * The provided container will be deployed as a KNative service.
+ * SolSA is used to configure the container's environment, manage its
+ * deployment and dependencies, but does not provide any of the logic
+ * that is actually executing inside the container.
+ */
+solsa.KNativeService = class KNativeService extends solsa.Service {
+  constructor (params) {
+    super(params, true)
+    this.image = params.image
+    this.env = params.env || { }
+  }
+
+  async _yaml (archive) {
+    for (let svc of this.solsa.dependencies) {
+      await svc._yaml(archive)
+    }
 
     const ksvc = {
       apiVersion: 'serving.knative.dev/v1alpha1',

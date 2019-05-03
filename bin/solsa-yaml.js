@@ -104,7 +104,7 @@ class SolsaArchiver {
               annotations: { 'solsa.ibm.com/exposed': true }
             }
           }
-          this.addPatch(patchAnnotation, `${ep.name}-annotate-exposed-svc.yml`, 'kubernetes')
+          this.addPatch(patchAnnotation, `${ep.name}-annotate-exposed-svc.yml`, cluster.name)
         }
 
         if (cluster.ingress.iks) {
