@@ -249,8 +249,8 @@ let solsa = {
 }
 
 function valueWrap (val) {
-  if (val.valueFrom) return val
-  if (val.value) return val
+  if (val.valueFrom) return { valueFrom: val.valueFrom }
+  if (val.value) return { value: val.value }
   return { value: val }
 }
 
