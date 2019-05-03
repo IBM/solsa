@@ -31,9 +31,13 @@ let cloudservice = {
 
 cloudservice.MessageHub = class MessageHub extends solsa.Service {
   constructor (name) {
-    super(name)
+    super(name, true)
     this.addDependency(new cloudservice.CloudService(name, { service: 'messagehub', plan: 'standard' }))
     this.topicCount = 0
+  }
+
+  async _yaml (archive) {
+    await this._yamlMyDependencies(archive)
   }
 
   addTopic (name, configs) {
@@ -45,7 +49,7 @@ cloudservice.MessageHub = class MessageHub extends solsa.Service {
 
 cloudservice.Topic = class Topic extends solsa.Service {
   constructor (internalName, externalName, messagehubName, configs) {
-    super(internalName)
+    super(internalName, true)
     this.internalName = internalName
     this.externalName = externalName
     this.messagehubName = messagehubName
@@ -73,15 +77,23 @@ cloudservice.Topic = class Topic extends solsa.Service {
 
 cloudservice.StreamingAnalytics = class StreamingAnalytics extends solsa.Service {
   constructor (name) {
-    super(name)
+    super(name, true)
     this.addDependency(new cloudservice.CloudService(name, { service: 'streaming-analytics', plan: 'entry-container-hourly', servicetype: 'IAM' }))
+  }
+
+  async _yaml (archive) {
+    await this._yamlMyDependencies(archive)
   }
 }
 
 cloudservice.Redis = class Redis extends solsa.Service {
   constructor (name) {
-    super(name)
+    super(name, true)
     this.addDependency(new cloudservice.CloudService(name, { service: 'compose-for-redis', plan: 'Standard', parameters: [{ name: 'tls', value: 'false' }] }))
+  }
+
+  async _yaml (archive) {
+    await this._yamlMyDependencies(archive)
   }
 }
 
