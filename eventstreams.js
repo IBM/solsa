@@ -1,6 +1,6 @@
 const solsa = require('./solsa')
 
-class EvenStreams extends solsa.Service {
+class EvenStreams extends solsa.Resource {
   constructor (name) {
     super(name, true)
 

@@ -15,7 +15,7 @@ global.__level = global.__level || 0
 global.__count = global.__count || 0
 
 let solsa = {
-  Service: class Service {
+  Resource: class Resource {
     static make () {
       // console.log(' '.repeat(global.__level) + 'make', this.name)
       if (!global.__yaml && global.__level) return null
@@ -248,6 +248,12 @@ let solsa = {
   }
 }
 
+solsa.Service = class Service extends solsa.Resource {
+  constructor (name, raw, file = callSites()[1].getFileName()) {
+    super(name, raw, file)
+  }
+}
+
 function valueWrap (val) {
   if (val.valueFrom) return { valueFrom: val.valueFrom }
   if (val.value) return { value: val.value }
@@ -262,11 +268,12 @@ function valueWrap (val) {
  * deployment and dependencies, but does not provide any of the logic
  * that is actually executing inside the container.
  */
-solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
+solsa.ContainerizedService = class ContainerizedService extends solsa.Resource {
   constructor (params) {
     super(params, true)
+    this.name = params.name
     this.image = params.image
-    this.env = params.env || { }
+    this.env = params.env || {}
   }
 
   async _yaml (archive) {
@@ -328,11 +335,11 @@ solsa.ContainerizedService = class ContainerizedService extends solsa.Service {
  * deployment and dependencies, but does not provide any of the logic
  * that is actually executing inside the container.
  */
-solsa.KNativeService = class KNativeService extends solsa.Service {
+solsa.KNativeService = class KNativeService extends solsa.Resource {
   constructor (params) {
     super(params, true)
     this.image = params.image
-    this.env = params.env || { }
+    this.env = params.env || {}
   }
 
   async _yaml (archive) {
@@ -365,14 +372,14 @@ solsa.KNativeService = class KNativeService extends solsa.Service {
   }
 }
 
-solsa.App = class App extends solsa.Service {
+solsa.App = class App extends solsa.Resource {
   constructor (name) {
     super(name, true)
     this.exposedServices = []
   }
 
   addIngress (service, paths = ['/']) {
-    if (service instanceof solsa.Service) {
+    if (service instanceof solsa.Resource) {
       this.exposedServices.push({ name: service.name, service: service, paths: paths })
     } else {
       this.exposedServices.push(service)
@@ -393,7 +400,7 @@ solsa.App = class App extends solsa.Service {
   }
 }
 
-solsa.Job = class Job extends solsa.Service {
+solsa.Job = class Job extends solsa.Resource {
   constructor (name, raw, file = callSites()[1].getFileName()) {
     super(name, raw, file)
     this.name = name

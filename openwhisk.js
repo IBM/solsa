@@ -1,7 +1,7 @@
 const solsa = require('./solsa')
 
 let ow = {
-  Function: class Function extends solsa.Service {
+  Function: class Function extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.spec = spec
@@ -17,7 +17,7 @@ let ow = {
     }
   },
 
-  FunctionInvocation: class FunctionInvocation extends solsa.Service {
+  FunctionInvocation: class FunctionInvocation extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.spec = spec
@@ -33,7 +33,7 @@ let ow = {
     }
   },
 
-  Transform: class Transform extends solsa.Service {
+  Transform: class Transform extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.func = spec.func
@@ -57,7 +57,7 @@ let ow = {
     }
   },
 
-  Package: class Package extends solsa.Service {
+  Package: class Package extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.spec = spec
@@ -73,7 +73,7 @@ let ow = {
     }
   },
 
-  Rule: class Rule extends solsa.Service {
+  Rule: class Rule extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.spec = spec
@@ -89,7 +89,7 @@ let ow = {
     }
   },
 
-  Trigger: class Trigger extends solsa.Service {
+  Trigger: class Trigger extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.spec = spec

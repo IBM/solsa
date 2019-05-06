@@ -1,7 +1,7 @@
 const solsa = require('./solsa')
 
 let cloudservice = {
-  CloudService: class CloudService extends solsa.Service {
+  CloudService: class CloudService extends solsa.Resource {
     constructor (name, spec) {
       super(name)
       this.name = name
@@ -29,7 +29,7 @@ let cloudservice = {
   }
 }
 
-cloudservice.MessageHub = class MessageHub extends solsa.Service {
+cloudservice.MessageHub = class MessageHub extends solsa.Resource {
   constructor (name) {
     super(name, true)
     this.addDependency(new cloudservice.CloudService(name, { service: 'messagehub', plan: 'standard' }))
@@ -47,7 +47,7 @@ cloudservice.MessageHub = class MessageHub extends solsa.Service {
   }
 }
 
-cloudservice.Topic = class Topic extends solsa.Service {
+cloudservice.Topic = class Topic extends solsa.Resource {
   constructor (internalName, externalName, messagehubName, configs) {
     super(internalName, true)
     this.internalName = internalName
@@ -75,7 +75,7 @@ cloudservice.Topic = class Topic extends solsa.Service {
   }
 }
 
-cloudservice.StreamingAnalytics = class StreamingAnalytics extends solsa.Service {
+cloudservice.StreamingAnalytics = class StreamingAnalytics extends solsa.Resource {
   constructor (name) {
     super(name, true)
     this.addDependency(new cloudservice.CloudService(name, { service: 'streaming-analytics', plan: 'entry-container-hourly', servicetype: 'IAM' }))
