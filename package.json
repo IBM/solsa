@@ -4,29 +4,19 @@
   "version": "0.1.0",
   "bin": {
     "solsa-build": "./bin/solsa-build.js",
-    "solsa-yaml": "./bin/solsa-yaml.js",
-    "solsa-serve": "./bin/solsa-serve.js"
+    "solsa-yaml": "./bin/solsa-yaml.js"
   },
   "scripts": {
-    "test": "standard",
-    "make:watson": "trash watson && mkdir watson && cd watson && watson"
+    "test": "standard"
   },
   "dependencies": {
     "archiver": "^3.0.0",
-    "callsites": "^3.0.0",
-    "express": "^4.16.4",
     "js-yaml": "^3.13.0",
     "minimist": "^1.2.0",
-    "needle": "^2.2.4",
-    "pkg-dir": "^4.0.0",
-    "tmp": "^0.1.0",
-    "watson-developer-cloud": "^3.18.1",
-    "@kubernetes/client-node": "^0.8.2"
+    "tmp": "^0.1.0"
   },
   "devDependencies": {
-    "@solsa/service-gen": "git+ssh://git@github.ibm.com:solsa/service-gen.git",
     "pre-commit": "^1.2.2",
-    "standard": "^12.0.1",
-    "trash-cli": "^1.4.0"
+    "standard": "^12.0.1"
   }
 }
