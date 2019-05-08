@@ -91,58 +91,62 @@ class SolsaArchiver {
 
   _finalizeIngress (cluster, apps) {
     for (let idx in apps) {
-      const exposedApp = apps[idx]
-      const endpoints = exposedApp._exposedServices()
-      if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-        for (let idx in endpoints) {
-          let ep = endpoints[idx]
+      const exposedServices = apps[idx].getExposedServices()
+      for (let idx in exposedServices) {
+        let es = exposedServices[idx]
+        console.log(es)
+        if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
           const patchAnnotation = {
             apiVersion: 'v1',
             kind: 'Service',
             metadata: {
-              name: ep.name,
+              name: es.service.name,
               annotations: { 'solsa.ibm.com/exposed': true }
             }
           }
-          this.addPatch(patchAnnotation, `${ep.name}-annotate-exposed-svc.yml`, cluster.name)
-        }
+          this.addPatch(patchAnnotation, `${es.service.name}-annotate-exposed-svc.yml`, cluster.name)
 
-        if (cluster.ingress.iks) {
-          const ingress = {
-            apiVersion: 'extensions/v1beta1',
-            kind: 'Ingress',
-            metadata: {
-              name: exposedApp.name + '-ing-iks',
-              labels: {
-                'solsa.ibm.com/name': exposedApp.name
-              }
-            },
-            spec: {
-              tls: [{
-                hosts: endpoints.map(ep => ep.name + '.' + cluster.ingress.iks.subdomain),
-                secretName: cluster.ingress.iks.tlssecret
-              }],
-              rules: endpoints.map(function (ep) {
-                return {
-                  host: ep.name + '.' + cluster.ingress.iks.subdomain,
-                  http: {
-                    paths: [{
-                      path: '/',
-                      backend: {
-                        serviceName: ep.service.name,
-                        servicePort: ep.service.port
-                      }
-                    }]
-                  }
+          if (cluster.ingress.iks) {
+            const vhost = es.service.name + '.' + cluster.ingress.iks.subdomain
+            const ingress = {
+              apiVersion: 'extensions/v1beta1',
+              kind: 'Ingress',
+              metadata: {
+                name: es.service.name + '-ing-iks',
+                labels: {
+                  'solsa.ibm.com/name': es.service.name
                 }
-              })
+              },
+              spec: {
+                tls: [{
+                  hosts: [vhost],
+                  secretName: cluster.ingress.iks.tlssecret
+                }],
+                rules: [{
+                  host: vhost,
+                  http: {
+                    paths: es.endpoints.flatMap(function (ep) {
+                      const rules = []
+                      ep.paths.map(function (p) {
+                        rules.push({
+                          path: p,
+                          backend: {
+                            serviceName: es.service.name,
+                            servicePort: ep.port.name
+                          }
+                        })
+                      })
+                      return rules
+                    })
+                  }
+                }]
+              }
             }
-          }
-          this.addResource(ingress, `ingress-${exposedApp.name}.yaml`, cluster.name)
-        } else if (cluster.ingress.nodePort) {
-          if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-            for (let idx in endpoints) {
-              let ep = endpoints[idx]
+            console.log(ingress)
+
+            this.addResource(ingress, `ingress-${es.service.name}.yaml`, cluster.name)
+          } else if (cluster.ingress.nodePort) {
+            if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
               const port = cluster.ingress.nodePort + parseInt(idx)
               const nodePortPatch = [
                 {
@@ -159,69 +163,70 @@ class SolsaArchiver {
                 target: {
                   version: 'v1',
                   kind: 'Service',
-                  name: ep.service.name
+                  name: es.service.name
                 },
-                path: `expose-svc-${exposedApp.name}-${port}.yaml`
+                path: `expose-svc-${es.service.name}-${port}.yaml`
               }
               this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
             }
           }
-        }
-      } else if (cluster.ingress.istio) {
-        const gw = {
-          apiVersion: 'networking.istio.io/v1alpha3',
-          kind: 'Gateway',
-          metadata: {
-            name: exposedApp.name + '-gw',
-            labels: {
-              'solsa.ibm.com/name': exposedApp.name
-            }
-          },
-          spec: {
-            selector: {
-              istio: 'ingressgateway'
-            },
-            servers: [{
-              port: {
-                number: 80,
-                name: 'http',
-                protocol: 'HTTP'
-              },
-              hosts: ['*']
-            }]
-          }
-        }
-        this.addResource(gw, `gw-${exposedApp.name}.yaml`, cluster.name)
-        const vs = {
-          apiVersion: 'networking.istio.io/v1alpha3',
-          kind: 'VirtualService',
-          metadata: {
-            name: exposedApp.name + '-vs',
-            labels: {
-              'solsa.ibm.com/name': exposedApp.name
-            }
-          },
-          spec: {
-            hosts: ['*'],
-            gateways: [exposedApp.name + '-gw'],
-            http: endpoints.map(function (ep) {
-              return {
-                match: ep.paths.map(function (p) {
-                  return {
-                    uri: { exact: p }
-                  }
-                }),
-                route: [{
-                  destination: {
-                    host: ep.service.name,
-                    port: { number: ep.service.port }
-                  }
-                }]
+        } else if (cluster.ingress.istio) {
+          const gw = {
+            apiVersion: 'networking.istio.io/v1alpha3',
+            kind: 'Gateway',
+            metadata: {
+              name: es.service.name + '-gw',
+              labels: {
+                'solsa.ibm.com/name': es.service.name
               }
-            })
+            },
+            spec: {
+              selector: {
+                istio: 'ingressgateway'
+              },
+              servers: [{
+                port: {
+                  number: 80,
+                  name: 'http',
+                  protocol: 'HTTP'
+                },
+                hosts: ['*']
+              }]
+            }
           }
+          this.addResource(gw, `gw-${es.service.name}.yaml`, cluster.name)
+          const vs = {
+            apiVersion: 'networking.istio.io/v1alpha3',
+            kind: 'VirtualService',
+            metadata: {
+              name: es.service.name + '-vs',
+              labels: {
+                'solsa.ibm.com/name': es.service.name
+              }
+            },
+            spec: {
+              hosts: ['*'],
+              gateways: [es.service.name + '-gw'],
+              // FIXME: I am not sure how to update this.  -- Dave.
+              http: es.map(function (ep) {
+                return {
+                  match: ep.paths.map(function (p) {
+                    return {
+                      uri: { exact: p }
+                    }
+                  }),
+                  route: [{
+                    destination: {
+                      host: ep.service.name,
+                      port: { number: ep.service.port }
+                    }
+                  }]
+                }
+              })
+            }
+          }
+          this.addResource(vs, `vs-${es.service.name}.yaml`, cluster.name)
         }
-        this.addResource(vs, `vs-${exposedApp.name}.yaml`, cluster.name)
       }
     }
   }
@@ -254,7 +259,7 @@ class SolsaArchiver {
       for (const cluster of userConfig.clusters) {
         let clusterLayer = this._getLayer(cluster.name)
         if (cluster.ingress) {
-        // TODO this._finalizeIngress(cluster, apps)
+          this._finalizeIngress(cluster, apps)
         }
         clusterLayer.images = this._finalizeImageRenames(cluster, apps)
         clusterLayer.bases.push('./../base', `./../${cluster.nature || 'kubernetes'}`)
