@@ -204,8 +204,7 @@ class SolsaArchiver {
             spec: {
               hosts: ['*'],
               gateways: [es.service.name + '-gw'],
-              // FIXME: I am not sure how to update this.  -- Dave.
-              http: es.map(function (ep) {
+              http: es.endpoints.flatMap(function (ep) {
                 return {
                   match: ep.paths.map(function (p) {
                     return {
@@ -214,8 +213,8 @@ class SolsaArchiver {
                   }),
                   route: [{
                     destination: {
-                      host: ep.service.name,
-                      port: { number: ep.service.port }
+                      host: es.service.name,
+                      port: { number: ep.port.port }
                     }
                   }]
                 }
