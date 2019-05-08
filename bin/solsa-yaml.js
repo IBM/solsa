@@ -94,7 +94,6 @@ class SolsaArchiver {
       const exposedServices = apps[idx].getExposedServices()
       for (let idx in exposedServices) {
         let es = exposedServices[idx]
-        console.log(es)
         if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
           const patchAnnotation = {
             apiVersion: 'v1',
@@ -142,8 +141,6 @@ class SolsaArchiver {
                 }]
               }
             }
-            console.log(ingress)
-
             this.addResource(ingress, `ingress-${es.service.name}.yaml`, cluster.name)
           } else if (cluster.ingress.nodePort) {
             if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
@@ -241,9 +238,9 @@ class SolsaArchiver {
       const names = Object.values(app.getImages())
       for (let name of names) {
         if (!images.find(renaming => renaming.name === name)) {
-          if (cluster.registry && cluster.imageTag) {
+          if (cluster.registry && cluster.imageTag && !name.includes('/')) {
             images.push({ name, newName: `${cluster.registry}/${name}`, newTag: cluster.imageTag })
-          } else if (cluster.registry) {
+          } else if (cluster.registry && !name.includes('/')) {
             images.push({ name, newName: `${cluster.registry}/${name}` })
           } else if (cluster.imageTag) {
             images.push({ name, newTag: cluster.imageTag })
