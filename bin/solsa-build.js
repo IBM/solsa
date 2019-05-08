@@ -56,8 +56,6 @@ function build (name, cwd, tags = [], push) {
   console.log()
 }
 
-global.__yaml = true
-
 const config = fs.existsSync(argv.config) ? yaml.safeLoad(fs.readFileSync(argv.config, 'utf8')) : { clusters: [] }
 
 if (argv.push && !config.clusters.find(cluster => cluster.name === argv.push)) {
@@ -67,25 +65,24 @@ if (argv.push && !config.clusters.find(cluster => cluster.name === argv.push)) {
 
 let apps = require(path.resolve(argv._[0]))
 if (!Array.isArray(apps)) apps = [apps]
-for (let idx in apps) {
-  const app = apps[idx]
-  const images = app._images()
-  for (let image of Object.values(images)) {
-    const tags = [`${image.name}:${argv.tag}`]
+for (let app of apps) {
+  const images = app.getBuilds()
+  for (let image of images) {
+    const tags = [`${image.image}:${argv.tag}`]
     let push
     for (let cluster of config.clusters) {
       const match = cluster.images && cluster.images.find(x => x.name === image.name)
       let tag
       if (match) {
-        tag = `${match.newName || image.name}:${match.newTag || argv.tag}`
+        tag = `${match.newName || image.image}:${match.newTag || argv.tag}`
       } else if (cluster.registry) {
-        tag = `${cluster.registry}/${image.name}:${argv.tag}`
+        tag = `${cluster.registry}/${image.image}:${argv.tag}`
       }
       if (tag) {
         tags.push(tag)
         if (cluster.name === argv.push) push = tag
       }
     }
-    build(image.name, image.dir, tags, push)
+    build(image.image, image.folder, tags, push)
   }
 }
