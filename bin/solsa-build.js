@@ -26,9 +26,8 @@ if (argv._.length !== 1) {
   process.exit(1)
 }
 
-function build ({ image, folder, main = '.' }, tags = [], push) {
-  console.log(image, folder, main)
-  console.log(`Building image "${image}" with tags ${tags.map(tag => `"${tag}"`).join(', ')}`)
+function build ({ name, folder, main = '.' }, tags = [], push) {
+  console.log(`Building image "${name}" with tags ${tags.map(tag => `"${tag}"`).join(', ')}`)
   if (!fs.existsSync(path.join(folder, 'package.json'))) {
     console.error(`Missing package.json in ${folder}`)
     process.exit(1)
@@ -66,24 +65,26 @@ if (argv.push && !config.clusters.find(cluster => cluster.name === argv.push)) {
 
 let apps = require(path.resolve(argv._[0]))
 if (!Array.isArray(apps)) apps = [apps]
+const images = []
 for (let app of apps) {
-  const images = app.getBuilds()
-  for (let image of images) {
-    const tags = [`${image.image}:${argv.tag}`]
-    let push
-    for (let cluster of config.clusters) {
-      const match = cluster.images && cluster.images.find(x => x.name === image.name)
-      let tag
-      if (match) {
-        tag = `${match.newName || image.image}:${match.newTag || argv.tag}`
-      } else if (cluster.registry) {
-        tag = `${cluster.registry}/${image.image}:${argv.tag}`
-      }
-      if (tag) {
-        tags.push(tag)
-        if (cluster.name === argv.push) push = tag
-      }
+  images.push(...app.getBuilds())
+}
+for (let name of new Set(images.map(image => image.name))) {
+  const image = images.find(image => image.name === name)
+  const tags = [`${name}:${argv.tag}`]
+  let push
+  for (let cluster of config.clusters) {
+    const match = cluster.images && cluster.images.find(image => image.name === name)
+    let tag
+    if (match) {
+      tag = `${match.newName || name}:${match.newTag || argv.tag}`
+    } else if (cluster.registry) {
+      tag = `${cluster.registry}/${name}:${argv.tag}`
     }
-    build(image, tags, push)
+    if (tag) {
+      tags.push(tag)
+      if (cluster.name === argv.push) push = tag
+    }
   }
+  build(image, tags, push)
 }
