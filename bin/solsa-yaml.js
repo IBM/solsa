@@ -233,7 +233,7 @@ class SolsaArchiver {
     for (let idx in apps) {
       const app = apps[idx]
       // map images to registry if not already mapped
-      const names = Object.values(app._images()).map(({ name }) => name)
+      const names = Object.values(app.getImages())
       for (let name of names) {
         if (!images.find(renaming => renaming.name === name)) {
           if (cluster.registry && cluster.imageTag) {
@@ -254,7 +254,7 @@ class SolsaArchiver {
       for (const cluster of userConfig.clusters) {
         let clusterLayer = this._getLayer(cluster.name)
         if (cluster.ingress) {
-          this._finalizeIngress(cluster, apps)
+        // TODO this._finalizeIngress(cluster, apps)
         }
         clusterLayer.images = this._finalizeImageRenames(cluster, apps)
         clusterLayer.bases.push('./../base', `./../${cluster.nature || 'kubernetes'}`)
@@ -276,7 +276,7 @@ class SolsaArchiver {
         apiVersion: 'kustomize.config.k8s.io/v1beta1',
         kind: 'Kustomization',
         commonAnnotations: {
-          'solsa.ibm.com/app': apps[0].name
+          'solsa.ibm.com/app': apps[0].name || 'bundle'
         },
         bases: layer.bases,
         resources: Object.keys(layer.resources),
@@ -291,7 +291,7 @@ class SolsaArchiver {
   }
 }
 
-async function main () {
+function main () {
   const argv = minimist(process.argv.slice(2), {
     default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
     alias: { output: 'o', config: 'c' },
@@ -311,14 +311,12 @@ async function main () {
   let apps = require(require('path').resolve(argv._[0]))
   if (!Array.isArray(apps)) apps = [apps]
 
-  const outputRoot = argv.output ? argv.output : 'solsa-' + apps[0].name.toLowerCase()
+  const outputRoot = argv.output ? argv.output : 'bundle'
   const sa = new SolsaArchiver(outputRoot)
   for (let idx in apps) {
-    await apps[idx]._yaml(sa)
+    apps[idx].getResources(sa).forEach(({ obj, name, layer }) => sa.addResource(obj, name, layer))
   }
   sa.finalize(userConfig, apps)
 }
-
-global.__yaml = true
 
 main()
