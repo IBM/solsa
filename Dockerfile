@@ -14,8 +14,14 @@
 
 FROM node:10-alpine
 
+ARG MAIN
+
+ENV MAIN ${MAIN}
+
 WORKDIR /solsa
 
 COPY . .
 
-CMD ["/solsa/node_modules/solsa/bin/solsa-serve.js", "."]
+RUN echo "module.exports = require('./solsa/${MAIN}')" > /main.js
+
+CMD ["node", "/main.js"]
