@@ -58,8 +58,14 @@ class SolsaArchiver {
   }
 
   _writeToFile (obj, fname, layer) {
-    this.archive.append(yaml.safeDump(obj, { noArrayIndent: true }),
-      { name: path.join(this.outputRoot, layer, fname) })
+    let text
+    try {
+      text = yaml.safeDump(obj, { noArrayIndent: true })
+    } catch (err) {
+      console.error(obj)
+      throw err
+    }
+    this.archive.append(text, { name: path.join(this.outputRoot, layer, fname) })
   }
 
   _getLayer (layer) {
