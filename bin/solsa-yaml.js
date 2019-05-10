@@ -99,21 +99,21 @@ class SolsaArchiver {
             apiVersion: 'v1',
             kind: 'Service',
             metadata: {
-              name: es.service.name,
+              name: es.name,
               annotations: { 'solsa.ibm.com/exposed': true }
             }
           }
-          this.addPatch(patchAnnotation, `${es.service.name}-annotate-exposed-svc.yml`, cluster.name)
+          this.addPatch(patchAnnotation, `${es.name}-annotate-exposed-svc.yml`, cluster.name)
 
           if (cluster.ingress.iks) {
-            const vhost = es.service.name + '.' + cluster.ingress.iks.subdomain
+            const vhost = es.name + '.' + cluster.ingress.iks.subdomain
             const ingress = {
               apiVersion: 'extensions/v1beta1',
               kind: 'Ingress',
               metadata: {
-                name: es.service.name + '-ing-iks',
+                name: es.name + '-ing-iks',
                 labels: {
-                  'solsa.ibm.com/name': es.service.name
+                  'solsa.ibm.com/name': es.name
                 }
               },
               spec: {
@@ -130,7 +130,7 @@ class SolsaArchiver {
                         rules.push({
                           path: p,
                           backend: {
-                            serviceName: es.service.name,
+                            serviceName: es.name,
                             servicePort: ep.port.name
                           }
                         })
@@ -141,7 +141,7 @@ class SolsaArchiver {
                 }]
               }
             }
-            this.addResource(ingress, `ingress-${es.service.name}.yaml`, cluster.name)
+            this.addResource(ingress, `ingress-${es.name}.yaml`, cluster.name)
           } else if (cluster.ingress.nodePort) {
             if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
               const port = cluster.ingress.nodePort + parseInt(idx)
@@ -160,9 +160,9 @@ class SolsaArchiver {
                 target: {
                   version: 'v1',
                   kind: 'Service',
-                  name: es.service.name
+                  name: es.name
                 },
-                path: `expose-svc-${es.service.name}-${port}.yaml`
+                path: `expose-svc-${es.name}-${port}.yaml`
               }
               this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
             }
@@ -172,9 +172,9 @@ class SolsaArchiver {
             apiVersion: 'networking.istio.io/v1alpha3',
             kind: 'Gateway',
             metadata: {
-              name: es.service.name + '-gw',
+              name: es.name + '-gw',
               labels: {
-                'solsa.ibm.com/name': es.service.name
+                'solsa.ibm.com/name': es.name
               }
             },
             spec: {
@@ -191,19 +191,19 @@ class SolsaArchiver {
               }]
             }
           }
-          this.addResource(gw, `gw-${es.service.name}.yaml`, cluster.name)
+          this.addResource(gw, `gw-${es.name}.yaml`, cluster.name)
           const vs = {
             apiVersion: 'networking.istio.io/v1alpha3',
             kind: 'VirtualService',
             metadata: {
-              name: es.service.name + '-vs',
+              name: es.name + '-vs',
               labels: {
-                'solsa.ibm.com/name': es.service.name
+                'solsa.ibm.com/name': es.name
               }
             },
             spec: {
               hosts: ['*'],
-              gateways: [es.service.name + '-gw'],
+              gateways: [es.name + '-gw'],
               http: es.endpoints.flatMap(function (ep) {
                 return {
                   match: ep.paths.map(function (p) {
@@ -213,15 +213,15 @@ class SolsaArchiver {
                   }),
                   route: [{
                     destination: {
-                      host: es.service.name,
-                      port: { number: ep.port.port }
+                      host: es.name,
+                      port: { number: ep.port.number }
                     }
                   }]
                 }
               })
             }
           }
-          this.addResource(vs, `vs-${es.service.name}.yaml`, cluster.name)
+          this.addResource(vs, `vs-${es.name}.yaml`, cluster.name)
         }
       }
     }
