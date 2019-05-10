@@ -26,24 +26,24 @@ if (argv._.length !== 1) {
   process.exit(1)
 }
 
-function build ({ name, folder, main = '.' }, tags = [], push) {
+function build ({ name, build, main = '.' }, tags = [], push) {
   console.log(`Building image "${name}" with tags ${tags.map(tag => `"${tag}"`).join(', ')}`)
-  if (!fs.existsSync(path.join(folder, 'package.json'))) {
-    console.error(`Missing package.json in ${folder}`)
+  if (!fs.existsSync(path.join(build, 'package.json'))) {
+    console.error(`Missing package.json in ${build}`)
     process.exit(1)
   }
 
-  if (!fs.existsSync(path.join(folder, 'package.json'))) {
+  if (!fs.existsSync(path.join(build, 'package.json'))) {
     console.log('Running npm install')
-    cp.execSync('npm install --prod --no-save', { cwd: folder, stdio: [0, 1, 2] })
+    cp.execSync('npm install --prod --no-save', { cwd: build, stdio: [0, 1, 2] })
   }
 
   console.log('Copying files to temporary folder')
   const dir = tmp.dirSync({ mode: '0755', prefix: 'solsa_', unsafeCleanup: true })
-  cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: folder, stdio: [0, 1, 2] })
+  cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: build, stdio: [0, 1, 2] })
 
   console.log('Running docker build')
-  cp.execSync(`docker build -f node_modules/solsa/Dockerfile "${dir.name}" --build-arg MAIN=${main} ${tags.map(tag => `-t "${tag}"`).join(' ')}`, { cwd: folder, stdio: [0, 1, 2] })
+  cp.execSync(`docker build -f node_modules/solsa/Dockerfile "${dir.name}" --build-arg MAIN=${main} ${tags.map(tag => `-t "${tag}"`).join(' ')}`, { cwd: build, stdio: [0, 1, 2] })
 
   console.log('Reclaiming temporary folder')
   dir.removeCallback()
