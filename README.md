@@ -121,14 +121,18 @@ sosla-yaml -o myApp myApp.js
 tar xzf myApp.tgz
 kubectl apply -k myApp/mycluster
 ```
+To undeploy the application, use the command
+```shell
+kubectl delete -k myApp/mycluster
+```
+
 Note that `kustomize` support was recently added to `kubectl` in
 version 1.14.  With older versions of `kubectl` you will need to
 install a standalone `kustomize` cli and instead do:
 ```shell
 kustomize build myApp/mycluster | kubectl apply -f -
 ```
-
-To undeploy the application, use the command
+or
 ```shell
-kubectl delete -k myApp/mycluster
+kustomize build myApp/mycluster | kubectl delete -f -
 ```
