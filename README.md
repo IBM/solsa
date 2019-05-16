@@ -110,7 +110,7 @@ application.
 ## Examples
 
 The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
-collects examples of SolSA services.
+contains sample cloud native applications and architectural patterns defined using SolSA.
 
 A SolSA application `myApp.js` can be built and deployed to the IKS
 cluster `mycluster` defined above by using `solsa-build`, `solsa-yaml`
