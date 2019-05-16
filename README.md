@@ -111,3 +111,24 @@ application.
 
 The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
 collects examples of SolSA services.
+
+A SolSA application `myApp.js` can be built and deployed to the IKS
+cluster `mycluster` defined above by using `solsa-build`, `solsa-yaml`
+and `kubectl` (v1.14) as shown below.
+```shell
+sosla-build --push mycluster myApp.js
+sosla-yaml -o myApp myApp.js
+tar xzf myApp.tgz
+kubectl apply -k myApp/mycluster
+```
+Note that `kustomize` support was recently added to `kubectl` in
+version 1.14.  With older versions of `kubectl` you will need to
+install a standalone `kustomize` cli and instead do:
+```shell
+kustomize build myApp/mycluster | kubectl apply -f -
+```
+
+To undeploy the application, use the command
+```shell
+kubectl delete -k myApp/mycluster
+```
