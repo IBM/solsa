@@ -3,7 +3,10 @@
 The SolSA programming model is intended to ease the _development_, _deployment_,
 and _integration_ of cloud-native services and applications.
 SolSA makes it possible to compose existing services (cloud services, cloud functions,
-container-based services) and event sources into new services and applications.
+container-based services) and event sources into new services and
+applications. SolSA also enables the specification of application
+architectural patterns as executable code that can be leveraged to
+create reusable and repeatable cloud native applications.
 
 SolSA leverages Node.js and its package manager `npm` to program services and
 applications in a familiar, modular way.
@@ -12,26 +15,38 @@ SolSA leverages containers to encapsulate and distribute services.
 
 SolSA leverages Kubernetes operators to manage the life cycle of services
 whether they run inside or outside of a Kubernetes cluster. In particular, SolSA
-transparently manages service credentials. SolSA can target a standard
-Kubernetes cluster or a Knative cluster.
+transparently manages service credentials.
+
+SolSA includes support for Knative and is able to deploy resources
+such as Knative Serving services and Knative Eventing sources,
+producers, channels, etc. as part of an application solution.
 
 SolSA leverages `kustomize` to permit targeting multiple environments, e.g.,
 local development cluster, Kubernetes cluster, Knative cluster.
 
-At the heart of SolSA is a simple template for declaring service parameters and
-service dependencies. Thanks to this template, SolSA can automatically identify,
-build, deploy, and configure all the services needed by an application.
+SolSA includes an optional capability to write program logic
+leveraging widely used frameworks such as `Express.js` without
+requiring explicit specification of how such logic will be
+containerized. This enables light-weight specification of glue
+code and business logic for integrating existing containerized
+components and external cloud services.
+
+At the heart of SolSA is a simple set of programming conventions for
+declaring service parameters and service dependencies as executable
+code. When developers follow these conventions, SolSA can
+automatically identify, optionally build, deploy, and configure all
+the services needed by an application.
 
 ## Components
 
 SolSA consists of:
-- A main `solsa` module that defines the root SolSA service class that every
-  SolSA service extends.
-- Helper modules like the `watson` module that offer existing IBM cloud services
-  as SolSA services.
+- A main `solsa` module that provides a library of high-level
+abstractions for defining the software architecture of an
+application.
 - Helper tools:
-  - `solsa-build` builds and pushes container images for SolSA services.
-  - `solsa-yaml` synthesizes "Kustomizable" yaml for deploying SolSA services.
+  - `solsa-build` builds and pushes container images for SolSA-defined services.
+  - `solsa-yaml` synthesizes "Kustomizable" yaml for deploying SolSA
+     applications on Kubernetes.
 
 ## Configure a Kubernetes Cluster for SolSA
 
@@ -42,8 +57,8 @@ SolSA consists of:
 2. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-knative_tutorial#knative_tutorial.
 
-   NOTE: There is a bug in the IKS installation of KNative 0.4.1 that results in a misconfigured istio ingress.
-   After installing KNative, execute `kubectl edit ing iks-knative-ingress -n istio-system` and change `_place_holder_for_ingress_secret`
+   NOTE: There is a bug in the IKS installation of Knative 0.4.1 that results in a misconfigured istio ingress.
+   After installing Knative, execute `kubectl edit ing iks-knative-ingress -n istio-system` and change `_place_holder_for_ingress_secret`
    to the real value of your Ingress Secret obtained via `bx cs cluster-get <MY_CLUSTER_NAME>`
 
 ### Per Namespace Setup
@@ -55,14 +70,14 @@ SolSA consists of:
 
 ## Local Setup
 
-1. Configure access to the Kubernetes cluster (`KUBECONFIG`).
+1. Configure `kubectl` to access your Kubernetes cluster(s).
 
-2. Login to the IBM container registry.
+2. Login to the IBM container registry if any of your clusters are IKS clusters.
 
 3. Create a `.solsa.yaml` file in you home directory that describes each
    Kubernetes cluster for which you want SolSA to generate a Kustomize overlay.
-   The example file below defines three deployment environments, a local dev
-   environment, an IKS cluster, a Knative cluster.
+   The example file below defines two deployment environments, a local dev
+   environment that uses a NodePort ingress and an IKS cluster.
    ```yaml
    clusters:
    - name: 'localdev'
@@ -77,17 +92,12 @@ SolSA consists of:
      images:
      - name: solsa-translator
        newName: us.icr.io/groved/solsa-translator
-   - name: 'myknative'
-     nature: 'knative'
-       iks:
-         subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-         tlssecret: 'mycluster123'
    ```
    The IKS cluster definition demonstrates how to instruct SolSA to generate a
    Kustomize overlay that will rename docker images so that instead of being
    pulled from the local registry on the dev machine, the images will instead be
    pulled from a specific namespace in the IBM Container Registry. Specific
-   images can be handled. A default registry can also be specified.
+   images can also be handled. A default registry can also be specified.
 
 4. Clone and initialize this repository:
    ```sh
