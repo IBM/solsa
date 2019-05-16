@@ -74,7 +74,7 @@ application.
 
 2. Login to the IBM container registry if any of your clusters are IKS clusters.
 
-3. Create a `.solsa.yaml` file in you home directory that describes each
+3. Create a `.solsa.yaml` file in your home directory that describes each
    Kubernetes cluster for which you want SolSA to generate a Kustomize overlay.
    The example file below defines two deployment environments, a local dev
    environment that uses a NodePort ingress and an IKS cluster.
