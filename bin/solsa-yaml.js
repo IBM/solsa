@@ -26,9 +26,7 @@ class SolsaArchiver {
       zlib: { level: 9 }
     })
     this.layers = {
-      base: new KustomizeLayer('base'),
-      knative: new KustomizeLayer('knative'),
-      kubernetes: new KustomizeLayer('kubernetes')
+      base: new KustomizeLayer('base')
     }
     this.outputRoot = outputRoot
 
@@ -95,144 +93,6 @@ class SolsaArchiver {
     kl.bases.push(base)
   }
 
-  _finalizeIngress (cluster, apps) {
-    for (let idx in apps) {
-      const exposedServices = apps[idx].getExposedServices()
-      for (let idx in exposedServices) {
-        let es = exposedServices[idx]
-        if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-          const patchAnnotation = {
-            apiVersion: 'v1',
-            kind: 'Service',
-            metadata: {
-              name: es.name,
-              annotations: { 'solsa.ibm.com/exposed': true }
-            }
-          }
-          this.addPatch(patchAnnotation, `${es.name}-annotate-exposed-svc.yml`, cluster.name)
-
-          if (cluster.ingress.iks) {
-            const vhost = es.name + '.' + cluster.ingress.iks.subdomain
-            const ingress = {
-              apiVersion: 'extensions/v1beta1',
-              kind: 'Ingress',
-              metadata: {
-                name: es.name + '-ing-iks',
-                labels: {
-                  'solsa.ibm.com/name': es.name
-                }
-              },
-              spec: {
-                tls: [{
-                  hosts: [vhost],
-                  secretName: cluster.ingress.iks.tlssecret
-                }],
-                rules: [{
-                  host: vhost,
-                  http: {
-                    paths: es.endpoints.flatMap(function (ep) {
-                      const rules = []
-                      ep.paths.map(function (p) {
-                        rules.push({
-                          path: p,
-                          backend: {
-                            serviceName: es.name,
-                            servicePort: ep.port.name
-                          }
-                        })
-                      })
-                      return rules
-                    })
-                  }
-                }]
-              }
-            }
-            this.addResource(ingress, `ingress-${es.name}.yaml`, cluster.name)
-          } else if (cluster.ingress.nodePort) {
-            if ((cluster.nature || 'kubernetes').toLowerCase() === 'kubernetes') {
-              const port = cluster.ingress.nodePort + parseInt(idx)
-              const nodePortPatch = [
-                {
-                  op: 'replace',
-                  path: '/spec/type',
-                  value: 'NodePort'
-                }, {
-                  op: 'add',
-                  path: '/spec/ports/0/nodePort',
-                  value: port
-                }
-              ]
-              const nodePortPatchTarget = {
-                target: {
-                  version: 'v1',
-                  kind: 'Service',
-                  name: es.name
-                },
-                path: `expose-svc-${es.name}-${port}.yaml`
-              }
-              this.addJSONPatch(nodePortPatch, nodePortPatchTarget, cluster.name)
-            }
-          }
-        } else if (cluster.ingress.istio) {
-          const gw = {
-            apiVersion: 'networking.istio.io/v1alpha3',
-            kind: 'Gateway',
-            metadata: {
-              name: es.name + '-gw',
-              labels: {
-                'solsa.ibm.com/name': es.name
-              }
-            },
-            spec: {
-              selector: {
-                istio: 'ingressgateway'
-              },
-              servers: [{
-                port: {
-                  number: 80,
-                  name: 'http',
-                  protocol: 'HTTP'
-                },
-                hosts: ['*']
-              }]
-            }
-          }
-          this.addResource(gw, `gw-${es.name}.yaml`, cluster.name)
-          const vs = {
-            apiVersion: 'networking.istio.io/v1alpha3',
-            kind: 'VirtualService',
-            metadata: {
-              name: es.name + '-vs',
-              labels: {
-                'solsa.ibm.com/name': es.name
-              }
-            },
-            spec: {
-              hosts: ['*'],
-              gateways: [es.name + '-gw'],
-              http: es.endpoints.flatMap(function (ep) {
-                return {
-                  match: ep.paths.map(function (p) {
-                    return {
-                      uri: { exact: p }
-                    }
-                  }),
-                  route: [{
-                    destination: {
-                      host: es.name,
-                      port: { number: ep.port.number }
-                    }
-                  }]
-                }
-              })
-            }
-          }
-          this.addResource(vs, `vs-${es.name}.yaml`, cluster.name)
-        }
-      }
-    }
-  }
-
   _finalizeImageRenames (cluster, apps) {
     let images = cluster.images || []
     if (!cluster.registry && !cluster.imageTag) return images
@@ -260,11 +120,8 @@ class SolsaArchiver {
     if (userConfig.clusters) {
       for (const cluster of userConfig.clusters) {
         let clusterLayer = this._getLayer(cluster.name)
-        if (cluster.ingress) {
-          this._finalizeIngress(cluster, apps)
-        }
+        clusterLayer.bases.push('./../base')
         clusterLayer.images = this._finalizeImageRenames(cluster, apps)
-        clusterLayer.bases.push('./../base', `./../${cluster.nature || 'kubernetes'}`)
       }
     }
 
@@ -321,7 +178,15 @@ function main () {
   const outputRoot = argv.output ? argv.output : 'bundle'
   const sa = new SolsaArchiver(outputRoot)
   for (let idx in apps) {
-    apps[idx].getResources(sa).forEach(({ obj, name, layer }) => sa.addResource(obj, name, layer))
+    apps[idx].getResources({ userConfig: userConfig }).forEach(item => {
+      if (item.obj) {
+        sa.addResource(item.obj, item.name, item.layer)
+      } else if (item.JSONPatch) {
+        sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
+      } else if (item.patch) {
+        sa.addPatch(item.patch, item.name, item.layer)
+      }
+    })
   }
   sa.finalize(userConfig, apps)
 }
