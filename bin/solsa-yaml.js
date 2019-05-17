@@ -94,26 +94,25 @@ class SolsaArchiver {
   }
 
   _finalizeImageRenames (cluster, apps) {
-    let images = cluster.images || []
-    if (!cluster.registry && !cluster.imageTag) return images
-
-    for (let idx in apps) {
-      const app = apps[idx]
-      // map images to registry if not already mapped
-      const names = Object.values(app.getImages())
-      for (let name of names) {
-        if (!images.find(renaming => renaming.name === name)) {
-          if (cluster.registry && cluster.imageTag && !name.includes('/')) {
-            images.push({ name, newName: `${cluster.registry}/${name}`, newTag: cluster.imageTag })
-          } else if (cluster.registry && !name.includes('/')) {
-            images.push({ name, newName: `${cluster.registry}/${name}` })
-          } else if (cluster.imageTag) {
-            images.push({ name, newTag: cluster.imageTag })
-          }
+    const images = []
+    for (let app of apps) {
+      for (let name of app.getImages()) {
+        const pos = name.indexOf(':', name.indexOf('/'))
+        let newName = pos === -1 ? name : name.substring(0, pos)
+        let newTag = pos === -1 ? undefined : name.substring(pos + 1)
+        if (cluster.images && cluster.images.find(image => image.name === name || image.name === newName)) continue // already kustomized
+        if (images.find(image => image.name === name)) continue // already encountered
+        const k = { name }
+        if (cluster.registry && !name.includes('/')) k.newName = cluster.registry + '/' + newName
+        if (newTag) {
+          images.unshift(k) // list tagged images first
+        } else {
+          if (cluster.imageTag) k.newTag = cluster.imageTag // tag image
+          images.push(k)
         }
       }
     }
-    return images
+    return (cluster.images || []).concat(images)
   }
 
   finalize (userConfig, apps) {

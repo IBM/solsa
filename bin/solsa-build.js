@@ -11,9 +11,9 @@ const yaml = require('js-yaml')
 tmp.setGracefulCleanup()
 
 const argv = minimist(process.argv.slice(2), {
-  default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml'), tag: 'latest' },
-  alias: { config: 'c', tag: 't' },
-  string: ['config', 'push', 'tag']
+  default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
+  alias: { config: 'c' },
+  string: ['config', 'push']
 })
 
 if (argv._.length !== 1) {
@@ -22,7 +22,6 @@ if (argv._.length !== 1) {
   console.error('Flags:')
   console.error('  -c, --config CONFIG  parse CONFIG file')
   console.error('  --push CLUSTER       push images to CLUSTER')
-  console.error('  -t, --tag TAG        use TAG instead of "latest"')
   process.exit(1)
 }
 
@@ -33,7 +32,7 @@ function build ({ name, build, main = '.' }, tags = [], push) {
     process.exit(1)
   }
 
-  if (!fs.existsSync(path.join(build, 'package.json'))) {
+  if (!fs.existsSync(path.join(build, 'node_modules'))) {
     console.log('Running npm install')
     cp.execSync('npm install --prod --no-save', { cwd: build, stdio: [0, 1, 2] })
   }
@@ -71,20 +70,27 @@ for (let app of apps) {
 }
 for (let name of new Set(images.map(image => image.name))) {
   const image = images.find(image => image.name === name)
-  const tags = [`${name}:${argv.tag}`]
+  const tags = []
   let push
   for (let cluster of config.clusters) {
-    const match = cluster.images && cluster.images.find(image => image.name === name)
-    let tag
-    if (match) {
-      tag = `${match.newName || name}:${match.newTag || argv.tag}`
-    } else if (cluster.registry) {
-      tag = `${cluster.registry}/${name}:${argv.tag}`
-    }
-    if (tag) {
-      tags.push(tag)
-      if (cluster.name === argv.push) push = tag
-    }
+    let tag = rename(name, cluster)
+    if (!tags.includes(tag)) tags.push(tag)
+    if (cluster.name === argv.push) push = tag
   }
   build(image, tags, push)
+}
+
+function rename (name, cluster) {
+  const pos = name.indexOf(':', name.indexOf('/'))
+  let newName = pos === -1 ? name : name.substring(0, pos)
+  let newTag = pos === -1 ? undefined : name.substring(pos + 1)
+  let image = (cluster.images || []).find(image => image.name === name || image.name === newName)
+  if (image) {
+    newName = image.newName || newName
+    newTag = image.newTag || newTag
+  } else {
+    if (cluster.registry && !name.includes('/')) newName = cluster.registry + '/' + newName
+    newTag = newTag || cluster.imageTag
+  }
+  return newTag ? newName + ':' + newTag : newName
 }
