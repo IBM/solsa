@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 
+const cp = require('child_process')
 const archiver = require('archiver')
 const fs = require('fs')
 const minimist = require('minimist')
 const os = require('os')
 const path = require('path')
+const tmp = require('tmp')
 const yaml = require('js-yaml')
+
+tmp.setGracefulCleanup()
 
 class KustomizeLayer {
   constructor (name) {
@@ -34,6 +38,7 @@ class SolsaArchiver {
     // 'close' event is fired only when a file descriptor is involved
     output.on('close', function () {
       console.error(`Generated application YAML to ${outputRoot}.tgz`)
+      if (argv.cluster) kustomize()
     })
 
     // good practice to catch warnings (ie stat failures and other non-blocking errors)
@@ -63,7 +68,7 @@ class SolsaArchiver {
       console.error(obj)
       throw err
     }
-    this.archive.append(text, { name: path.join(this.outputRoot, layer, fname) })
+    this.archive.append(text, { name: path.join(path.basename(this.outputRoot), layer, fname) })
   }
 
   _getLayer (layer) {
@@ -138,15 +143,13 @@ class SolsaArchiver {
       const kustom = {
         apiVersion: 'kustomize.config.k8s.io/v1beta1',
         kind: 'Kustomization',
-        commonAnnotations: {
-          'solsa.ibm.com/app': apps[0].name || 'bundle'
-        },
         bases: layer.bases,
         resources: Object.keys(layer.resources),
         patches: Object.keys(layer.patches),
         patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target),
         images: layer.images
       }
+      if (apps[0].name) kustom.commonAnnotations = { 'solsa.ibm.com/app': apps[0].name }
       this._writeToFile(kustom, 'kustomization.yaml', layer.name)
     }
 
@@ -154,40 +157,60 @@ class SolsaArchiver {
   }
 }
 
-function main () {
-  const argv = minimist(process.argv.slice(2), {
-    default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
-    alias: { output: 'o', config: 'c' },
-    string: ['output', 'config']
-  })
+const argv = minimist(process.argv.slice(2), {
+  default: { config: process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml') },
+  alias: { output: 'o', config: 'c' },
+  string: ['output', 'config', 'cluster']
+})
 
-  var userConfig = {}
-  if (argv.config) {
-    try {
-      userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
-    } catch (err) {
-      console.error(`Unable to load ${argv.config}`)
-      console.error('Generating base SolSA YAML layers without target clusters')
-    }
-  }
-
-  let apps = require(require('path').resolve(argv._[0]))
-  if (!Array.isArray(apps)) apps = [apps]
-
-  const outputRoot = argv.output ? argv.output : 'bundle'
-  const sa = new SolsaArchiver(outputRoot)
-  for (let idx in apps) {
-    apps[idx].getResources({ userConfig: userConfig }).forEach(item => {
-      if (item.obj) {
-        sa.addResource(item.obj, item.name, item.layer)
-      } else if (item.JSONPatch) {
-        sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
-      } else if (item.patch) {
-        sa.addPatch(item.patch, item.name, item.layer)
-      }
-    })
-  }
-  sa.finalize(userConfig, apps)
+if (argv._.length !== 1) {
+  console.error('Usage:')
+  console.error('  solsa-yaml path [flags]')
+  console.error('Flags:')
+  console.error('  -c, --config CONFIG  parse CONFIG file')
+  console.error('  --cluster CLUSTER    output YAML for CLUSTER')
+  console.error('  -o, --output FILE    write FILE.tgz instead of default bundle.tgz')
+  process.exit(1)
 }
 
-main()
+var userConfig = {}
+if (argv.config) {
+  try {
+    userConfig = yaml.safeLoad(fs.readFileSync(argv.config, 'utf8'))
+  } catch (err) {
+    console.error(`Unable to load ${argv.config}`)
+    console.error('Generating base SolSA YAML layers without target clusters')
+  }
+}
+
+let apps = require(require('path').resolve(argv._[0]))
+if (!Array.isArray(apps)) apps = [apps]
+
+const outputRoot = argv.output ? argv.output : 'bundle'
+const sa = new SolsaArchiver(outputRoot)
+for (let idx in apps) {
+  apps[idx].getResources({ userConfig: userConfig }).forEach(item => {
+    if (item.obj) {
+      sa.addResource(item.obj, item.name, item.layer)
+    } else if (item.JSONPatch) {
+      sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
+    } else if (item.patch) {
+      sa.addPatch(item.patch, item.name, item.layer)
+    }
+  })
+}
+sa.finalize(userConfig, apps)
+
+function kustomize () {
+  if (!userConfig.clusters.find(cluster => cluster.name === argv.cluster)) {
+    console.error(`Cannot find cluster "${argv.cluster}" in configuration file`)
+    process.exit(1)
+  }
+
+  const dir = tmp.dirSync({ mode: '0755', prefix: 'solsa_', unsafeCleanup: true })
+
+  cp.execSync(`tar -C ${dir.name} -zxvf ${outputRoot}.tgz`, { stdio: [0, 1, 2] })
+  cp.execSync(`kustomize build ${path.join(dir.name, path.basename(outputRoot), argv.cluster)}`, { stdio: [0, 1, 2] })
+
+  dir.removeCallback()
+}
