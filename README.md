@@ -8,13 +8,13 @@ event sources.
 
 SolSA leverages Kubernetes operators to define and configure these resources
 whether they run inside or outside of a Kubernetes cluster. SolSA relies on the
-[composable operator](https://github.ibm.com/seed/composable) to encode dynamic dependencies between resource
-configurations.
+[composable operator](https://github.ibm.com/seed/composable) to encode dynamic
+dependencies between resource configurations.
 
 The execution of the SolSA code produces yaml than can be fed directly into
-`kubectl` to deploy the solution. SolSA leverages `kustomize` to permit
-targeting multiple environments, e.g., local development cluster, IKS or ICP
-cluster.
+`kubectl` to deploy the solution. SolSA leverages
+[Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit targeting
+multiple environments, e.g., local development cluster, IKS or ICP cluster.
 
 SolSA enables the specification of repeatable architectural patterns that can be
 reused across many solutions. SolSA supports expressing dependencies on shared
@@ -29,19 +29,20 @@ during deployment.
 SolSA includes an optional capability to containerize Node.js code. This
 facilitates the integration of components that require a little bit of glue code
 to interface properly, e.g., to align schemas or match protocols. This glue code
-can leverage portable Node.js frameworks such as `express` or `kafkajs`. SolSA
+can leverage portable Node.js frameworks such as
+[Express](https://expressjs.com) or [KafkaJS](https://kafka.js.org). SolSA
 builds the container image and synthesizes the yaml to instantiate the image
 with the proper configuration.
 
 ## Components
 
 SolSA consists of:
-- A main `solsa` module that provides a library of high-level abstractions for
-  defining the software architecture of a solution.
-- Helper tools:
-  - `solsa-build` builds and pushes container images for SolSA-defined services.
-  - `solsa-yaml` synthesizes "Kustomizable" yaml for deploying SolSA solutions
-     on Kubernetes.
+- A main `solsa` Node.js module that provides a library of high-level
+  abstractions for defining the software architecture of a solution.
+- A `solsa` command-line interface (CLI):
+  - `solsa build` builds and pushes container images for SolSA-defined services
+    (if any).
+  - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
 
 ## Configure a Kubernetes Cluster for SolSA
 
@@ -50,7 +51,7 @@ SolSA consists of:
 1. Install SEED. Follow the instructions at https://github.ibm.com/seed/charts.
 
 2. Optionally install Knative. For IKS, follow the instructions at
-   https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative
+   https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
 
 ### Per Namespace Setup
 
@@ -66,11 +67,11 @@ SolSA consists of:
 2. Login to the IBM container registry if any of your clusters are IKS clusters.
 
 3. Create a `.solsa.yaml` file in your home directory that describes each
-   Kubernetes cluster for which you want SolSA to generate a Kustomize overlay.
-   The example file below defines two deployment environments, a local dev
+   Kubernetes context for which you want SolSA to generate a Kustomize overlay.
+   The example file below defines two deployment contexts, a local dev
    environment that uses a NodePort ingress and an IKS cluster.
    ```yaml
-   clusters:
+   contexts:
    - name: 'localdev'
      ingress:
        nodePort: 32323
@@ -84,7 +85,7 @@ SolSA consists of:
      - name: solsa-translator
        newName: us.icr.io/groved/solsa-translator
    ```
-   The IKS cluster definition demonstrates how to instruct SolSA to generate a
+   The IKS context definition demonstrates how to instruct SolSA to generate a
    Kustomize overlay that will rename docker images so that instead of being
    pulled from the local registry on the dev machine, the images will instead be
    pulled from a specific namespace in the IBM Container Registry. Specific
@@ -94,7 +95,7 @@ SolSA consists of:
    ```sh
    git clone https://github.ibm.com/solsa/solsa.git
    cd solsa
-   npm install
+   npm install --prod
    npm link
    ```
 
@@ -104,27 +105,14 @@ The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
 contains sample cloud native applications and architectural patterns defined
 using SolSA.
 
-A SolSA application `myApp.js` can be built and deployed to the IKS cluster
-`mycluster` defined above by using `solsa-build`, `solsa-yaml` and `kubectl`
-(v1.14) as shown below.
+A SolSA application `myApp.js` can be built and deployed to the current
+Kubernetes context using `solsa build`, `solsa yaml` and `kubectl` as shown
+below.
 ```shell
-sosla-build --push mycluster myApp.js
-sosla-yaml -o myApp myApp.js
-tar xzf myApp.tgz
-kubectl apply -k myApp/mycluster
+sosla build myApp.js --push
+sosla yaml myApp.js | kubectl apply -f -
 ```
-To undeploy the application, use the command
+To undeploy the application, use the command:
 ```shell
-kubectl delete -k myApp/mycluster
-```
-
-Note that `kustomize` support was recently added to `kubectl` in version 1.14.
-With older versions of `kubectl` you will need to install a standalone
-`kustomize` cli and instead do:
-```shell
-kustomize build myApp/mycluster | kubectl apply -f -
-```
-or
-```shell
-kustomize build myApp/mycluster | kubectl delete -f -
+sosla yaml myApp.js | kubectl apply -f -
 ```

@@ -3,14 +3,12 @@
   "main": "solsa.js",
   "version": "0.1.0",
   "bin": {
-    "solsa-build": "./bin/solsa-build.js",
-    "solsa-yaml": "./bin/solsa-yaml.js"
+    "solsa": "./bin/solsa.js"
   },
   "scripts": {
     "test": "standard"
   },
   "dependencies": {
-    "archiver": "^3.0.0",
     "js-yaml": "^3.13.0",
     "minimist": "^1.2.0",
     "tmp": "^0.1.0"
