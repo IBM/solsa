@@ -1,3 +1,8 @@
+#
+# A ServiceAccount for pods running SolSA utility tasks
+# such as the SchemaTransformer that need to be able to
+# update Secret and ConfigMap data entries.
+#
 apiVersion: v1
 kind: ServiceAccount
 metadata:

@@ -46,6 +46,22 @@ SolSA consists of:
 
 ## Configure a Kubernetes Cluster for SolSA
 
+Note: If you are installing SolSA on an IKS cluster, we assume your
+cluster is already properly configured to enable you to pull images
+from the IBM Container Registry.  If it is not, please see the
+instructions at https://cloud.ibm.com/docs/containers?topic=containers-images. 
+
+We assume that you have already configured `kubectl` to be able to
+access each Kubernetes cluster you will be using with SolSA.
+
+We assume you have cloned this git repository to your development machine.
+```shell
+git clone https://github.ibm.com/solsa/solsa.git
+```
+We will use `$SOLSA_ROOT` to indicate the root of your clone of this
+repository in the instructions below.
+
+
 ### Cluster-wide Setup
 
 1. Install SEED. Follow the instructions at https://github.ibm.com/seed/charts.
@@ -55,24 +71,26 @@ SolSA consists of:
 
 ### Per Namespace Setup
 
-1. Create an image pull secret for the IBM Container Registry.
+1. Apply the SolSA yaml for per-namespace setup.
+```shell
+kubectl apply -f $SOLSA_ROOT/install/solsaNamespaceSetup.yaml
+```
 
-2. Edit the namespace's default service account to add the secret to the list of
-   imagePullSecrets.
+2. Edit the solsa-transformer service account to have the same list
+of imagePullSecrets as the default service account.
+Use `kubectl get sa default -o yaml` to see the default set of
+imagePullSecrets and then use `kubectl edit sa solsa-transformer` to
+cut & paste the list of imagePullSecrets into it.
 
 ## Local Setup
 
-1. Configure `kubectl` to access your Kubernetes cluster(s).
-
-2. Login to the IBM container registry if any of your clusters are IKS clusters.
-
-3. Create a `.solsa.yaml` file in your home directory that describes each
+1. Create a `.solsa.yaml` file in your home directory that describes each
    Kubernetes context for which you want SolSA to generate a Kustomize overlay.
-   The example file below defines two deployment contexts, a local dev
-   environment that uses a NodePort ingress and an IKS cluster.
+   The example file below defines two deployment contexts, a local development
+   environment provided by Docker Desktop that uses a NodePort ingress and an IKS cluster.
    ```yaml
    contexts:
-   - name: 'localdev'
+   - name: 'docker-for-desktop'
      ingress:
        nodePort: 32323
    - name: 'mycluster'
@@ -91,13 +109,13 @@ SolSA consists of:
    pulled from a specific namespace in the IBM Container Registry. Specific
    images can also be handled. A default registry can also be specified.
 
-4. Clone and initialize this repository:
-   ```sh
-   git clone https://github.ibm.com/solsa/solsa.git
-   cd solsa
-   npm install --prod
-   npm link
-   ```
+2. Install the SolSA npm module
+
+```sh
+cd $SOLSA_ROOT
+npm install --prod
+npm link
+```
 
 ## Examples
 
