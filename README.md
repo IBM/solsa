@@ -114,5 +114,5 @@ solsa yaml myApp.js | kubectl apply -f -
 ```
 To undeploy the application, use the command:
 ```shell
-solsa yaml myApp.js | kubectl apply -f -
+solsa yaml myApp.js | kubectl delete -f -
 ```
