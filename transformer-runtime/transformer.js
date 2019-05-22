@@ -7,18 +7,26 @@ const minimist = require('minimist')
 async function patchSecret (namespace, name, newSecrets) {
   // update newSecrets to base64 encode values
   Object.keys(newSecrets).map(key => { newSecrets[key] = Buffer.from(newSecrets[key]).toString('base64') })
+  const savedDefaultHeaders = client.defaultHeaders
   try {
+    client.defaultHeaders = { 'Accept': 'application/json', 'Content-Type': 'application/strategic-merge-patch+json' }
     await client.patchNamespacedSecret(name, namespace, { data: newSecrets })
   } catch (err) {
     console.log(err)
+  } finally {
+    client.defaultHeaders = savedDefaultHeaders
   }
 }
 
 async function writeConfigMap (namespace, name, newEntries) {
+  const savedDefaultHeaders = client.defaultHeaders
   try {
+    client.defaultHeaders = { 'Accept': 'application/json', 'Content-Type': 'application/strategic-merge-patch+json' }
     await client.patchNamespacedConfigMap(name, namespace, { data: newEntries })
   } catch (err) {
     console.log(err)
+  } finally {
+    client.defaultHeaders = savedDefaultHeaders
   }
 }
 
