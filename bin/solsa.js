@@ -249,7 +249,7 @@ function buildCommand () {
     cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Running docker build')
-    cp.execSync(`docker build -f node_modules/solsa/Dockerfile "${dir.name}" --build-arg MAIN=${main} ${tags.map(tag => `-t "${tag}"`).join(' ')}`, { cwd: build, stdio: [0, 1, 2] })
+    cp.execSync(`docker build -f node_modules/solsa/runtime/node/Dockerfile "${dir.name}" --build-arg MAIN=${main} ${tags.map(tag => `-t "${tag}"`).join(' ')}`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Reclaiming temporary folder')
     dir.removeCallback()
