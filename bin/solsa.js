@@ -49,29 +49,26 @@ function init (argv) {
 
 const argv = minimist(process.argv.slice(2), {
   string: ['config', 'context', 'output'],
-  boolean: ['push'],
   alias: { context: 'c', output: 'o' }
 })
 let command = argv._[0]
 let source = argv._[1]
 
-if (argv._.length !== 2 || !['yaml', 'build'].includes(command)) {
+if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(command)) {
   console.error('Usage:')
-  console.error('  solsa COMMAND PATH [FLAGS]')
+  console.error('  solsa <command> [flags]')
   console.error()
   console.error('Available commands:')
-  console.error('  build                    build container images')
-  console.error('  yaml                     synthesize yaml')
+  console.error('  build <solution.js>        build container images')
+  console.error('  push <solution.js>         push container images to registries for current kubernetes context')
+  console.error('  yaml <solution.js>         synthesize yaml for current kubernetes context')
   console.error()
   console.error('Global flags:')
-  console.error('      --config CONFIG      use CONFIG file instead of default')
-  console.error('  -c, --context CONTEXT    use CONTEXT instead of current context')
-  console.error()
-  console.error(`Flags for "build" command:`)
-  console.error('      --push               push images')
+  console.error('      --config <config>      use <config> file instead of default')
+  console.error('  -c, --context <context>    use <context> instead of current kubernetes context')
   console.error()
   console.error(`Flags for "yaml" command:`)
-  console.error('  -o, --output FILE        output YAML to FILE.tgz')
+  console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
   console.error()
   process.exit(1)
 }
@@ -227,12 +224,8 @@ function buildCommand () {
   let apps = require(path.resolve(source))
   if (!Array.isArray(apps)) apps = [apps]
 
-  function build ({ name, build, main = '.' }, tags = [], push) {
-    if (tags.length > 0) {
-      console.log(`Building image "${name}" with tags ${tags.map(tag => `"${tag}"`).join(', ')}`)
-    } else {
-      console.log(`Building image "${name}"`)
-    }
+  function build ({ name, build, main = '.' }) {
+    console.log(`Building image "${name}"`)
     if (!fs.existsSync(path.join(build, 'package.json'))) {
       console.error(`Error: Missing package.json in ${build}, skipping image`)
       errors++
@@ -249,23 +242,37 @@ function buildCommand () {
     cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Running docker build')
-    cp.execSync(`docker build -f node_modules/solsa/runtime/node/Dockerfile "${dir.name}" --build-arg MAIN=${main} ${tags.map(tag => `-t "${tag}"`).join(' ')}`, { cwd: build, stdio: [0, 1, 2] })
+    cp.execSync(`docker build -f node_modules/solsa/runtime/node/Dockerfile "${dir.name}" --build-arg MAIN=${main}`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Reclaiming temporary folder')
     dir.removeCallback()
-
-    if (argv.push) {
-      if (push) {
-        console.log(`Running docker push "${push}"`)
-        cp.execSync(`docker push "${push}"`, { stdio: [0, 1, 2] })
-      } else {
-        console.error('Error: Missing context, skipping push')
-        errors++
-      }
-    }
   }
 
-  function rename (name, context) {
+  const images = []
+  for (let app of apps) {
+    images.push(...app.getBuilds())
+  }
+  for (let name of new Set(images.map(image => image.name))) {
+    build(images.find(image => image.name === name))
+  }
+}
+
+function pushCommand () {
+  if (!config.context) {
+    console.error('Error: Missing context, cannot push')
+    errors++
+    return
+  }
+
+  function push (name, tag) {
+    console.log(`Tagging image "${name}" with tag "${tag}"`)
+    cp.execSync(`docker tag "${name}" "${tag}"`, { stdio: [0, 1, 2] })
+
+    console.log(`Pushing image "${tag}"`)
+    cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
+  }
+
+  function tag (name, context) {
     const pos = name.indexOf(':', name.indexOf('/'))
     let newName = pos === -1 ? name : name.substring(0, pos)
     let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -280,20 +287,15 @@ function buildCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
+  let apps = require(path.resolve(source))
+  if (!Array.isArray(apps)) apps = [apps]
+
   const images = []
   for (let app of apps) {
     images.push(...app.getBuilds())
   }
   for (let name of new Set(images.map(image => image.name))) {
-    const image = images.find(image => image.name === name)
-    const tags = []
-    let push
-    for (let context of config.contexts) {
-      let tag = rename(name, context)
-      tags.push(tag)
-      if (argv.push && context.name === config.context) push = tag
-    }
-    build(image, Array.from(new Set(tags)), push)
+    push(name, tag(name, config.contexts.find(({ name }) => name === config.context)))
   }
 }
 
@@ -303,6 +305,9 @@ switch (command) {
     break
   case 'build':
     buildCommand()
+    break
+  case 'push':
+    pushCommand()
 }
 
 if (errors) {
