@@ -4,25 +4,19 @@ const k8s = require('@kubernetes/client-node')
 const client = k8s.Config.defaultClient()
 const minimist = require('minimist')
 
-async function writeSecret (namespace, name, secretDictionary) {
-  const ksecret = new k8s.V1Secret()
-  ksecret.metadata = new k8s.V1ObjectMeta()
-  ksecret.metadata.name = name
-  ksecret.stringData = secretDictionary
+async function patchSecret (namespace, name, newSecrets) {
+  // update newSecrets to base64 encode values
+  Object.keys(newSecrets).map(key => { newSecrets[key] = Buffer.from(newSecrets[key]).toString('base64') })
   try {
-    await client.createNamespacedSecret(namespace, ksecret)
+    await client.patchNamespacedSecret(name, namespace, { data: newSecrets })
   } catch (err) {
     console.log(err)
   }
 }
 
-async function writeConfigMap (namespace, name, dictionary) {
-  const kcm = new k8s.V1ConfigMap()
-  kcm.metadata = new k8s.V1ObjectMeta()
-  kcm.metadata.name = name
-  kcm.data = dictionary
+async function writeConfigMap (namespace, name, newEntries) {
   try {
-    await client.createNamespacedConfigMap(namespace, kcm)
+    await client.patchNamespacedConfigMap(name, namespace, { data: newEntries })
   } catch (err) {
     console.log(err)
   }
@@ -52,10 +46,10 @@ function main () {
     const type = outputDict[name]
     const data = res[name] || {}
     if (type === 'secret') {
-      console.log(`Writing secret ${name}`)
-      writeSecret(argv.namespace, name, data)
+      console.log(`Patching secret ${name}`)
+      patchSecret(argv.namespace, name, data)
     } else if (type === 'configmap') {
-      console.log(`Writing cm ${name}`)
+      console.log(`Patching cm ${name}`)
       writeConfigMap(argv.namespace, name, data)
     }
   })
