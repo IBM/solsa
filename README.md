@@ -41,7 +41,7 @@ SolSA consists of:
   abstractions for defining the software architecture of a solution.
 - A `solsa` command-line interface (CLI):
   - `solsa build` builds container images for SolSA-defined services (if any).
-  - `solsa push` pushes container images for SolSA-defined services.
+  - `solsa push` pushes container images for SolSA-defined services (if any).
   - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
 
 ## Configure a Kubernetes Cluster for SolSA
