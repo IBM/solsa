@@ -40,8 +40,8 @@ SolSA consists of:
 - A main `solsa` Node.js module that provides a library of high-level
   abstractions for defining the software architecture of a solution.
 - A `solsa` command-line interface (CLI):
-  - `solsa build` builds and pushes container images for SolSA-defined services
-    (if any).
+  - `solsa build` builds container images for SolSA-defined services (if any).
+  - `solsa push` pushes container images for SolSA-defined services.
   - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
 
 ## Configure a Kubernetes Cluster for SolSA
@@ -106,13 +106,13 @@ contains sample cloud native applications and architectural patterns defined
 using SolSA.
 
 A SolSA application `myApp.js` can be built and deployed to the current
-Kubernetes context using `solsa build`, `solsa yaml` and `kubectl` as shown
-below.
+Kubernetes context using the `solsa` CLI and `kubectl` as shown below.
 ```shell
-sosla build myApp.js --push
-sosla yaml myApp.js | kubectl apply -f -
+solsa build myApp.js
+solsa push myApp.js
+solsa yaml myApp.js | kubectl apply -f -
 ```
 To undeploy the application, use the command:
 ```shell
-sosla yaml myApp.js | kubectl apply -f -
+solsa yaml myApp.js | kubectl apply -f -
 ```
