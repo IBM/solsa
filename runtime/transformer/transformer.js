@@ -2,7 +2,6 @@
 
 const k8s = require('@kubernetes/client-node')
 const client = k8s.Config.defaultClient()
-const minimist = require('minimist')
 
 async function patchSecret (namespace, name, newSecrets) {
   // update newSecrets to base64 encode values
@@ -18,7 +17,7 @@ async function patchSecret (namespace, name, newSecrets) {
   }
 }
 
-async function writeConfigMap (namespace, name, newEntries) {
+async function patchConfigMap (namespace, name, newEntries) {
   const savedDefaultHeaders = client.defaultHeaders
   try {
     client.defaultHeaders = { 'Accept': 'application/json', 'Content-Type': 'application/strategic-merge-patch+json' }
@@ -31,36 +30,24 @@ async function writeConfigMap (namespace, name, newEntries) {
 }
 
 function main () {
-  const argv = minimist(process.argv.slice(2), {
-    default: {
-      code: process.env.SOLSA_USER_CODE,
-      output: process.env.SOLSA_OUTPUT_SCHEMA,
-      namespace: process.env.SOLSA_NAMESPACE || 'default'
-    },
-    alias: { code: 'c', output: 'o', namespace: 'n' },
-    string: ['code', 'output', 'namespace']
-  })
+  const code = process.env.SOLSA_USER_CODE
+  const namespace = process.env.SOLSA_NAMESPACE
+  const outputSecret = process.env.SOLSA_OUTPUT_SECRET
+  const outputConfigMap = process.env.SOLSA_OUTPUT_CONFIG_MAP
 
   // Run the user-supplied transform function
-  const userFunction = JSON.parse(argv.code)
+  const userFunction = JSON.parse(code)
   const thunk = `(${userFunction})()`
   const res = eval(thunk)
 
-  // Parse the user-supplied output directives
-  const outputDict = JSON.parse(argv.output)
-
-  // Apply the directives to the value returned from the evaluation of the user code
-  Object.keys(outputDict).forEach(name => {
-    const type = outputDict[name]
-    const data = res[name] || {}
-    if (type === 'secret') {
-      console.log(`Patching secret ${name}`)
-      patchSecret(argv.namespace, name, data)
-    } else if (type === 'configmap') {
-      console.log(`Patching cm ${name}`)
-      writeConfigMap(argv.namespace, name, data)
-    }
-  })
+  // Use the result to patch the targeted output resource
+  if (outputSecret) {
+    console.log(`Patching secret ${outputSecret}`)
+    patchSecret(namespace, outputSecret, res)
+  } else if (outputConfigMap) {
+    console.log(`Patching configMap ${outputConfigMap}`)
+    patchConfigMap(namespace, outputConfigMap, res)
+  }
 }
 
 main()
