@@ -36,8 +36,7 @@ function main () {
   const outputConfigMap = process.env.SOLSA_OUTPUT_CONFIG_MAP
 
   // Run the user-supplied transform function
-  const userFunction = JSON.parse(code)
-  const thunk = `(${userFunction})()`
+  const thunk = `(${code})()`
   const res = eval(thunk)
 
   // Use the result to patch the targeted output resource
