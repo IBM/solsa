@@ -80,7 +80,7 @@ install/install.sh -n mynamespace
 
 1. Install SolSA
 
-```sh
+```shell
 npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
 ```
 
