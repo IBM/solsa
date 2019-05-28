@@ -31,8 +31,8 @@ facilitates the integration of components that require a little bit of glue code
 to interface properly, e.g., to align schemas or match protocols. This glue code
 can leverage portable Node.js frameworks such as
 [Express](https://expressjs.com) or [KafkaJS](https://kafka.js.org). SolSA
-builds the container image and synthesizes the yaml to instantiate the image
-with the proper configuration.
+builds and pushes the container image in addition to synthesizing the yaml to
+instantiate the image with the proper configuration.
 
 ## Components
 
@@ -48,19 +48,11 @@ SolSA consists of:
 
 Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
 already properly configured to enable you to pull images from the IBM Container
-Registry.  If it is not, please see the instructions at
-https://cloud.ibm.com/docs/containers?topic=containers-images. 
+Registry. If it is not, please see the instructions at
+https://cloud.ibm.com/docs/containers?topic=containers-images.
 
 We assume that you have already configured `kubectl` to be able to access each
 Kubernetes cluster you will be using with SolSA.
-
-We assume you have cloned this git repository to your development machine.
-```shell
-git clone https://github.ibm.com/solsa/solsa.git
-```
-We will use `$SOLSA_ROOT` to indicate the root of your clone of this repository
-in the instructions below.
-
 
 ### Cluster-wide Setup
 
@@ -73,6 +65,9 @@ in the instructions below.
 
 4. Optionally install the Kafka Knative Event Source from
    https://github.com/knative/eventing-sources/tree/master/contrib/kafka/samples.
+   If using the IBM container registry make sure to add a corresponding image
+   pull secret to the `kafka-controller-manager` service account of the
+   `knative-sources` namespace.
 
 ### Per Namespace Setup
 
@@ -83,11 +78,17 @@ install/install.sh -n mynamespace
 
 ## Local Setup
 
-1. Create a `.solsa.yaml` file in your home directory that describes each
-   Kubernetes context for which you want SolSA to generate a Kustomize overlay.
-   The example file below defines two deployment contexts, a local development
-   environment provided by Docker Desktop that uses a NodePort ingress and an
-   IKS cluster.
+1. Install SolSA
+
+```sh
+npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
+```
+
+2. Optionally create a `.solsa.yaml` file in your home directory that describes
+   each Kubernetes context for which you want SolSA to generate a Kustomize
+   overlay. The example file below defines two deployment contexts, a local
+   development environment provided by Docker Desktop that uses a NodePort
+   ingress and an IKS cluster.
    ```yaml
    contexts:
    - name: 'docker-for-desktop'
@@ -106,16 +107,8 @@ install/install.sh -n mynamespace
    The IKS context definition demonstrates how to instruct SolSA to generate a
    Kustomize overlay that will rename docker images so that instead of being
    pulled from the local registry on the dev machine, the images will instead be
-   pulled from a specific namespace in the IBM Container Registry. Specific
-   images can also be handled. A default registry can also be specified.
-
-2. Install the SolSA npm module
-
-```sh
-cd $SOLSA_ROOT
-npm install --prod
-npm link
-```
+   pulled from a specific namespace in the IBM Container Registry. In addition
+   to a default registry, specific images can be handled.
 
 ## Examples
 
@@ -130,7 +123,31 @@ solsa build myApp.js
 solsa push myApp.js
 solsa yaml myApp.js | kubectl apply -f -
 ```
+The `build` and `push` steps are not necessary when only using SolSA to
+synthesize yaml. These steps tag and push images for SolSA-defined services
+according to the SolSA configuration for the current Kubernetes context.
+
+Run `solsa` with no arguments to see a list of supported commands and flags.
+
 To undeploy the application, use the command:
 ```shell
 solsa yaml myApp.js | kubectl delete -f -
 ```
+
+## Development
+
+To contribute to the development of SolSA, clone and link this repository:
+```shell
+git clone https://github.ibm.com/solsa/solsa.git
+cd solsa
+npm install
+npm link
+```
+This will ensure the `solsa` CLI uses the local checkout.
+
+Then, for each SolSA solution, make sure to link your SolSA clone:
+```shell
+cd my-solsa-solution
+npm link solsa
+```
+This will ensure the `solsa` library uses the local checkout.
