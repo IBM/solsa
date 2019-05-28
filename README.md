@@ -46,48 +46,48 @@ SolSA consists of:
 
 ## Configure a Kubernetes Cluster for SolSA
 
-Note: If you are installing SolSA on an IKS cluster, we assume your
-cluster is already properly configured to enable you to pull images
-from the IBM Container Registry.  If it is not, please see the
-instructions at https://cloud.ibm.com/docs/containers?topic=containers-images. 
+Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
+already properly configured to enable you to pull images from the IBM Container
+Registry.  If it is not, please see the instructions at
+https://cloud.ibm.com/docs/containers?topic=containers-images. 
 
-We assume that you have already configured `kubectl` to be able to
-access each Kubernetes cluster you will be using with SolSA.
+We assume that you have already configured `kubectl` to be able to access each
+Kubernetes cluster you will be using with SolSA.
 
 We assume you have cloned this git repository to your development machine.
 ```shell
 git clone https://github.ibm.com/solsa/solsa.git
 ```
-We will use `$SOLSA_ROOT` to indicate the root of your clone of this
-repository in the instructions below.
+We will use `$SOLSA_ROOT` to indicate the root of your clone of this repository
+in the instructions below.
 
 
 ### Cluster-wide Setup
 
-1. Install SEED. Follow the instructions at https://github.ibm.com/seed/charts.
+1. Install SEED operators from https://github.ibm.com/seed/charts.
 
-2. Optionally install Knative. For IKS, follow the instructions at
+2. Install the Composable operator from https://github.ibm.com/seed/composable.
+
+3. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
+
+4. Optionally install the Kafka Knative Event Source from
+   https://github.com/knative/eventing-sources/tree/master/contrib/kafka/samples.
 
 ### Per Namespace Setup
 
-1. Apply the SolSA yaml for per-namespace setup.
+1. Run for each namespace:
 ```shell
-kubectl apply -f $SOLSA_ROOT/install/solsaNamespaceSetup.yaml
+install/install.sh -n mynamespace
 ```
-
-2. Edit the solsa-transformer service account to have the same list
-of imagePullSecrets as the default service account.
-Use `kubectl get sa default -o yaml` to see the default set of
-imagePullSecrets and then use `kubectl edit sa solsa-transformer` to
-cut & paste the list of imagePullSecrets into it.
 
 ## Local Setup
 
 1. Create a `.solsa.yaml` file in your home directory that describes each
    Kubernetes context for which you want SolSA to generate a Kustomize overlay.
    The example file below defines two deployment contexts, a local development
-   environment provided by Docker Desktop that uses a NodePort ingress and an IKS cluster.
+   environment provided by Docker Desktop that uses a NodePort ingress and an
+   IKS cluster.
    ```yaml
    contexts:
    - name: 'docker-for-desktop'
