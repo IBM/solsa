@@ -41,11 +41,19 @@ SolSA consists of:
 - A main `solsa` Node.js module that provides a library of high-level
   abstractions for defining the software architecture of a solution.
 - A `solsa` command-line interface (CLI):
+  - `solsa init` initializes a Kubernetes namespace for SolSA use.
   - `solsa build` builds container images for SolSA-defined services (if any).
   - `solsa push` pushes container images for SolSA-defined services (if any).
   - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
 
-## Configure a Kubernetes Cluster for SolSA
+## Setup
+
+Install SolSA:
+```shell
+npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
+```
+
+### Kubernetes Cluster Setup
 
 Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
 already properly configured to enable you to pull images from the IBM Container
@@ -54,8 +62,6 @@ https://cloud.ibm.com/docs/containers?topic=containers-images.
 
 We assume that you have already configured `kubectl` to be able to access each
 Kubernetes cluster you will be using with SolSA.
-
-### Cluster-wide Setup
 
 1. Install SEED operators from https://github.ibm.com/seed/charts.
 
@@ -72,44 +78,38 @@ Kubernetes cluster you will be using with SolSA.
 
 ### Per Namespace Setup
 
-1. Run for each namespace:
+Run for each namespace which will host SolSA-defined services:
 ```shell
-install/solsaNamespaceSetup.sh -n mynamespace
+solsa init my-namespace
 ```
 
-## Local Setup
+### Local Configuration File
 
-1. Install SolSA
-
-```shell
-npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
+Optionally create a `.solsa.yaml` file in your home directory that describes
+each Kubernetes context for which you want SolSA to generate a Kustomize
+overlay. The example file below defines two deployment contexts, a local
+development environment provided by Docker Desktop that uses a NodePort ingress
+and an IKS cluster.
+```yaml
+contexts:
+- name: 'docker-for-desktop'
+  ingress:
+    nodePort: 32323
+- name: 'mycluster'
+  ingress:
+    iks:
+      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+      tlssecret: 'mycluster123'
+  registry: 'us.icr.io/tardieu'
+  images:
+  - name: solsa-translator
+    newName: us.icr.io/groved/solsa-translator
 ```
-
-2. Optionally create a `.solsa.yaml` file in your home directory that describes
-   each Kubernetes context for which you want SolSA to generate a Kustomize
-   overlay. The example file below defines two deployment contexts, a local
-   development environment provided by Docker Desktop that uses a NodePort
-   ingress and an IKS cluster.
-   ```yaml
-   contexts:
-   - name: 'docker-for-desktop'
-     ingress:
-       nodePort: 32323
-   - name: 'mycluster'
-     ingress:
-       iks:
-         subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-         tlssecret: 'mycluster123'
-     registry: 'us.icr.io/tardieu'
-     images:
-     - name: solsa-translator
-       newName: us.icr.io/groved/solsa-translator
-   ```
-   The IKS context definition demonstrates how to instruct SolSA to generate a
-   Kustomize overlay that will rename docker images so that instead of being
-   pulled from the local registry on the dev machine, the images will instead be
-   pulled from a specific namespace in the IBM Container Registry. In addition
-   to a default registry, specific images can be handled.
+The IKS context definition demonstrates how to instruct SolSA to generate a
+Kustomize overlay that will rename docker images so that instead of being pulled
+from the local registry on the dev machine, the images will instead be pulled
+from a specific namespace in the IBM Container Registry. Rules for specific
+images can also be specified using Kustomize syntax.
 
 ## Examples
 

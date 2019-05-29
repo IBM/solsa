@@ -13,7 +13,7 @@ const yaml = require('js-yaml')
 
 tmp.setGracefulCleanup()
 
-const commands = { yaml: yamlCommand, build: buildCommand, push: pushCommand }
+const commands = { yaml: yamlCommand, build: buildCommand, push: pushCommand, init: initCommand }
 
 // process command line arguments
 
@@ -31,6 +31,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error()
   console.error('Available commands:')
   console.error('  build <solution.js>        build container images')
+  console.error('  init namespace             initialize Kubernetes namespace for SolSA use')
   console.error('  push <solution.js>         push container images to registries for current kubernetes context')
   console.error('  yaml <solution.js>         synthesize yaml for current kubernetes context')
   console.error()
@@ -325,6 +326,10 @@ function pushCommand () {
       cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
     }
   }
+}
+
+function initCommand () {
+  cp.execSync(`${path.join(__dirname, '..', 'install', 'solsaNamespaceSetup.sh')} -n ${argv.file}`, { stdio: [0, 1, 2] })
 }
 
 // process command
