@@ -4,73 +4,26 @@ const { Bundle } = require('../lib/bundle')
 const cp = require('child_process')
 const fs = require('fs')
 const minimist = require('minimist')
-const os = require('os')
 const Module = require('module')
+const os = require('os')
 const path = require('path')
-const util = require('util')
 const tmp = require('tmp')
+const util = require('util')
 const yaml = require('js-yaml')
-
-// resolve module even if not in default path
-const _resolveFilename = Module._resolveFilename
-Module._resolveFilename = function (request, parent) {
-  if (request.startsWith('solsa')) {
-    try {
-      return _resolveFilename(request, parent)
-    } catch (error) {
-      return require.resolve(request.replace('solsa', '..'))
-    }
-  } else {
-    return _resolveFilename(request, parent)
-  }
-}
 
 tmp.setGracefulCleanup()
 
-let errors = 0
-
-function init (argv) {
-  let context
-  try {
-    context = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
-  } catch (err) {
-    console.error('Warning: Current context is not set')
-    errors++
-  }
-
-  let config = { contexts: [] }
-  const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
-  try {
-    config = yaml.safeLoad(fs.readFileSync(name))
-    if (!Array.isArray(config.contexts)) {
-      console.error(`Warning: Cannot find contexts in configuration file "${name}"`)
-      errors++
-      config.contexts = []
-    } else {
-      if (context) {
-        if (!config.contexts.find(({ name }) => name === context)) {
-          console.error(`Warning: Cannot find context "${context}" in configuration file "${name}"`)
-          errors++
-        } else {
-          config.context = context
-        }
-      }
-    }
-  } catch (err) {
-    console.error(`Warning: Unable to load configuration file "${name}"`)
-    errors++
-  }
-  return config
-}
+// process command line arguments
 
 const argv = minimist(process.argv.slice(2), {
   string: ['config', 'context', 'output'],
   alias: { context: 'c', output: 'o' }
 })
-const command = argv._[0]
-const source = argv._[1]
 
-if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(command)) {
+argv.command = argv._[0]
+argv.file = argv._[1]
+
+if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(argv.command)) {
   console.error('Usage:')
   console.error('  solsa <command> [flags]')
   console.error()
@@ -89,32 +42,82 @@ if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(command)) {
   process.exit(1)
 }
 
-const config = init(argv)
+// handle errors and warnings
 
-function load (source) {
-  const app = require(path.resolve(source))
-  if (!(app instanceof Bundle)) {
-    const err = new Error(`"${source}" does not export a bundle`)
+let warnings = 0
+
+function reportError (msg, fatal) {
+  if (fatal) {
+    const err = new Error(msg)
     throw err
+  } else {
+    console.error('Warning:', msg)
+    warnings++
   }
-  return app
 }
 
-function yamlCommand () {
-  if (argv.output) {
-    if (config.contexts.length === 0) {
-      console.error('Warning: Generating base YAML without kustomization layers')
-      errors++
-    }
+// load config file, abort if fatal
+
+function loadConfig (fatal) {
+  let context
+  try {
+    context = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+  } catch (err) {
+    reportError('Current context is not set', fatal)
+  }
+  let config = { contexts: [] }
+  const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
+  try {
+    config = yaml.safeLoad(fs.readFileSync(name))
+  } catch (err) {
+    reportError(`Unable to load configuration file "${name}"`, fatal)
+  }
+  if (!Array.isArray(config.contexts)) {
+    reportError(`Cannot find contexts in configuration file "${name}"`, fatal)
+    config.contexts = []
   } else {
-    if (!config.context) {
-      console.error('Warning: Generating base YAML without kustomization layer')
-      errors++
+    if (context) {
+      if (!config.contexts.find(({ name }) => name === context)) {
+        reportError(`Cannot find context "${context}" in configuration file "${name}"`, fatal)
+      } else {
+        config.context = context
+      }
+    }
+  }
+  return config
+}
+
+// load solution file
+
+function loadApp () {
+  // resolve module even if not in default path
+  const _resolveFilename = Module._resolveFilename
+  Module._resolveFilename = function (request, parent) {
+    if (request.startsWith('solsa')) {
+      try {
+        return _resolveFilename(request, parent)
+      } catch (error) {
+        return require.resolve(request.replace('solsa', '..'))
+      }
+    } else {
+      return _resolveFilename(request, parent)
     }
   }
 
-  const app = load(source)
+  try {
+    const app = require(path.resolve(argv.file))
+    if (!(app instanceof Bundle)) {
+      reportError(`No bundle exported by "${argv.file}"`, true)
+    }
+    return app
+  } finally {
+    Module._resolveFilename = _resolveFilename
+  }
+}
 
+// solsa yaml
+
+function yamlCommand () {
   class Layer {
     constructor (name) {
       this.name = name
@@ -216,6 +219,20 @@ function yamlCommand () {
     }
   }
 
+  const app = loadApp()
+
+  const config = loadConfig()
+
+  if (argv.output) {
+    if (config.contexts.length === 0) {
+      reportError('Generating base yaml without kustomization layers')
+    }
+  } else {
+    if (!config.context) {
+      reportError('Generating base yaml without kustomization layer')
+    }
+  }
+
   const dir = tmp.dirSync({ mode: '0755', prefix: 'solsa_', unsafeCleanup: true })
   const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
@@ -240,14 +257,13 @@ function yamlCommand () {
   dir.removeCallback()
 }
 
-function buildCommand () {
-  const app = load(source)
+// solsa build
 
+function buildCommand () {
   function build ({ name, build, main = '.' }) {
     console.log(`Building image "${name}"`)
     if (!fs.existsSync(path.join(build, 'package.json'))) {
-      console.error(`Warning: Missing package.json in ${build}, skipping image`)
-      errors++
+      reportError(`Missing package.json in ${build}, skipping image`)
       return
     }
 
@@ -267,36 +283,37 @@ function buildCommand () {
     dir.removeCallback()
   }
 
-  const images = app.getBuilds()
+  const images = loadApp().getBuilds()
+
   for (let name of new Set(images.map(image => image.name))) {
     build(images.find(image => image.name === name))
   }
 }
 
-function rename (name, context) {
-  const pos = name.indexOf(':', name.indexOf('/'))
-  let newName = pos === -1 ? name : name.substring(0, pos)
-  let newTag = pos === -1 ? undefined : name.substring(pos + 1)
-  const image = (context.images || []).find(image => image.name === name || image.name === newName)
-  if (image) {
-    newName = image.newName || newName
-    newTag = image.newTag || newTag
-  } else {
-    if (context.registry && !name.includes('/')) newName = context.registry + '/' + newName
-    newTag = newTag || context.imageTag
-  }
-  return newTag ? newName + ':' + newTag : newName
-}
+// solsa push
 
 function pushCommand () {
-  if (!config.context) {
-    console.error('Warning: Missing context, cannot push')
-    errors++
-    return
+  function rename (name, context) {
+    const pos = name.indexOf(':', name.indexOf('/'))
+    let newName = pos === -1 ? name : name.substring(0, pos)
+    let newTag = pos === -1 ? undefined : name.substring(pos + 1)
+    const image = (context.images || []).find(image => image.name === name || image.name === newName)
+    if (image) {
+      newName = image.newName || newName
+      newTag = image.newTag || newTag
+    } else {
+      if (context.registry && !name.includes('/')) newName = context.registry + '/' + newName
+      newTag = newTag || context.imageTag
+    }
+    return newTag ? newName + ':' + newTag : newName
   }
 
+  const images = loadApp().getBuilds()
+
+  const config = loadConfig(true)
   const context = config.contexts.find(({ name }) => name === config.context)
-  for (let name of new Set(load(source).getBuilds().map(image => image.name))) {
+
+  for (let name of new Set(images.map(image => image.name))) {
     const tag = rename(name, context)
     console.log(`Tagging image "${name}" with tag "${tag}"`)
     cp.execSync(`docker tag "${name}" "${tag}"`, { stdio: [0, 1, 2] })
@@ -308,7 +325,9 @@ function pushCommand () {
   }
 }
 
-switch (command) {
+// process command
+
+switch (argv.command) {
   case 'yaml':
     yamlCommand()
     break
@@ -319,7 +338,6 @@ switch (command) {
     pushCommand()
 }
 
-if (errors) {
-  console.error('Warnings: ' + errors)
-  process.exit(1)
+if (warnings) {
+  console.error('Warnings: ' + warnings)
 }
