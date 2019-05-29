@@ -11,14 +11,16 @@ whether they run inside or outside of a Kubernetes cluster. SolSA relies on the
 [composable operator](https://github.ibm.com/seed/composable) to encode dynamic
 dependencies between resource configurations.
 
-SolSA can synthesize all the yaml needed to deploy a solution. But it does not
-have to. SolSA makes it easy to share resources across solutions. The generated
-yaml can be deployed at once, i.e., with a single `kubectl apply` command.
-Optionally, SolSA leverages
-[Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit targeting
-multiple environments, e.g., local development cluster, IKS or ICP cluster.
-SolSA automatically tailors resources such as ingresses to the specifics of each
-targeted environment.
+SolSA can synthesize all the yaml needed to deploy a solution. But it
+does not have to do so. SOlSA supports easy configuration to select
+which resources should be unique to a solution instance and which
+resources should be shared across multiple instances.  The generated
+yaml can be deployed at once, i.e., with a single `kubectl apply`
+command.  Optionally, SolSA leverages
+[Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit
+targeting multiple environments, e.g., local development cluster, IKS
+or ICP cluster.  SolSA automatically tailors resources such as
+ingresses to the specifics of each targeted environment.
 
 The SolSA code is much more compact and much less error-prone than the yaml it
 produces. SolSA enables the specification of repeatable architectural patterns
@@ -81,7 +83,7 @@ On each cluster:
 
 ### Per Namespace Setup
 
-Run for each namespace which will host SolSA-defined services:
+For each namespace which will host SolSA-defined services execute:
 ```shell
 solsa init my-namespace
 ```
