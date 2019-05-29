@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { Bundle } = require('../lib/bundle')
 const cp = require('child_process')
 const fs = require('fs')
 const minimist = require('minimist')
@@ -90,6 +91,15 @@ if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(command)) {
 
 const config = init(argv)
 
+function load (source) {
+  const app = require(path.resolve(source))
+  if (!(app instanceof Bundle)) {
+    const err = new Error(`"${source}" does not export a bundle`)
+    throw err
+  }
+  return app
+}
+
 function yamlCommand () {
   if (argv.output) {
     if (config.contexts.length === 0) {
@@ -103,8 +113,7 @@ function yamlCommand () {
     }
   }
 
-  let apps = require(require('path').resolve(source))
-  if (!Array.isArray(apps)) apps = [apps]
+  const app = load(source)
 
   class Layer {
     constructor (name) {
@@ -153,33 +162,31 @@ function yamlCommand () {
       this.getLayer(layer).patchesJSON[target.path] = { patch, target }
     }
 
-    finalizeImageRenames (context, apps) {
+    finalizeImageRenames (context, app) {
       const images = []
-      for (let app of apps) {
-        for (let name of app.getImages()) {
-          const pos = name.indexOf(':', name.indexOf('/'))
-          let newName = pos === -1 ? name : name.substring(0, pos)
-          let newTag = pos === -1 ? undefined : name.substring(pos + 1)
-          if (context.images && context.images.find(image => image.name === name || image.name === newName)) continue // already kustomized
-          if (images.find(image => image.name === name)) continue // already encountered
-          const k = { name }
-          if (context.registry && !name.includes('/')) k.newName = context.registry + '/' + newName
-          if (newTag) {
-            images.unshift(k) // list tagged images first
-          } else {
-            if (context.imageTag) k.newTag = context.imageTag // tag image
-            images.push(k)
-          }
+      for (let name of app.getImages()) {
+        const pos = name.indexOf(':', name.indexOf('/'))
+        let newName = pos === -1 ? name : name.substring(0, pos)
+        let newTag = pos === -1 ? undefined : name.substring(pos + 1)
+        if (context.images && context.images.find(image => image.name === name || image.name === newName)) continue // already kustomized
+        if (images.find(image => image.name === name)) continue // already encountered
+        const k = { name }
+        if (context.registry && !name.includes('/')) k.newName = context.registry + '/' + newName
+        if (newTag) {
+          images.unshift(k) // list tagged images first
+        } else {
+          if (context.imageTag) k.newTag = context.imageTag // tag image
+          images.push(k)
         }
       }
       return (context.images || []).concat(images)
     }
 
-    finalize (config, apps) {
+    finalize (config, app) {
       for (const context of config.contexts) {
         let contextLayer = this.getLayer(context.name)
         contextLayer.bases.push('./../base')
-        contextLayer.images = this.finalizeImageRenames(context, apps)
+        contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
       fs.mkdirSync(this.outputRoot)
@@ -203,7 +210,7 @@ function yamlCommand () {
           patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target),
           images: layer.images
         }
-        if (apps[0].name) kustom.commonAnnotations = { 'solsa.ibm.com/app': apps[0].name }
+        if (app.name) kustom.commonAnnotations = { 'solsa.ibm.com/app': app.name }
         this.writeToFile(kustom, 'kustomization.yaml', layer.name)
       }
     }
@@ -213,18 +220,16 @@ function yamlCommand () {
   const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
   const sa = new SolsaArchiver(outputRoot)
-  for (let app of apps) {
-    for (let item of app.getResources({ config })) {
-      if (item.obj) {
-        sa.addResource(item.obj, item.name, item.layer)
-      } else if (item.JSONPatch) {
-        sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
-      } else if (item.patch) {
-        sa.addPatch(item.patch, item.name, item.layer)
-      }
+  for (let item of app.getResources({ config })) {
+    if (item.obj) {
+      sa.addResource(item.obj, item.name, item.layer)
+    } else if (item.JSONPatch) {
+      sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
+    } else if (item.patch) {
+      sa.addPatch(item.patch, item.name, item.layer)
     }
   }
-  sa.finalize(config, apps)
+  sa.finalize(config, app)
 
   if (argv.output) {
     cp.execSync(`tar -C ${dir.name} -zcf ${argv.output}.tgz ${path.basename(argv.output)}`, { stdio: [0, 1, 2] })
@@ -236,8 +241,7 @@ function yamlCommand () {
 }
 
 function buildCommand () {
-  let apps = require(path.resolve(source))
-  if (!Array.isArray(apps)) apps = [apps]
+  const app = load(source)
 
   function build ({ name, build, main = '.' }) {
     console.log(`Building image "${name}"`)
@@ -263,10 +267,7 @@ function buildCommand () {
     dir.removeCallback()
   }
 
-  const images = []
-  for (let app of apps) {
-    images.push(...app.getBuilds())
-  }
+  const images = app.getBuilds()
   for (let name of new Set(images.map(image => image.name))) {
     build(images.find(image => image.name === name))
   }
@@ -302,14 +303,7 @@ function pushCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
-  let apps = require(path.resolve(source))
-  if (!Array.isArray(apps)) apps = [apps]
-
-  const images = []
-  for (let app of apps) {
-    images.push(...app.getBuilds())
-  }
-  for (let name of new Set(images.map(image => image.name))) {
+  for (let name of new Set(load(source).getBuilds().map(image => image.name))) {
     push(name, tag(name, config.contexts.find(({ name }) => name === config.context)))
   }
 }
