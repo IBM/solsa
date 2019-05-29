@@ -13,6 +13,8 @@ const yaml = require('js-yaml')
 
 tmp.setGracefulCleanup()
 
+const commands = { yaml: yamlCommand, build: buildCommand, push: pushCommand }
+
 // process command line arguments
 
 const argv = minimist(process.argv.slice(2), {
@@ -23,7 +25,7 @@ const argv = minimist(process.argv.slice(2), {
 argv.command = argv._[0]
 argv.file = argv._[1]
 
-if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(argv.command)) {
+if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error('Usage:')
   console.error('  solsa <command> [flags]')
   console.error()
@@ -327,16 +329,7 @@ function pushCommand () {
 
 // process command
 
-switch (argv.command) {
-  case 'yaml':
-    yamlCommand()
-    break
-  case 'build':
-    buildCommand()
-    break
-  case 'push':
-    pushCommand()
-}
+commands[argv.command]()
 
 if (warnings) {
   console.error('Warnings: ' + warnings)
