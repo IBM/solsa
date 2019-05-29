@@ -56,14 +56,15 @@ npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
 
 ### Kubernetes Cluster Setup
 
+We assume that you have already configured `kubectl` to be able to access each
+Kubernetes cluster you will be using with SolSA.
+
 Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
 already properly configured to enable you to pull images from the IBM Container
 Registry. If it is not, please see the instructions at
 https://cloud.ibm.com/docs/containers?topic=containers-images.
 
-We assume that you have already configured `kubectl` to be able to access each
-Kubernetes cluster you will be using with SolSA.
-
+On each cluster:
 1. Install SEED operators from https://github.ibm.com/seed/charts.
 
 2. Install the Composable operator from https://github.ibm.com/seed/composable.
@@ -73,9 +74,10 @@ Kubernetes cluster you will be using with SolSA.
 
 4. Optionally install the Kafka Knative Event Source from
    https://github.com/knative/eventing-sources/tree/master/contrib/kafka/samples.
-   If using the IBM container registry make sure to add a corresponding image
-   pull secret to the `kafka-controller-manager` service account of the
-   `knative-sources` namespace.
+   If using the IBM container registry to host the container images for the
+   source, make sure to add a matching image pull secret to the
+   `kafka-controller-manager` service account of the `knative-sources`
+   namespace.
 
 ### Per Namespace Setup
 
@@ -140,13 +142,13 @@ The yaml synthesized by SolSA for context `mycluster` is provided in
 been replaced with the fully qualified name and the ingress has been generated
 according to the specification of context `mycluster` in the configuration file.
 
-## More examples
+## More Examples
 
 The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
 contains other examples of cloud-native applications, services, and
 architectural patterns defined using SolSA.
 
-## Building SolSA-Defined Services
+## Building SolSA-defined Services
 
 In order to build and deploy solutions that include SolSA-defined services, run:
 ```shell
