@@ -73,7 +73,7 @@ Kubernetes cluster you will be using with SolSA.
 
 1. Run for each namespace:
 ```shell
-install/install.sh -n mynamespace
+install/solsaNamespaceSetup.sh -n mynamespace
 ```
 
 ## Local Setup
