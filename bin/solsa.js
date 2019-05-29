@@ -4,10 +4,25 @@ const cp = require('child_process')
 const fs = require('fs')
 const minimist = require('minimist')
 const os = require('os')
+const Module = require('module')
 const path = require('path')
 const util = require('util')
 const tmp = require('tmp')
 const yaml = require('js-yaml')
+
+// resolve module even if not in default path
+const _resolveFilename = Module._resolveFilename
+Module._resolveFilename = function (request, parent) {
+  if (request.startsWith('solsa')) {
+    try {
+      return _resolveFilename(request, parent)
+    } catch (error) {
+      return require.resolve(request.replace('solsa', '..'))
+    }
+  } else {
+    return _resolveFilename(request, parent)
+  }
+}
 
 tmp.setGracefulCleanup()
 
@@ -242,7 +257,7 @@ function buildCommand () {
     cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Running docker build')
-    cp.execSync(`docker build -f node_modules/solsa/runtime/node/Dockerfile "${dir.name}" --build-arg MAIN=${main}`, { cwd: build, stdio: [0, 1, 2] })
+    cp.execSync(`docker build -f ${path.join(__dirname, '..', 'runtime', 'node', 'Dockerfile')} "${dir.name}" --build-arg MAIN=${main} -t ${name}`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Reclaiming temporary folder')
     dir.removeCallback()
