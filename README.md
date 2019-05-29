@@ -12,7 +12,7 @@ whether they run inside or outside of a Kubernetes cluster. SolSA relies on the
 dependencies between resource configurations.
 
 SolSA can synthesize all the yaml needed to deploy a solution. But it
-does not have to do so. SOlSA supports easy configuration to select
+does not have to do so. SolSA supports easy configuration to select
 which resources should be unique to a solution instance and which
 resources should be shared across multiple instances.  The generated
 yaml can be deployed at once, i.e., with a single `kubectl apply`
