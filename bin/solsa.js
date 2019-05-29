@@ -67,8 +67,8 @@ const argv = minimist(process.argv.slice(2), {
   string: ['config', 'context', 'output'],
   alias: { context: 'c', output: 'o' }
 })
-let command = argv._[0]
-let source = argv._[1]
+const command = argv._[0]
+const source = argv._[1]
 
 if (argv._.length !== 2 || !['yaml', 'build', 'push'].includes(command)) {
   console.error('Usage:')
@@ -184,7 +184,7 @@ function yamlCommand () {
 
     finalize (config, app) {
       for (const context of config.contexts) {
-        let contextLayer = this.getLayer(context.name)
+        const contextLayer = this.getLayer(context.name)
         contextLayer.bases.push('./../base')
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
@@ -273,6 +273,21 @@ function buildCommand () {
   }
 }
 
+function rename (name, context) {
+  const pos = name.indexOf(':', name.indexOf('/'))
+  let newName = pos === -1 ? name : name.substring(0, pos)
+  let newTag = pos === -1 ? undefined : name.substring(pos + 1)
+  const image = (context.images || []).find(image => image.name === name || image.name === newName)
+  if (image) {
+    newName = image.newName || newName
+    newTag = image.newTag || newTag
+  } else {
+    if (context.registry && !name.includes('/')) newName = context.registry + '/' + newName
+    newTag = newTag || context.imageTag
+  }
+  return newTag ? newName + ':' + newTag : newName
+}
+
 function pushCommand () {
   if (!config.context) {
     console.error('Warning: Missing context, cannot push')
@@ -280,31 +295,16 @@ function pushCommand () {
     return
   }
 
-  function push (name, tag) {
+  const context = config.contexts.find(({ name }) => name === config.context)
+  for (let name of new Set(load(source).getBuilds().map(image => image.name))) {
+    const tag = rename(name, context)
     console.log(`Tagging image "${name}" with tag "${tag}"`)
     cp.execSync(`docker tag "${name}" "${tag}"`, { stdio: [0, 1, 2] })
 
-    console.log(`Pushing image "${tag}"`)
-    cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
-  }
-
-  function tag (name, context) {
-    const pos = name.indexOf(':', name.indexOf('/'))
-    let newName = pos === -1 ? name : name.substring(0, pos)
-    let newTag = pos === -1 ? undefined : name.substring(pos + 1)
-    let image = (context.images || []).find(image => image.name === name || image.name === newName)
-    if (image) {
-      newName = image.newName || newName
-      newTag = image.newTag || newTag
-    } else {
-      if (context.registry && !name.includes('/')) newName = context.registry + '/' + newName
-      newTag = newTag || context.imageTag
+    if (tag.includes('/')) {
+      console.log(`Pushing image "${tag}"`)
+      cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
     }
-    return newTag ? newName + ':' + newTag : newName
-  }
-
-  for (let name of new Set(load(source).getBuilds().map(image => image.name))) {
-    push(name, tag(name, config.contexts.find(({ name }) => name === config.context)))
   }
 }
 
