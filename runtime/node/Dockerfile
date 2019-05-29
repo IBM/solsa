@@ -22,6 +22,4 @@ WORKDIR /solsa
 
 COPY . .
 
-RUN echo "module.exports = require('./solsa/${MAIN}')" > /main.js
-
-CMD ["node", "/main.js"]
+CMD node ${MAIN}
