@@ -46,6 +46,8 @@ SolSA consists of:
   - `solsa push` pushes container images for SolSA-defined services (if any).
   - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
 
+SolSA supports Node.js 8 and above.
+
 ## Setup
 
 Install SolSA:
@@ -94,7 +96,8 @@ and an IKS cluster.
 contexts:
 - name: 'docker-for-desktop'
   ingress:
-    nodePort: 32323
+    nodePort: 3232
+  defaultTag: dev
 - name: 'mycluster'
   ingress:
     iks:
@@ -102,8 +105,8 @@ contexts:
       tlssecret: 'mycluster123'
   registry: 'us.icr.io/tardieu'
   images:
-  - name: solsa-translator
-    newName: us.icr.io/groved/solsa-translator
+  - name: 'kn-helloworld'
+    newName: 'docker.io/ibmcom/kn-helloworld'
 ```
 The IKS context definition demonstrates how to instruct SolSA to generate a
 Kustomize overlay that will rename docker images so that instead of being pulled
@@ -111,29 +114,50 @@ from the local registry on the dev machine, the images will instead be pulled
 from a specific namespace in the IBM Container Registry. Rules for specific
 images can also be specified using Kustomize syntax.
 
-## Examples
+## A First Example
+
+A sample SolSA solution is provided in [helloWorld.js](samples/helloWorld.js).
+```javascript
+const solsa = require('solsa')
+const bundle = new solsa.Bundle()
+module.exports = bundle
+
+bundle.helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'kn-helloworld' })
+bundle.ingress = new bundle.helloWorld.Ingress()
+```
+It consists of a single containerized service and an ingress for this service.
+
+This solution can be deployed to the current Kubernetes context using the
+`solsa` CLI and `kubectl` as follows.
+```shell
+solsa yaml helloWorld.js | kubectl apply -f -
+```
+To undeploy the solution, use the command:
+```shell
+solsa yaml helloWorld.js | kubectl delete -f -
+```
+The yaml synthesized by SolSA for context `mycluster` is provided in
+[helloWorld.yaml](samples/helloWorld.yaml). In this yaml, the image name has
+been replaced with the fully qualified name and the ingress has been generated
+according to the specification of context `mycluster` in the configuration file.
+
+## More examples
 
 The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
-contains sample cloud native applications and architectural patterns defined
-using SolSA.
+contains other examples of cloud-native applications, services, and
+architectural patterns defined using SolSA.
 
-A SolSA application `myApp.js` can be built and deployed to the current
-Kubernetes context using the `solsa` CLI and `kubectl` as shown below.
+## Building SolSA-Defined Services
+
+In order to build and deploy solutions that include SolSA-defined services, run:
 ```shell
-solsa build myApp.js
-solsa push myApp.js
-solsa yaml myApp.js | kubectl apply -f -
+solsa build mySolution.js
+solsa push mySolution.js
+solsa yaml mySolution.js | kubectl apply -f -
 ```
-The `build` and `push` steps are not necessary when only using SolSA to
-synthesize yaml. These steps tag and push images for SolSA-defined services
-according to the SolSA configuration for the current Kubernetes context.
-
-Run `solsa` with no arguments to see a list of supported commands and flags.
-
-To undeploy the application, use the command:
-```shell
-solsa yaml myApp.js | kubectl delete -f -
-```
+The `build` command builds images for the SolSA-defined services. The `push`
+command tags and pushes these images according to the SolSA configuration for
+the current Kubernetes context.
 
 ## Development
 
