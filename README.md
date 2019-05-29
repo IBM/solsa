@@ -20,12 +20,11 @@ multiple environments, e.g., local development cluster, IKS or ICP cluster.
 SolSA automatically tailors resources such as ingresses to the specifics of each
 targeted environment.
 
-SolSA enables the specification of repeatable architectural patterns that can be
-reused across many solutions. SolSA supports expressing dependencies on shared
-resources. SolSA simplifies the configuration of related resources such as a
-Kafka instance, a Kafka topic, and a Knative Kafka event source. The SolSA code
-is much more compact than the yaml it produces. The SolSA code is much less
-error-prone than the corresponding yaml.
+The SolSA code is much more compact and much ess error-prone than the yaml it
+produces. SolSA enables the specification of repeatable architectural patterns
+that can be reused across many solutions. SolSA simplifies the configuration of
+related resources such as a Kafka instance, a Kafka topic, and a Knative Kafka
+event source. 
 
 SolSA includes an optional capability to containerize Node.js code. This
 facilitates the integration of components that require a little bit of glue code
