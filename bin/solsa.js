@@ -33,7 +33,7 @@ function init (argv) {
   try {
     context = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
   } catch (err) {
-    console.error('Error: Current context is not set')
+    console.error('Warning: Current context is not set')
     errors++
   }
 
@@ -42,13 +42,13 @@ function init (argv) {
   try {
     config = yaml.safeLoad(fs.readFileSync(name))
     if (!Array.isArray(config.contexts)) {
-      console.error(`Error: Cannot find contexts in configuration file "${name}"`)
+      console.error(`Warning: Cannot find contexts in configuration file "${name}"`)
       errors++
       config.contexts = []
     } else {
       if (context) {
         if (!config.contexts.find(({ name }) => name === context)) {
-          console.error(`Error: Cannot find context "${context}" in configuration file "${name}"`)
+          console.error(`Warning: Cannot find context "${context}" in configuration file "${name}"`)
           errors++
         } else {
           config.context = context
@@ -56,7 +56,7 @@ function init (argv) {
       }
     }
   } catch (err) {
-    console.error(`Error: Unable to load configuration file "${name}"`)
+    console.error(`Warning: Unable to load configuration file "${name}"`)
     errors++
   }
   return config
@@ -93,12 +93,12 @@ const config = init(argv)
 function yamlCommand () {
   if (argv.output) {
     if (config.contexts.length === 0) {
-      console.error('Error: Generating base YAML without kustomization layers')
+      console.error('Warning: Generating base YAML without kustomization layers')
       errors++
     }
   } else {
     if (!config.context) {
-      console.error('Error: Generating base YAML without kustomization layer')
+      console.error('Warning: Generating base YAML without kustomization layer')
       errors++
     }
   }
@@ -242,7 +242,7 @@ function buildCommand () {
   function build ({ name, build, main = '.' }) {
     console.log(`Building image "${name}"`)
     if (!fs.existsSync(path.join(build, 'package.json'))) {
-      console.error(`Error: Missing package.json in ${build}, skipping image`)
+      console.error(`Warning: Missing package.json in ${build}, skipping image`)
       errors++
       return
     }
@@ -274,7 +274,7 @@ function buildCommand () {
 
 function pushCommand () {
   if (!config.context) {
-    console.error('Error: Missing context, cannot push')
+    console.error('Warning: Missing context, cannot push')
     errors++
     return
   }
@@ -326,6 +326,6 @@ switch (command) {
 }
 
 if (errors) {
-  console.error('Errors: ' + errors)
+  console.error('Warnings: ' + errors)
   process.exit(1)
 }
