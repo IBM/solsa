@@ -144,10 +144,3 @@ npm install
 npm link
 ```
 This will ensure the `solsa` CLI uses the local checkout.
-
-Then, for each SolSA solution, make sure to link your SolSA clone:
-```shell
-cd my-solsa-solution
-npm link solsa
-```
-This will ensure the `solsa` library uses the local checkout.
