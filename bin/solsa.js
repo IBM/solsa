@@ -255,7 +255,13 @@ function yamlCommand () {
     cp.execSync(`tar -C ${dir.name} -zcf ${argv.output}.tgz ${path.basename(argv.output)}`, { stdio: [0, 1, 2] })
     console.log(`Generated YAML to ${argv.output}.tgz`)
   } else {
-    cp.execSync(`kustomize build ${path.join(outputRoot, config.context || 'base')}`, { stdio: [0, 1, 2] })
+    try {
+      cp.execSync(`kustomize build ${path.join(outputRoot, config.context || 'base')}`, { stdio: [0, 1, 2] })
+    } catch (err) {
+      if (!err.signal === 'SIGPIPE') {
+        throw err
+      }
+    }
   }
   dir.removeCallback()
 }
