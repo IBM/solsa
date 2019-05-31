@@ -99,7 +99,11 @@ and an IKS cluster.
 contexts:
 - name: 'docker-for-desktop'
   ingress:
-    nodePort: 3232
+    nodePort:
+    - name: my-library-productpage
+      port: 32123
+    - name: my-library-ratings
+      port: 32124
   defaultTag: dev
 - name: 'mycluster'
   ingress:
@@ -111,6 +115,8 @@ contexts:
   - name: 'kn-helloworld'
     newName: 'docker.io/ibmcom/kn-helloworld'
 ```
+The NodePort ingress allows fixed port assignments based on service names.
+Any additional exposed services not named here will be given dynamic port numbers.
 The IKS context definition demonstrates how to instruct SolSA to generate a
 Kustomize overlay that will rename docker images so that instead of being pulled
 from the local registry on the dev machine, the images will instead be pulled
