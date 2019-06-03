@@ -340,7 +340,42 @@ function initCommand () {
   cp.execSync(`kubectl get namespace ${argv.file}`, { env, stdio: [0, 1, 2] }) // check context and namespace exist
   // cp.execSync(`${path.join(__dirname, '..', 'install', 'solsaNamespaceSetup.sh')} -n ${argv.file}`, { stdio: [0, 1, 2] })
   const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}'`, { env, stdio: [0, 'pipe', 2] })
-  const input = fs.readFileSync(path.join(__dirname, '..', 'install', 'solsaNamespaceSetup.yaml')).toString().replace(/\$SECRET/, secret)
+  const input = `---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: solsa-transformer
+imagePullSecrets:
+- name: solsa-transformer-pullsecret
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: solsa-transformer
+subjects:
+- kind: ServiceAccount
+  name: solsa-transformer
+roleRef:
+  kind: Role
+  name: solsa-transformer
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: solsa-transformer
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["create", "patch"]
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: solsa-transformer-pullsecret
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: ${secret}`
   cp.execSync(`kubectl apply -f - -n ${argv.file}`, { env, input, stdio: ['pipe', 1, 2] })
 }
 
