@@ -335,11 +335,9 @@ function pushCommand () {
 }
 
 function initCommand () {
-  const env = Object.assign({}, process.env)
-  if (argv.context) env.KUBECONFIG = argv.context
-  cp.execSync(`kubectl get namespace ${argv.file}`, { env, stdio: [0, 1, 2] }) // check context and namespace exist
-  // cp.execSync(`${path.join(__dirname, '..', 'install', 'solsaNamespaceSetup.sh')} -n ${argv.file}`, { stdio: [0, 1, 2] })
-  const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}'`, { env, stdio: [0, 'pipe', 2] })
+  const context = argv.context ? `--context ${argv.context}` : ''
+  cp.execSync(`kubectl get namespace ${argv.file} ${context}`, { stdio: [0, 1, 2] }) // check context and namespace exist
+  const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}' ${context}`, { stdio: [0, 'pipe', 2] })
   const input = `---
 apiVersion: v1
 kind: ServiceAccount
@@ -376,7 +374,7 @@ metadata:
 type: kubernetes.io/dockerconfigjson
 data:
   .dockerconfigjson: ${secret}`
-  cp.execSync(`kubectl apply -f - -n ${argv.file}`, { env, input, stdio: ['pipe', 1, 2] })
+  cp.execSync(`kubectl apply -f - -n ${argv.file} ${context}`, { input, stdio: ['pipe', 1, 2] })
 }
 
 // process command
