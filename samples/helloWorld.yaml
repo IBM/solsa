@@ -1,46 +1,46 @@
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    solsa.ibm.com/name: hello-world
   name: hello-world
 spec:
   ports:
-  - name: http
-    port: 8080
+  - port: 8080
   selector:
-    solsa.ibm.com/name: hello-world
+    solsa.ibm.com/pod: hello-world
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    solsa.ibm.com/name: hello-world
   name: hello-world
 spec:
   replicas: 1
   selector:
     matchLabels:
-      solsa.ibm.com/name: hello-world
+      solsa.ibm.com/pod: hello-world
   template:
     metadata:
       labels:
-        solsa.ibm.com/name: hello-world
+        solsa.ibm.com/pod: hello-world
     spec:
       containers:
-      - env: []
+      - env:
+        - name: PORT
+          value: "8080"
         image: docker.io/ibmcom/kn-helloworld
+        livenessProbe:
+          tcpSocket:
+            port: 8080
         name: hello-world
         ports:
         - containerPort: 8080
-          name: http
+        readinessProbe:
+          tcpSocket:
+            port: 8080
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  labels:
-    solsa.ibm.com/name: hello-world
   name: hello-world-ing-iks
 spec:
   rules:
@@ -49,7 +49,7 @@ spec:
       paths:
       - backend:
           serviceName: hello-world
-          servicePort: http
+          servicePort: 8080
         path: /
   tls:
   - hosts:
