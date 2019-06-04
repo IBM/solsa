@@ -41,7 +41,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: hello-world-ing-iks
+  name: hello-world
 spec:
   rules:
   - host: hello-world.mycluster123.us-east.containers.appdomain.cloud
