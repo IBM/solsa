@@ -18,7 +18,7 @@ const commands = { yaml: yamlCommand, build: buildCommand, push: pushCommand, in
 // process command line arguments
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['config', 'context', 'output'],
+  string: ['cluster', 'config', 'context', 'output'],
   alias: { context: 'c', output: 'o' }
 })
 
@@ -38,6 +38,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error('Global flags:')
   console.error('      --config <config>      use <config> file instead of default')
   console.error('  -c, --context <context>    use <context> instead of current kubernetes context')
+  console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
   console.error()
   console.error(`Flags for "yaml" command:`)
   console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
@@ -59,16 +60,25 @@ function reportError (msg, fatal) {
   }
 }
 
-// load config file, abort if fatal
+// load the configuration file and identify the current cluster and config
 
 function loadConfig (fatal) {
+  // Determine target context and cluster
   let context
   try {
     context = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
   } catch (err) {
     reportError('Current context is not set', fatal)
   }
-  let config = { contexts: [] }
+  let cluster
+  try {
+    cluster = argv.cluster || cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+  } catch (err) {
+    reportError('Current cluster is not set', fatal)
+  }
+
+  // Load SolSA config file to get its set of known contexts and clusters
+  let config = { contexts: [ ], clusters: [] }
   const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
   try {
     config = yaml.safeLoad(fs.readFileSync(name))
@@ -78,15 +88,32 @@ function loadConfig (fatal) {
   if (!Array.isArray(config.contexts)) {
     reportError(`Cannot find contexts in configuration file "${name}"`, fatal)
     config.contexts = []
-  } else {
-    if (context) {
-      if (!config.contexts.find(({ name }) => name === context)) {
-        reportError(`Cannot find context "${context}" in configuration file "${name}"`, fatal)
-      } else {
-        config.context = context
-      }
+  }
+  if (!Array.isArray(config.clusters)) {
+    reportError(`Cannot find clusters in configuration file "${name}"`, fatal)
+    config.clusters = []
+  }
+
+  // Record the current cluster and config in the context.
+  if (cluster) {
+    if (!config.clusters.find(({ name }) => name === cluster)) {
+      reportError(`Did not find cluster "${cluster}" in configuration file "${name}"`, fatal)
+    } else {
+      config.currentCluster = cluster
     }
   }
+  if (context) {
+    if (!config.contexts.find(({ name }) => name === context)) {
+      if (argv.context) {
+        reportError(`Did not find context "${context}" in configuration file "${name}"`, fatal)
+      }
+      config.currentContext = 'solsa-default'
+      config.contexts.push({ name: 'solsa-default', cluster: config.currentCluster })
+    } else {
+      config.currentContext = context
+    }
+  }
+
   return config
 }
 
@@ -189,9 +216,14 @@ function yamlCommand () {
     }
 
     finalize (config, app) {
+      for (const cluster of config.clusters) {
+        const clusterLayer = this.getLayer(cluster.name)
+        clusterLayer.bases.push('./../base')
+        clusterLayer.images = this.finalizeImageRenames(cluster, app)
+      }
       for (const context of config.contexts) {
         const contextLayer = this.getLayer(context.name)
-        contextLayer.bases.push('./../base')
+        contextLayer.bases.push(`./../${context.cluster}`)
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
@@ -227,11 +259,11 @@ function yamlCommand () {
   const config = loadConfig()
 
   if (argv.output) {
-    if (config.contexts.length === 0) {
+    if (config.contexts.length === 0 && config.clusters.length === 0) {
       reportError('Generating base yaml without kustomization layers')
     }
   } else {
-    if (!config.context) {
+    if (!(config.currentContext || config.currentCluster)) {
       reportError('Generating base yaml without kustomization layer')
     }
   }
@@ -256,7 +288,7 @@ function yamlCommand () {
     console.log(`Generated YAML to ${argv.output}.tgz`)
   } else {
     try {
-      cp.execSync(`kustomize build ${path.join(outputRoot, config.context || 'base')}`, { stdio: [0, 1, 2] })
+      cp.execSync(`kustomize build ${path.join(outputRoot, config.currentContext || config.currentCluster || 'base')}`, { stdio: [0, 1, 2] })
     } catch (err) {
       if (!err.signal === 'SIGPIPE') {
         throw err
@@ -320,7 +352,7 @@ function pushCommand () {
   const images = loadApp().getBuilds()
 
   const config = loadConfig(true)
-  const context = config.contexts.find(({ name }) => name === config.context)
+  const context = config.clutsers.find(({ name }) => name === config.currentCluster)
 
   for (let name of new Set(images.map(image => image.name))) {
     const tag = rename(name, context)

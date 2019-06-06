@@ -92,11 +92,11 @@ solsa init my-namespace
 
 Optionally create a `.solsa.yaml` file in your home directory that describes
 each Kubernetes context for which you want SolSA to generate a Kustomize
-overlay. The example file below defines two deployment contexts, a local
-development environment provided by Docker Desktop that uses a NodePort ingress
-and an IKS cluster.
+overlay. Just like `kubectl`, `solsa` supports both cluster-level and context-level
+specification and requires the context to name the cluster to which it belongs.
+Appended is an example that illustrates some of the options:
 ```yaml
-contexts:
+clusters:
 - name: 'docker-for-desktop'
   ingress:
     nodePort:
@@ -104,7 +104,6 @@ contexts:
       port: 32123
     - name: my-library-ratings
       port: 32124
-  defaultTag: dev
 - name: 'mycluster'
   ingress:
     iks:
@@ -114,14 +113,22 @@ contexts:
   images:
   - name: 'kn-helloworld'
     newName: 'docker.io/ibmcom/kn-helloworld'
+- name: 'myoscluster'
+  ingress:
+    os:
+      subdomain: 'myoscluster456.us-east.containers.appdomain.cloud'
+contexts:
+- name: localdev
+  cluster: 'docker-for-desktop'
+  defaultTag: dev
 ```
-The NodePort ingress allows fixed port assignments based on service names.
+The NodePort ingress used by `docker-for-desktop` allows fixed port assignments based on service names.
 Any additional exposed services not named here will be given dynamic port numbers.
-The IKS context definition demonstrates how to instruct SolSA to generate a
+The `mycluster` definition demonstrates how to instruct SolSA to generate a
 Kustomize overlay that will rename docker images so that instead of being pulled
 from the local registry on the dev machine, the images will instead be pulled
 from a specific namespace in the IBM Container Registry. Rules for specific
-images can also be specified using Kustomize syntax.
+images can also be specified using Kustomize syntax. The '
 
 ## A First Example
 
@@ -148,7 +155,7 @@ solsa yaml helloWorld.js | kubectl delete -f -
 The yaml synthesized by SolSA for context `mycluster` is provided in
 [helloWorld.yaml](samples/helloWorld.yaml). In this yaml, the image name has
 been replaced with the fully qualified name and the ingress has been generated
-according to the specification of context `mycluster` in the configuration file.
+according to the specification of cluster `mycluster` in the configuration file.
 
 ## More Examples
 
