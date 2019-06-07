@@ -151,6 +151,7 @@ function yamlCommand () {
   class Layer {
     constructor (name) {
       this.name = name
+      this.subdir = ''
       this.resources = {}
       this.bases = []
       this.patches = {}
@@ -217,19 +218,19 @@ function yamlCommand () {
 
     finalize (config, app) {
       for (const cluster of config.clusters) {
-        const clusterLayer = this.getLayer(cluster.name)
-        clusterLayer.bases.push('./../base')
+        const clusterLayer = this.getLayer(`cluster/${cluster.name}`)
+        clusterLayer.bases.push('./../../base')
         clusterLayer.images = this.finalizeImageRenames(cluster, app)
       }
       for (const context of config.contexts) {
-        const contextLayer = this.getLayer(context.name)
-        contextLayer.bases.push(`./../${context.cluster}`)
+        const contextLayer = this.getLayer(`context/${context.name}`)
+        contextLayer.bases.push(`./../../cluster/${context.cluster}`)
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
       fs.mkdirSync(this.outputRoot)
       for (let layer of Object.values(this.layers)) {
-        fs.mkdirSync(path.join(this.outputRoot, layer.name))
+        fs.mkdirSync(path.join(this.outputRoot, layer.name), { recursive: true })
         for (let fname of Object.keys(layer.resources)) {
           this.writeToFile(layer.resources[fname], fname, layer.name)
         }
@@ -288,8 +289,17 @@ function yamlCommand () {
     console.log(`Generated YAML to ${argv.output}.tgz`)
   } else {
     try {
-      cp.execSync(`kustomize build ${path.join(outputRoot, config.currentContext || config.currentCluster || 'base')}`, { stdio: [0, 1, 2] })
+      let selectedLayer
+      if (config.currentContext) {
+        selectedLayer = path.join(outputRoot, 'context', config.currentContext)
+      } else if (config.currentCluster) {
+        selectedLayer = path.join(outputRoot, 'cluster', config.currentCluster)
+      } else {
+        selectedLayer = path.join(outputRoot, 'base')
+      }
+      cp.execSync(`kustomize build ${selectedLayer}`, { stdio: [0, 1, 2] })
     } catch (err) {
+      console.log(err)
       if (!err.signal === 'SIGPIPE') {
         throw err
       }
