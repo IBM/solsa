@@ -36,9 +36,9 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error('  yaml <solution.js>         synthesize yaml for current kubernetes context')
   console.error()
   console.error('Global flags:')
+  console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
   console.error('      --config <config>      use <config> file instead of default')
   console.error('  -c, --context <context>    use <context> instead of current kubernetes context')
-  console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
   console.error()
   console.error(`Flags for "yaml" command:`)
   console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
@@ -352,7 +352,7 @@ function pushCommand () {
   const images = loadApp().getBuilds()
 
   const config = loadConfig(true)
-  const context = config.clutsers.find(({ name }) => name === config.currentCluster)
+  const context = config.clusters.find(({ name }) => name === config.currentCluster)
 
   for (let name of new Set(images.map(image => image.name))) {
     const tag = rename(name, context)
