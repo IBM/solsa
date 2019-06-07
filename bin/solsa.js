@@ -77,7 +77,7 @@ function loadConfig (fatal) {
     reportError('Current cluster is not set', fatal)
   }
 
-  // Load SolSA config file to get its set of known contexts and clusters
+  // Load SolSA config file to get its set of known clusters and contexts
   let config = { contexts: [ ], clusters: [] }
   const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
   try {
@@ -94,7 +94,7 @@ function loadConfig (fatal) {
     config.clusters = []
   }
 
-  // Determine cluster for all contexts in the config
+  // Determine cluster for all loaded contexts
   for (let context of config.contexts) {
     if (!context.cluster) {
       try {
@@ -105,7 +105,7 @@ function loadConfig (fatal) {
       } catch (err) {
       } finally {
         if (!context.cluster) {
-          reportError(`Context ${context.name} not defined in \`kubectl config\`; using "base" as its parent layer`, fatal)
+          reportError(`Context ${context.name} not defined in \`kubectl config\`; will use "base" as its parent layer`, fatal)
         }
       }
     }
@@ -166,7 +166,6 @@ function yamlCommand () {
   class Layer {
     constructor (name) {
       this.name = name
-      this.subdir = ''
       this.resources = {}
       this.bases = []
       this.patches = {}
