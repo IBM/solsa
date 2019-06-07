@@ -99,7 +99,7 @@ function loadConfig (fatal) {
     if (!context.cluster) {
       try {
         const cluster = cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context.name}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
-        if (cluster.length) {
+        if (cluster.length && config.clusters.find(({ name }) => name === cluster)) {
           context.cluster = cluster
         }
       } catch (err) {
