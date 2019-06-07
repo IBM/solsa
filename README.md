@@ -97,13 +97,9 @@ specification and requires the context to name the cluster to which it belongs.
 Appended is an example that illustrates some of the options:
 ```yaml
 clusters:
-- name: 'docker-for-desktop'
+- name: 'docker-for-desktop-cluster'
   ingress:
-    nodePort:
-    - name: my-library-productpage
-      port: 32123
-    - name: my-library-ratings
-      port: 32124
+    nodePort: true
 - name: 'mycluster'
   ingress:
     iks:
@@ -119,10 +115,16 @@ clusters:
       subdomain: 'myoscluster456.us-east.containers.appdomain.cloud'
 contexts:
 - name: localdev
-  cluster: 'docker-for-desktop'
+  cluster: 'docker-for-desktop-cluster'
   defaultTag: dev
+  ingress:
+    nodePort:
+    - name: my-library-productpage
+      port: 32123
+    - name: my-library-ratings
+      port: 32124
 ```
-The NodePort ingress used by `docker-for-desktop` allows fixed port assignments based on service names.
+The NodePort ingress used in `localdev` specifies fixed port assignments based on service names.
 Any additional exposed services not named here will be given dynamic port numbers.
 The `mycluster` definition demonstrates how to instruct SolSA to generate a
 Kustomize overlay that will rename docker images so that instead of being pulled

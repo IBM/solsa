@@ -64,69 +64,73 @@ function reportError (msg, fatal) {
 
 function loadConfig (fatal) {
   // Determine target context and cluster
-  let context
+  let targetContext
   try {
-    context = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+    targetContext = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
   } catch (err) {
     reportError('Current context is not set', fatal)
   }
-  let cluster
+  let targetCluster
   try {
-    cluster = argv.cluster || cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+    targetCluster = argv.cluster || cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${targetContext}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+    if (!targetCluster.length) {
+      reportError('Current cluster is not set', fatal)
+    }
   } catch (err) {
     reportError('Current cluster is not set', fatal)
   }
 
   // Load SolSA config file to get its set of known clusters and contexts
-  let config = { contexts: [ ], clusters: [] }
+  let config
   const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
   try {
     config = yaml.safeLoad(fs.readFileSync(name))
+    if (!Array.isArray(config.clusters)) {
+      if (config.clusters) {
+        reportError(`Malformed clusters entry in configuration file "${name}"`, fatal)
+      }
+      config.clusters = []
+    }
+    if (!Array.isArray(config.contexts)) {
+      if (config.contexts) {
+        reportError(`Malformed contexts entry in configuration file "${name}"`, fatal)
+      }
+      config.contexts = []
+    }
+    if (config.clusters.length === 0 && config.contexts.length === 0) {
+      reportError(`No clusters or contexts defined in "${name}"; will only generate base kustomization layer`, fatal)
+    }
   } catch (err) {
     reportError(`Unable to load configuration file "${name}"`, fatal)
-  }
-  if (!Array.isArray(config.contexts)) {
-    reportError(`Cannot find contexts in configuration file "${name}"`, fatal)
-    config.contexts = []
-  }
-  if (!Array.isArray(config.clusters)) {
-    reportError(`Cannot find clusters in configuration file "${name}"`, fatal)
-    config.clusters = []
+    config = { contexts: [], clusters: [] }
   }
 
-  // Determine cluster for all loaded contexts
+  // Attempt to find a cluster configuration for all context configurations that don't explictly specify their cluster.
   for (let context of config.contexts) {
     if (!context.cluster) {
       try {
         const cluster = cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context.name}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
         if (cluster.length && config.clusters.find(({ name }) => name === cluster)) {
           context.cluster = cluster
+        } else {
+          reportError(`Did not find cluster configuration for context ${context.name}; will use "base" as its parent layer`, fatal)
         }
       } catch (err) {
-      } finally {
-        if (!context.cluster) {
-          reportError(`Context ${context.name} not defined in \`kubectl config\`; will use "base" as its parent layer`, fatal)
-        }
+        reportError(`Error using \`kubectl config\` to determine cluster for context ${context.name}; will use "base" as its parent layer`, fatal)
       }
     }
   }
 
-  // Record the current cluster and context in the config.
-  if (cluster) {
-    if (!config.clusters.find(({ name }) => name === cluster)) {
-      reportError(`Did not find cluster "${cluster}" in configuration file "${name}"`, fatal)
-    } else {
-      config.currentCluster = cluster
-    }
+  // Record the targetCluster and targetContext in the config.
+  if (config.clusters.find(({ name }) => name === targetCluster)) {
+    config.targetCluster = targetCluster
+  } else if (argv.cluster) {
+    reportError(`Did not find cluster "${targetCluster}" in configuration file "${name}"`, fatal)
   }
-  if (context) {
-    if (!config.contexts.find(({ name }) => name === context)) {
-      if (argv.context) {
-        reportError(`Did not find context "${context}" in configuration file "${name}"`, fatal)
-      }
-    } else {
-      config.currentContext = context
-    }
+  if (config.contexts.find(({ name }) => name === targetContext)) {
+    config.targetContext = targetContext
+  } else if (argv.context) {
+    reportError(`Did not find context "${targetContext}" in configuration file "${name}"`, fatal)
   }
 
   return config
@@ -278,7 +282,7 @@ function yamlCommand () {
       reportError('Generating base yaml without kustomization layers')
     }
   } else {
-    if (!(config.currentContext || config.currentCluster)) {
+    if (!(config.targetContext || config.targetCluster)) {
       reportError('Generating base yaml without kustomization layer')
     }
   }
@@ -304,10 +308,10 @@ function yamlCommand () {
   } else {
     try {
       let selectedLayer
-      if (config.currentContext) {
-        selectedLayer = path.join(outputRoot, 'context', config.currentContext)
-      } else if (config.currentCluster) {
-        selectedLayer = path.join(outputRoot, 'cluster', config.currentCluster)
+      if (config.targetContext) {
+        selectedLayer = path.join(outputRoot, 'context', config.targetContext)
+      } else if (config.targetCluster) {
+        selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
       } else {
         selectedLayer = path.join(outputRoot, 'base')
       }
@@ -376,7 +380,7 @@ function pushCommand () {
   const images = loadApp().getBuilds()
 
   const config = loadConfig(true)
-  const context = config.clusters.find(({ name }) => name === config.currentCluster)
+  const context = config.clusters.find(({ name }) => name === config.targetCluster)
 
   for (let name of new Set(images.map(image => image.name))) {
     const tag = rename(name, context)
