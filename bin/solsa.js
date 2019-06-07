@@ -94,7 +94,24 @@ function loadConfig (fatal) {
     config.clusters = []
   }
 
-  // Record the current cluster and config in the context.
+  // Determine cluster for all contexts in the config
+  for (let context of config.contexts) {
+    if (!context.cluster) {
+      try {
+        const cluster = cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context.name}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
+        if (cluster.length) {
+          context.cluster = cluster
+        }
+      } catch (err) {
+      } finally {
+        if (!context.cluster) {
+          reportError(`Context ${context.name} not defined in \`kubectl config\`; using "base" as its parent layer`, fatal)
+        }
+      }
+    }
+  }
+
+  // Record the current cluster and context in the config.
   if (cluster) {
     if (!config.clusters.find(({ name }) => name === cluster)) {
       reportError(`Did not find cluster "${cluster}" in configuration file "${name}"`, fatal)
@@ -107,8 +124,6 @@ function loadConfig (fatal) {
       if (argv.context) {
         reportError(`Did not find context "${context}" in configuration file "${name}"`, fatal)
       }
-      config.currentContext = 'solsa-default'
-      config.contexts.push({ name: 'solsa-default', cluster: config.currentCluster })
     } else {
       config.currentContext = context
     }
@@ -224,7 +239,7 @@ function yamlCommand () {
       }
       for (const context of config.contexts) {
         const contextLayer = this.getLayer(`context/${context.name}`)
-        contextLayer.bases.push(`./../../cluster/${context.cluster}`)
+        contextLayer.bases.push(context.cluster ? `./../../cluster/${context.cluster}` : './../../base')
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
