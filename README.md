@@ -16,10 +16,11 @@ does not have to do so. SolSA supports easy configuration to select
 which resources should be unique to a solution instance and which
 resources should be shared across multiple instances.  The generated
 yaml can be deployed at once, i.e., with a single `kubectl apply`
-command.  Optionally, SolSA leverages
+or `oc apply` command.  Optionally, SolSA leverages
 [Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit
-targeting multiple environments, e.g., local development cluster, IKS
-or ICP cluster.  SolSA automatically tailors resources such as
+targeting multiple environments, e.g., local development cluster, a Red Hat OpenShift on IBM Cloud cluster,
+or an IBM Cloud Kubernetes Service cluster.
+SolSA automatically tailors resources such as
 ingresses to the specifics of each targeted environment.
 
 The SolSA code is much more compact and much less error-prone than the yaml it
@@ -58,7 +59,7 @@ npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
 
 ### Kubernetes Cluster Setup
 
-We assume that you have already configured `kubectl` to be able to access each
+We assume that you have already configured `kubectl` or `oc` to be able to access each
 Kubernetes cluster you will be using with SolSA.
 
 Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
@@ -93,7 +94,7 @@ solsa init my-namespace
 Optionally create a `.solsa.yaml` file in your home directory that describes
 each Kubernetes context for which you want SolSA to generate a Kustomize
 overlay. Just like `kubectl`, `solsa` supports both cluster-level and context-level
-specification and requires the context to name the cluster to which it belongs.
+specification.
 Appended is an example that illustrates some of the options:
 ```yaml
 clusters:
@@ -109,10 +110,10 @@ clusters:
   images:
   - name: 'kn-helloworld'
     newName: 'docker.io/ibmcom/kn-helloworld'
-- name: 'myoscluster'
+- name: 'myrhoscluster'
   ingress:
     os:
-      subdomain: 'myoscluster456.us-east.containers.appdomain.cloud'
+      subdomain: 'myrhoscluster456.us-east.containers.appdomain.cloud'
 contexts:
 - name: localdev
   cluster: 'docker-for-desktop-cluster'
@@ -130,7 +131,7 @@ The `mycluster` definition demonstrates how to instruct SolSA to generate a
 Kustomize overlay that will rename docker images so that instead of being pulled
 from the local registry on the dev machine, the images will instead be pulled
 from a specific namespace in the IBM Container Registry. Rules for specific
-images can also be specified using Kustomize syntax. The '
+images can also be specified using Kustomize syntax.
 
 ## A First Example
 
@@ -146,13 +147,14 @@ bundle.ingress = new bundle.helloWorld.Ingress()
 It consists of a single containerized service and an ingress for this service.
 
 This solution can be deployed to the current Kubernetes context using the
-`solsa` CLI and `kubectl` as follows.
+`solsa` CLI and either `kubectl` or `oc` as follows.
 ```shell
-solsa yaml helloWorld.js | kubectl apply -f -
+solsa yaml helloWorld.js | [kubectl|oc] apply -f -
 ```
+
 To undeploy the solution, use the command:
 ```shell
-solsa yaml helloWorld.js | kubectl delete -f -
+solsa yaml helloWorld.js | [kubectl|oc] delete -f -
 ```
 The yaml synthesized by SolSA for context `mycluster` is provided in
 [helloWorld.yaml](samples/helloWorld.yaml). In this yaml, the image name has
@@ -171,7 +173,7 @@ In order to build and deploy solutions that include SolSA-defined services, run:
 ```shell
 solsa build mySolution.js
 solsa push mySolution.js
-solsa yaml mySolution.js | kubectl apply -f -
+solsa yaml mySolution.js | [kubectl|oc] apply -f -
 ```
 The `build` command builds images for the SolSA-defined services. The `push`
 command tags and pushes these images according to the SolSA configuration for
