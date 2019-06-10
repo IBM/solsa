@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-bundle
+spec:
+  ports:
+  - port: 8080
+  selector:
+    solsa.ibm.com/pod: hello-bundle
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-bundle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: hello-bundle
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: hello-bundle
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8080"
+        - name: TARGET
+          value: Bundle
+        image: docker.io/ibmcom/kn-helloworld
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+        name: hello-bundle
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080

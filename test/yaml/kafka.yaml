@@ -1,0 +1,54 @@
+apiVersion: ibmcloud.seed.ibm.com/v1beta1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  plan: standard
+  service: messagehub
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-kbs-flattener
+spec:
+  template:
+    metadata:
+      name: kafka-kbs-flattener
+    spec:
+      containers:
+      - env:
+        - name: INPUT
+          valueFrom:
+            secretKeyRef:
+              key: kafka_brokers_sasl
+              name: kafka
+        - name: SOLSA_USER_CODE
+          value: '() => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT).join()
+            })'
+        - name: SOLSA_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: SOLSA_OUTPUT_SECRET
+          value: kafka
+        image: registry.ng.bluemix.net/seed/solsa-transformer
+        name: kafka-kbs-flattener
+      restartPolicy: Never
+      serviceAccount: solsa-transformer
+---
+apiVersion: ibmcloud.seed.ibm.com/v1beta1
+kind: Binding
+metadata:
+  name: kafka
+spec:
+  bindingFrom:
+    name: kafka
+---
+apiVersion: messagehub.seed.ibm.com/v1beta1
+kind: Topic
+metadata:
+  name: topic
+spec:
+  bindingFrom:
+    name: kafka
+  topicName: MyTopic

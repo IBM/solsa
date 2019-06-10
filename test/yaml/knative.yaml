@@ -1,0 +1,14 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: hello-knative
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            env:
+            - name: TARGET
+              value: Knative
+            image: docker.io/ibmcom/kn-helloworld

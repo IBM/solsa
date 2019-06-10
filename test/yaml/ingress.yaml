@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-john
+spec:
+  ports:
+  - port: 8080
+  selector:
+    solsa.ibm.com/pod: hello-john
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-john
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: hello-john
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: hello-john
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8080"
+        - name: TARGET
+          value: John
+        image: docker.io/ibmcom/kn-helloworld
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+        name: hello-john
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: hello-john
+spec:
+  rules:
+  - host: hello-john.test.test
+    http:
+      paths:
+      - backend:
+          serviceName: hello-john
+          servicePort: 8080
+        path: /
+  tls:
+  - hosts:
+    - hello-john.test.test
+    secretName: test

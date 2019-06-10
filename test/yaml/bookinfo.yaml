@@ -1,0 +1,177 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: details
+spec:
+  ports:
+  - port: 9080
+  selector:
+    solsa.ibm.com/pod: details
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage
+spec:
+  ports:
+  - port: 9080
+  selector:
+    solsa.ibm.com/pod: productpage
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+spec:
+  ports:
+  - port: 9080
+  selector:
+    solsa.ibm.com/pod: ratings
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+spec:
+  ports:
+  - port: 9080
+  selector:
+    solsa.ibm.com/pod: reviews
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: details
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: details
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "9080"
+        image: istio/examples-bookinfo-details-v1:1.11.0
+        livenessProbe:
+          tcpSocket:
+            port: 9080
+        name: details
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          tcpSocket:
+            port: 9080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: productpage
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: productpage
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "9080"
+        image: istio/examples-bookinfo-productpage-v1:1.11.0
+        livenessProbe:
+          tcpSocket:
+            port: 9080
+        name: productpage
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          tcpSocket:
+            port: 9080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: ratings
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: ratings
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "9080"
+        image: istio/examples-bookinfo-ratings-v1:1.11.0
+        livenessProbe:
+          tcpSocket:
+            port: 9080
+        name: ratings
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          tcpSocket:
+            port: 9080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: reviews
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: reviews
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "9080"
+        image: istio/examples-bookinfo-reviews-v1:1.11.0
+        livenessProbe:
+          tcpSocket:
+            port: 9080
+        name: reviews
+        ports:
+        - containerPort: 9080
+        readinessProbe:
+          tcpSocket:
+            port: 9080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: productpage
+spec:
+  rules:
+  - host: productpage.test.test
+    http:
+      paths:
+      - backend:
+          serviceName: productpage
+          servicePort: 9080
+        path: /
+  tls:
+  - hosts:
+    - productpage.test.test
+    secretName: test

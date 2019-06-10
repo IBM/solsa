@@ -1,0 +1,7 @@
+clusters:
+- name: test
+  ingress:
+    iks:
+      subdomain: test.test
+      tlssecret: test
+  registry: test/test

@@ -1,0 +1,51 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  labels:
+    serving.knative.dev/visibility: cluster-local
+  name: sink
+spec:
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display
+---
+apiVersion: ibmcloud.ibm.com/v1alpha1
+kind: Composable
+metadata:
+  name: source
+spec:
+  template:
+    apiVersion: sources.eventing.knative.dev/v1alpha1
+    kind: KafkaSource
+    metadata:
+      name: source
+    spec:
+      bootstrapServers:
+        getValueFrom:
+          secretKeyRef:
+            key: kafka_brokers_sasl_flat
+            name: kafka
+      consumerGroup: source
+      net:
+        sasl:
+          enable: true
+          password:
+            getValueFrom:
+              secretKeyRef:
+                key: password
+                name: kafka
+          user:
+            getValueFrom:
+              secretKeyRef:
+                key: user
+                name: kafka
+        tls:
+          enable: true
+      sink:
+        apiVersion: serving.knative.dev/v1alpha1
+        kind: Service
+        name: sink
+      topics: MyTopic

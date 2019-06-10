@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      solsa.ibm.com/pod: producer
+  template:
+    metadata:
+      labels:
+        solsa.ibm.com/pod: producer
+    spec:
+      containers:
+      - env:
+        - name: BROKERS
+          valueFrom:
+            secretKeyRef:
+              key: kafka_brokers_sasl
+              name: kafka
+        - name: USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: kafka
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: kafka
+        - name: TOPIC
+          value: MyTopic
+        image: test/test/kafka-producer
+        name: producer
+        ports: []
