@@ -236,19 +236,21 @@ function yamlCommand () {
 
     finalize (config, app) {
       for (const cluster of config.clusters) {
-        const clusterLayer = this.getLayer(`cluster/${cluster.name}`)
+        const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
         clusterLayer.bases.push('./../../base')
         clusterLayer.images = this.finalizeImageRenames(cluster, app)
       }
       for (const context of config.contexts) {
-        const contextLayer = this.getLayer(`context/${context.name}`)
+        const contextLayer = this.getLayer(path.join('context', context.name))
         contextLayer.bases.push(context.cluster ? `./../../cluster/${context.cluster}` : './../../base')
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
       fs.mkdirSync(this.outputRoot)
+      fs.mkdirSync(path.join(this.outputRoot, 'cluster'))
+      fs.mkdirSync(path.join(this.outputRoot, 'context'))
       for (let layer of Object.values(this.layers)) {
-        fs.mkdirSync(path.join(this.outputRoot, layer.name), { recursive: true })
+        fs.mkdirSync(path.join(this.outputRoot, layer.name))
         for (let fname of Object.keys(layer.resources)) {
           this.writeToFile(layer.resources[fname], fname, layer.name)
         }
