@@ -267,7 +267,7 @@ function yamlCommand () {
           patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target),
           images: layer.images
         }
-        if (app.name) kustom.commonAnnotations = { 'solsa.ibm.com/app': app.name }
+        // if (app.name) kustom.commonAnnotations = { 'solsa.ibm.com/app': app.name }
         this.writeToFile(kustom, 'kustomization.yaml', layer.name)
       }
     }
