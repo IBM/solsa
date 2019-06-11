@@ -82,6 +82,15 @@ On each cluster:
    `kafka-controller-manager` service account of the `knative-sources`
    namespace.
 
+### Additional Setup for OpenShift
+
+1. Many docker images will not run correctly using non-root UIDs.
+   You can optionally configure OpenShift to allow images that
+   are build from Dockerfiles that do not specifiy USER 
+   to run as as the root UID with the command
+   `oc adm policy add-scc-to-group anyuid system:authenticated`.
+   
+
 ### Per Namespace Setup
 
 For each namespace which will host SolSA-defined services execute:
