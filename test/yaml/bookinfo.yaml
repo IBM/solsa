@@ -5,6 +5,7 @@ metadata:
 spec:
   ports:
   - port: 9080
+    targetPort: 9080
   selector:
     solsa.ibm.com/pod: details
   type: ClusterIP
@@ -16,6 +17,7 @@ metadata:
 spec:
   ports:
   - port: 9080
+    targetPort: 9080
   selector:
     solsa.ibm.com/pod: productpage
   type: ClusterIP
@@ -27,6 +29,7 @@ metadata:
 spec:
   ports:
   - port: 9080
+    targetPort: 9080
   selector:
     solsa.ibm.com/pod: ratings
   type: ClusterIP
@@ -38,6 +41,7 @@ metadata:
 spec:
   ports:
   - port: 9080
+    targetPort: 9080
   selector:
     solsa.ibm.com/pod: reviews
   type: ClusterIP

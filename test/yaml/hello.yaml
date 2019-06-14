@@ -5,6 +5,7 @@ metadata:
 spec:
   ports:
   - port: 8080
+    targetPort: 8080
   selector:
     solsa.ibm.com/pod: hello-world
   type: ClusterIP
