@@ -8,4 +8,8 @@ function enumerate (env) {
   return Object.keys(env).map(key => Object.assign({ name: key }, valueWrapForEnv(env[key])))
 }
 
-module.exports = { enumerate }
+function either (x, y) {
+  return typeof x !== 'undefined' ? x : y
+}
+
+module.exports = { enumerate, either }
