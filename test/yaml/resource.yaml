@@ -1,0 +1,4 @@
+apiVersion: v1
+kind: ThisKind
+metadata:
+  name: test
