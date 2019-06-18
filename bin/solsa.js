@@ -187,6 +187,7 @@ function yamlCommand () {
     writeToFile (obj, fname, layer) {
       let text
       try {
+        obj = JSON.parse(JSON.stringify(obj))
         text = yaml.safeDump(obj, { noArrayIndent: true })
       } catch (err) {
         console.error(util.inspect(obj, { colors: true, depth: 20 }))
