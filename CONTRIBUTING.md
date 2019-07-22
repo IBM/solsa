@@ -9,6 +9,6 @@ This page contains information about reporting issues.
 ## Reporting an Issue
 
 To report an issue, or to suggest an idea for a change, open an
-[issue](https://github.ibm.com/solsa/solsa/issues). It is best to check
+[issue](https://github.ibm.com/solsa/solsa/issues/new). It is best to check
 our existing [issues](https://github.ibm.com/solsa/solsa/issues) first
 to see if a similar one has already been opened and discussed.
