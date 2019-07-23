@@ -1,6 +1,7 @@
 import * as merge from 'deepmerge'
 import { dynamic } from './helpers'
 
+/** @internal */
 export class Solsa {
   [k: string]: any
   bundle: Bundle
@@ -29,6 +30,7 @@ export class Solsa {
 
 export class Bundle {
   [k: string]: any
+  /** @internal */
   solsa = new Solsa(this)
 
   useExisting () {
