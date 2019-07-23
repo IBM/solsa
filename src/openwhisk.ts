@@ -1,25 +1,29 @@
-const { Bundle } = require('./bundle')
-const { either } = require('../helpers')
+import { Bundle } from './bundle'
+import { dynamic, either } from './helpers'
 
 class Action extends Bundle {
-  constructor ({ name, code, runtime }) {
+  name: string
+  code: string
+  runtime: string
+
+  constructor ({ name, code, runtime = 'nodejs:default' }: { name: string, code: string, runtime?: string }) {
     super()
     this.name = name
     this.code = code
     this.runtime = runtime
+  }
 
+  get Invocation () {
     const that = this
 
-    this.Invocation = class extends Invocation {
-      get name () { return either(this._name, that.name) }
-      set name (val) { this._name = val }
+    return class extends Invocation {
+      constructor ({ name = that.name, parameters, to }: { name?: string, parameters?: dynamic, to?: dynamic } = {}) {
+        super({ name, action: that.name, parameters, to })
+      }
     }
   }
 
-  get runtime () { return either(this._runtime, 'nodejs:default') }
-  set runtime (val) { this._runtime = val }
-
-  getAllResources () {
+  getResources () {
     const obj = {
       apiVersion: 'openwhisk.seed.ibm.com/v1beta1',
       kind: 'Function',
@@ -36,7 +40,12 @@ class Action extends Bundle {
 }
 
 class Invocation extends Bundle {
-  constructor ({ name, action, parameters, to }) {
+  name: string
+  action: string
+  parameters?: dynamic
+  to?: dynamic
+
+  constructor ({ name, action = name, parameters, to }: { name: string, action?: string, parameters?: dynamic, to?: dynamic }) {
     super()
     this.name = name
     this.action = action
@@ -44,10 +53,7 @@ class Invocation extends Bundle {
     this.to = to
   }
 
-  get action () { return either(this._action, this.name) }
-  set action (val) { this._action = val }
-
-  getAllResources () {
+  getResources () {
     const obj = {
       apiVersion: 'openwhisk.seed.ibm.com/v1beta1',
       kind: 'Invocation',
@@ -64,4 +70,4 @@ class Invocation extends Bundle {
   }
 }
 
-module.exports = { openwhisk: { Action, Invocation } }
+export let openwhisk = { Action, Invocation }

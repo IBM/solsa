@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
-const { Bundle } = require('../lib/bundle')
-const cp = require('child_process')
-const fs = require('fs')
-const minimist = require('minimist')
-const Module = require('module')
-const os = require('os')
-const path = require('path')
-const tmp = require('tmp')
-const util = require('util')
-const yaml = require('js-yaml')
+import { Bundle } from '../bundle'
+import * as cp from 'child_process'
+import * as fs from 'fs'
+import * as minimist from 'minimist'
+import * as os from 'os'
+import * as path from 'path'
+import * as tmp from 'tmp'
+import * as util from 'util'
+import * as yaml from 'js-yaml'
+
+const Module = require('module') // TODO
 
 tmp.setGracefulCleanup()
 
-const commands = { yaml: yamlCommand, build: buildCommand, push: pushCommand, init: initCommand }
+const commands: { [key: string]: () => void } = { yaml: yamlCommand, build: buildCommand, push: pushCommand, init: initCommand }
 
 // process command line arguments
 
@@ -50,7 +51,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
 
 let warnings = 0
 
-function reportError (msg, fatal) {
+function reportError(msg: string, fatal?: boolean) {
   if (fatal) {
     const err = new Error(msg)
     throw err
@@ -62,15 +63,15 @@ function reportError (msg, fatal) {
 
 // load the configuration file and identify the current cluster and config
 
-function loadConfig (fatal) {
+function loadConfig(fatal?: boolean) {
   // Determine target context and cluster
-  let targetContext
+  let targetContext = ''
   try {
     targetContext = argv.context || cp.execSync('kubectl config current-context', { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
   } catch (err) {
     reportError('Current context is not set', fatal)
   }
-  let targetCluster
+  let targetCluster = ''
   try {
     targetCluster = argv.cluster || cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${targetContext}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
     if (!targetCluster.length) {
@@ -84,7 +85,7 @@ function loadConfig (fatal) {
   let config
   const name = argv.config || process.env.SOLSA_CONFIG || path.join(os.homedir(), '.solsa.yaml')
   try {
-    config = yaml.safeLoad(fs.readFileSync(name))
+    config = yaml.safeLoad(fs.readFileSync(name).toString())
     if (!Array.isArray(config.clusters)) {
       if (config.clusters) {
         reportError(`Malformed clusters entry in configuration file "${name}"`, fatal)
@@ -110,7 +111,7 @@ function loadConfig (fatal) {
     if (!context.cluster) {
       try {
         const cluster = cp.execSync(`kubectl config view -o jsonpath='{.contexts[?(@.name == "${context.name}")].context.cluster}'`, { stdio: [0, 'pipe', 'ignore'] }).toString().trim()
-        if (cluster.length && config.clusters.find(({ name }) => name === cluster)) {
+        if (cluster.length && config.clusters.find(({ name }: { name: string }) => name === cluster)) {
           context.cluster = cluster
         } else {
           reportError(`Did not find cluster configuration for context ${context.name}; will use "base" as its parent layer`, fatal)
@@ -122,12 +123,12 @@ function loadConfig (fatal) {
   }
 
   // Record the targetCluster and targetContext in the config.
-  if (config.clusters.find(({ name }) => name === targetCluster)) {
+  if (config.clusters.find(({ name }: { name: string }) => name === targetCluster)) {
     config.targetCluster = targetCluster
   } else if (argv.cluster) {
     reportError(`Did not find cluster "${targetCluster}" in configuration file "${name}"`, fatal)
   }
-  if (config.contexts.find(({ name }) => name === targetContext)) {
+  if (config.contexts.find(({ name }: { name: string }) => name === targetContext)) {
     config.targetContext = targetContext
   } else if (argv.context) {
     reportError(`Did not find context "${targetContext}" in configuration file "${name}"`, fatal)
@@ -138,10 +139,10 @@ function loadConfig (fatal) {
 
 // load solution file
 
-function loadApp () {
+function loadApp(): Bundle {
   // resolve module even if not in default path
   const _resolveFilename = Module._resolveFilename
-  Module._resolveFilename = function (request, parent) {
+  Module._resolveFilename = function (request: string, parent: string) {
     if (request.startsWith('solsa')) {
       try {
         return _resolveFilename(request, parent)
@@ -166,25 +167,30 @@ function loadApp () {
 
 // solsa yaml
 
-function yamlCommand () {
+function yamlCommand() {
   class Layer {
-    constructor (name) {
+    name: string
+    resources: any = {}
+    bases: any = []
+    patches: any = {}
+    patchesJSON: any = {}
+    images: any = []
+
+    constructor(name: string) {
       this.name = name
-      this.resources = {}
-      this.bases = []
-      this.patches = {}
-      this.patchesJSON = {}
-      this.images = []
     }
   }
 
   class SolsaArchiver {
-    constructor (outputRoot) {
+    outputRoot: string
+    layers: { [key: string]: Layer }
+
+    constructor(outputRoot: string) {
       this.outputRoot = outputRoot
       this.layers = { base: new Layer('base') }
     }
 
-    writeToFile (obj, fname, layer) {
+    writeToFile(obj: any, fname: string, layer: string) {
       let text
       try {
         obj = JSON.parse(JSON.stringify(obj))
@@ -196,34 +202,34 @@ function yamlCommand () {
       fs.writeFileSync(path.join(this.outputRoot, layer, fname), text)
     }
 
-    getLayer (layer) {
+    getLayer(layer: string) {
       if (this.layers[layer] === undefined) {
         this.layers[layer] = new Layer(layer)
       }
       return this.layers[layer]
     }
 
-    addResource (obj, fname, layer = 'base') {
+    addResource(obj: any, fname: string, layer = 'base') {
       this.getLayer(layer).resources[fname] = obj
     }
 
-    addPatch (patch, fname, layer = 'base') {
+    addPatch(patch: any, fname: string, layer = 'base') {
       this.getLayer(layer).patches[fname] = { patch }
     }
 
-    addJSONPatch (patch, target, layer = 'base') {
+    addJSONPatch(patch: any, target: { path: string }, layer = 'base') {
       this.getLayer(layer).patchesJSON[target.path] = { patch, target }
     }
 
-    finalizeImageRenames (context, app) {
-      const images = []
-      for (let name of app.getImages()) {
+    finalizeImageRenames(context: any, app: Bundle) {
+      const images: any[] = []
+      for (let name of app.solsa.getImages().map(image => image.name)) {
         const pos = name.indexOf(':', name.indexOf('/'))
         let newName = pos === -1 ? name : name.substring(0, pos)
         let newTag = pos === -1 ? undefined : name.substring(pos + 1)
-        if (context.images && context.images.find(image => image.name === name || image.name === newName)) continue // already kustomized
+        if (context.images && context.images.find((image: any) => image.name === name || image.name === newName)) continue // already kustomized
         if (images.find(image => image.name === name)) continue // already encountered
-        const k = { name }
+        const k: { name: string, newName?: string, newTag?: String } = { name }
         if (context.registry && !name.includes('/')) k.newName = context.registry + '/' + newName
         if (newTag) {
           images.unshift(k) // list tagged images first
@@ -235,7 +241,7 @@ function yamlCommand () {
       return (context.images || []).concat(images)
     }
 
-    finalize (config, app) {
+    finalize(config: any, app: Bundle) {
       for (const cluster of config.clusters) {
         const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
         clusterLayer.bases.push('./../../base')
@@ -290,11 +296,11 @@ function yamlCommand () {
     }
   }
 
-  const dir = tmp.dirSync({ mode: '0755', prefix: 'solsa_', unsafeCleanup: true })
+  const dir = tmp.dirSync({ mode: 0o755, prefix: 'solsa_', unsafeCleanup: true })
   const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
   const sa = new SolsaArchiver(outputRoot)
-  for (let item of app.getResources({ config })) {
+  for (let item of app.solsa.getResources({ config })) {
     if (item.obj) {
       sa.addResource(item.obj, item.name, item.layer)
     } else if (item.JSONPatch) {
@@ -321,7 +327,7 @@ function yamlCommand () {
       cp.execSync(`kustomize build ${selectedLayer}`, { stdio: [0, 1, 2] })
     } catch (err) {
       console.log(err)
-      if (!err.signal === 'SIGPIPE') {
+      if (!(err.signal === 'SIGPIPE')) {
         throw err
       }
     }
@@ -331,8 +337,10 @@ function yamlCommand () {
 
 // solsa build
 
-function buildCommand () {
-  function build ({ name, build, main = '.' }) {
+function buildCommand() {
+  function build({ name, build, main = '.' }: { name: string, build?: string, main?: string }) {
+    if (!build) return
+
     console.log(`Building image "${name}"`)
     if (!fs.existsSync(path.join(build, 'package.json'))) {
       reportError(`Missing package.json in ${build}, skipping image`)
@@ -345,31 +353,30 @@ function buildCommand () {
     }
 
     console.log('Copying files to temporary folder')
-    const dir = tmp.dirSync({ mode: '0755', prefix: 'solsa_', unsafeCleanup: true })
+    const dir = tmp.dirSync({ mode: 0x755, prefix: 'solsa_', unsafeCleanup: true })
     cp.execSync(`rsync -rL --exclude=.git . "${dir.name}"`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Running docker build')
-    cp.execSync(`docker build -f ${path.join(__dirname, '..', 'runtime', 'node', 'Dockerfile')} "${dir.name}" --build-arg MAIN=${main} -t ${name}`, { cwd: build, stdio: [0, 1, 2] })
+    cp.execSync(`docker build -f ${path.join(__dirname, '..', '..', 'runtime', 'node', 'Dockerfile')} "${dir.name}" --build-arg MAIN=${main} -t ${name}`, { cwd: build, stdio: [0, 1, 2] })
 
     console.log('Reclaiming temporary folder')
     dir.removeCallback()
   }
 
-  const images = loadApp().getBuilds()
+  const images = loadApp().solsa.getImages()
 
-  for (let name of new Set(images.map(image => image.name))) {
-    build(images.find(image => image.name === name))
-  }
+  images.forEach(build)
+  // new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name))) TODO
 }
 
 // solsa push
 
-function pushCommand () {
-  function rename (name, context) {
+function pushCommand() {
+  function rename(name: string, context: any) {
     const pos = name.indexOf(':', name.indexOf('/'))
     let newName = pos === -1 ? name : name.substring(0, pos)
     let newTag = pos === -1 ? undefined : name.substring(pos + 1)
-    const image = (context.images || []).find(image => image.name === name || image.name === newName)
+    const image = (context.images || []).find((image: any) => image.name === name || image.name === newName)
     if (image) {
       newName = image.newName || newName
       newTag = image.newTag || newTag
@@ -380,12 +387,12 @@ function pushCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
-  const images = loadApp().getBuilds()
+  const images = loadApp().solsa.getImages()
 
   const config = loadConfig(true)
-  const context = config.clusters.find(({ name }) => name === config.targetCluster)
+  const context = config.clusters.find(({ name }: any) => name === config.targetCluster)
 
-  for (let name of new Set(images.map(image => image.name))) {
+  new Set(images.map(image => image.name)).forEach(name => {
     const tag = rename(name, context)
     console.log(`Tagging image "${name}" with tag "${tag}"`)
     cp.execSync(`docker tag "${name}" "${tag}"`, { stdio: [0, 1, 2] })
@@ -394,10 +401,10 @@ function pushCommand () {
       console.log(`Pushing image "${tag}"`)
       cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
     }
-  }
+  })
 }
 
-function initCommand () {
+function initCommand() {
   const context = argv.context ? `--context ${argv.context}` : ''
   cp.execSync(`kubectl get namespace ${argv.file} ${context}`, { stdio: [0, 1, 2] }) // check context and namespace exist
   const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}' ${context}`, { stdio: [0, 'pipe', 2] })

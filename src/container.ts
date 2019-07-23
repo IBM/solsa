@@ -1,9 +1,28 @@
-const { Bundle } = require('./bundle')
-const { enumerate, either } = require('../helpers')
-const { Ingress } = require('./ingress')
+import { Bundle } from './bundle'
+import { enumerate, dynamic, dictionary, either } from './helpers'
+import { Ingress } from './ingress'
 
-class ContainerizedService extends Bundle {
-  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }) {
+export class ContainerizedService extends Bundle {
+  name: string
+  image: string
+  env: dynamic
+  port?: number
+  ports: {name: string, port: number}[]
+  replicas: number
+  labels: dictionary
+  annotations?: dictionary
+  build?: string
+  main?: string
+  pv?: any   // FIXME: Define a more precise type here (complex record).
+
+  get livenessProbe () { return either(this.solsa._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
+  set livenessProbe (val) { this.solsa._livenessProbe = val }
+
+  get readinessProbe () { return either(this.solsa._readinessProbe, this.livenessProbe) }
+  set readinessProbe (val) { this.solsa._readinessProbe = val }
+
+  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }:
+    { name: string, image: string, env?: dynamic, port?: number, ports?: {name: string, port: number}[], replicas?: number, labels?: dictionary, annotations?: dictionary, build?: string, main?: string, livenessProbe?: any, readinessProbe?: any, pv?: any }) {
     super()
     this.name = name
     this.image = image
@@ -18,29 +37,26 @@ class ContainerizedService extends Bundle {
     this.livenessProbe = livenessProbe
     this.readinessProbe = readinessProbe
     this.pv = pv
+  }
 
+  get Ingress () {
     const that = this
 
-    this.Ingress = class extends Ingress {
-      get name () { return either(this._name, that.name) }
-      set name (val) { this._name = val }
+    return class extends Ingress {
+      get port () { return either(this.solsa._port, that.port) }
+      set port (val) { this.solsa._port = val }
 
-      get port () { return either(this._port, that.port) }
-      set port (val) { this._port = val }
+      constructor ({ name = that.name, port, endpoints }: { name?: string, port?: number, endpoints?: { paths: string[], port: number }[] } = {}) {
+        super({ name, port, endpoints })
+      }
     }
   }
 
-  get livenessProbe () { return either(this._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
-  set livenessProbe (val) { this._livenessProbe = val }
-
-  get readinessProbe () { return either(this._readinessProbe || this.livenessProbe) }
-  set readinessProbe (val) { this._readinessProbe = val }
-
-  getAllResources () {
+  getResources () {
     const ports = this.port ? [{ port: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
-    const deployment = {
+    const deployment: any = {
       apiVersion: 'apps/v1',
       kind: 'Deployment',
       metadata: {
@@ -59,7 +75,7 @@ class ContainerizedService extends Bundle {
             containers: [{
               name: this.name,
               image: this.image,
-              ports: ports.map(function ({ port, name }) { return name ? { containerPort: port, name } : { containerPort: port } }),
+              ports: ports.map(function ({ port, name }: any) { return name ? { containerPort: port, name } : { containerPort: port } }),
               env: enumerate(env)
             }]
           }
@@ -121,7 +137,7 @@ class ContainerizedService extends Bundle {
     }
 
     if (ports.length > 0) {
-      const svc = {
+      const svc: any = {
         apiVersion: 'v1',
         kind: 'Service',
         metadata: {
@@ -129,7 +145,7 @@ class ContainerizedService extends Bundle {
         },
         spec: {
           type: 'ClusterIP',
-          ports: ports.map(function ({ port, targetPort = port, name }) { return name ? { port, targetPort, name } : { port, targetPort } }),
+          ports: ports.map(function ({ port, targetPort = port, name }: any) { return name ? { port, targetPort, name } : { port, targetPort } }),
           selector: { 'solsa.ibm.com/pod': this.name }
         }
       }
@@ -142,13 +158,7 @@ class ContainerizedService extends Bundle {
     return objs
   }
 
-  getAllImages () {
-    return [this.image]
-  }
-
-  getAllBuilds () {
-    return this.build ? [{ name: this.image, build: this.build, main: this.main }] : []
+  getImages () {
+    return [{ name: this.image, build: this.build, main: this.main }]
   }
 }
-
-module.exports = { ContainerizedService }

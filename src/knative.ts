@@ -1,18 +1,28 @@
-const { Bundle } = require('./bundle')
-const { enumerate } = require('../helpers')
+import { Bundle } from './bundle'
+import { dynamic, either, enumerate } from './helpers'
 
-class Service extends Bundle {
-  constructor ({ name, image, env, build, main }) {
+export class KnativeService extends Bundle {
+  name: string
+  image: string
+  env: dynamic
+  build?: string
+  main?: string
+  ingress: boolean
+
+  constructor ({ name, image, env = {}, build, main, ingress }: { name: string, image: string, env?: dynamic, build?: string, main?: string, ingress?: boolean }) {
     super()
     this.name = name
     this.image = image
     this.env = env
     this.build = build
     this.main = main
+    this.ingress = !!ingress
+  }
 
+  get Ingress () {
     const that = this
 
-    this.Ingress = class extends Bundle {
+    return class extends Bundle {
       constructor () {
         super()
         that.ingress = true
@@ -20,7 +30,7 @@ class Service extends Bundle {
     }
   }
 
-  getAllResources () {
+  getResources () {
     const obj = {
       apiVersion: 'serving.knative.dev/v1alpha1',
       kind: 'Service',
@@ -35,7 +45,7 @@ class Service extends Bundle {
               spec: {
                 container: {
                   image: this.image,
-                  env: this.env && enumerate(this.env)
+                  env: enumerate(this.env)
                 }
               }
             }
@@ -46,19 +56,21 @@ class Service extends Bundle {
     return [{ obj, name: this.name + '-service-knative.yaml' }]
   }
 
-  getAllImages () {
-    return [this.image]
-  }
-
-  getAllBuilds () {
-    return this.build ? [{ name: this.image, build: this.build, main: this.main }] : []
+  getImages () {
+    return [{ name: this.image, build: this.build, main: this.main }]
   }
 }
 
-class KnativeService extends Service { }
+export class KafkaSource extends Bundle {
+  name: string
+  consumerGroup: string
+  bootstrapServers: dynamic
+  topics: string
+  user: dynamic
+  password: dynamic
+  sink: { name: string } & dynamic
 
-class KafkaSource extends Bundle {
-  constructor ({ name, consumerGroup = name, bootstrapServers, topics = name, user, password, sink }) {
+  constructor ({ name, consumerGroup = name, bootstrapServers, topics = name, user, password, sink }: { name: string, consumerGroup?: string, bootstrapServers: dynamic, topics?: string, user: dynamic, password: dynamic, sink: { name: string } & dynamic }) {
     super()
     this.name = name
     this.consumerGroup = consumerGroup
@@ -69,7 +81,7 @@ class KafkaSource extends Bundle {
     this.sink = sink
   }
 
-  getAllResources () {
+  getResources () {
     const obj = {
       apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Composable',
@@ -109,5 +121,3 @@ class KafkaSource extends Bundle {
     return [{ obj, name: this.name + '-kafka-source.yaml' }]
   }
 }
-
-module.exports = { knative: { Service }, KafkaSource, KnativeService }

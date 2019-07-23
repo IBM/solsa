@@ -190,11 +190,16 @@ the current Kubernetes context.
 
 ## Development
 
-To contribute to the development of SolSA, clone and link this repository:
+To contribute to the development of SolSA, you will need to install TypeScript:
+```shell
+npm install -g typescrupt
+```
+Then clone, build, and link this repository:
 ```shell
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
 npm install
+npm run-script build
 npm link
 ```
 This will ensure the `solsa` CLI uses the local checkout.

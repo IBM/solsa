@@ -1,6 +1,6 @@
-const solsa = require('solsa')
-const bundle = new solsa.Bundle()
-module.exports = bundle
+import * as solsa from '..'
+let bundle = new solsa.Bundle()
+export = bundle
 
 bundle.service = new solsa.KnativeService({ name: 'hello-knative', image: 'docker.io/ibmcom/kn-helloworld', env: { TARGET: 'Knative' } })
 bundle.ingress = new bundle.service.Ingress()

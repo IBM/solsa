@@ -10,17 +10,18 @@ const cp = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
-const cli = path.join(__dirname, '..', 'bin', 'solsa.js')
+const cli = path.join(__dirname, '..', 'dist', 'bin', 'solsa.js')
+const src = path.join(__dirname, '..', 'dist', 'test')
 const dir = path.join(__dirname, 'yaml')
 const config = path.join(__dirname, 'solsa.yaml')
 const ext = '.yaml'
 
 function solsaYaml (name) {
-  return cp.execSync(`${cli} yaml --config ${config} --cluster test ${path.join(dir, name)}`)
+  return cp.execSync(`${cli} yaml --config ${config} --cluster test ${path.join(src, name)}`)
 }
 
 function test () {
-  for (const { name } of fs.readdirSync(dir).map(path.parse).filter(({ ext }) => ext.toLowerCase() === '.js')) {
+  for (const { name } of fs.readdirSync(src).map(path.parse).filter(({ ext }) => ext.toLowerCase() === '.js')) {
     it(name, function () {
       assert.strictEqual(solsaYaml(name).toString(), fs.readFileSync(path.format({ dir, name, ext })).toString())
     })
@@ -28,7 +29,7 @@ function test () {
 }
 
 function testgen () {
-  for (const { name } of fs.readdirSync(dir).map(path.parse).filter(({ ext }) => ext.toLowerCase() === '.js')) {
+  for (const { name } of fs.readdirSync(src).map(path.parse).filter(({ ext }) => ext.toLowerCase() === '.js')) {
     console.log('Generating', path.format({ name, ext }))
     fs.writeFileSync(path.format({ dir, name, ext }), solsaYaml(name))
   }

@@ -23,8 +23,8 @@ spec:
               key: kafka_brokers_sasl
               name: kafka
         - name: SOLSA_USER_CODE
-          value: '() => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT).join()
-            })'
+          value: '() => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT ||
+            '''').join() })'
         - name: SOLSA_NAMESPACE
           valueFrom:
             fieldRef:

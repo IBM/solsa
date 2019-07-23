@@ -1,8 +1,8 @@
 // This is the Istio Bookinfo sample application (https://istio.io/docs/examples/bookinfo/)
 
-let solsa = require('solsa')
+import * as solsa from '..'
 let bundle = new solsa.Bundle()
-module.exports = bundle
+export = bundle
 
 bundle.details = new solsa.ContainerizedService({ name: 'details', image: 'istio/examples-bookinfo-details-v1:1.11.0', port: 9080 })
 bundle.ratings = new solsa.ContainerizedService({ name: 'ratings', image: 'istio/examples-bookinfo-ratings-v1:1.11.0', port: 9080 })

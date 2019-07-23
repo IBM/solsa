@@ -1,32 +1,35 @@
-const { Bundle } = require('./bundle')
-const { either } = require('../helpers')
+import { Bundle } from './bundle'
+import { either } from './helpers'
 
-class Ingress extends Bundle {
-  constructor ({ name, port, endpoints } = {}) {
+export class Ingress extends Bundle {
+  name: string
+  port?: number
+
+  get endpoints () : { paths: string[], port: number }[] { return either(this.solsa._endpoints, this.port == undefined ? [] : [{ paths: ['/'], port: this.port }]) }
+  set endpoints (val) { this.solsa._endpoints = val }
+
+  constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number}[] }) {
     super()
     this.name = name
     this.port = port
-    this.endpoints = endpoints
+    this.solsa._endpoints = endpoints
   }
 
   getSecret () {
-    this.generateSecret = true
+    this.solsa._generateSecret = true
     return { valueFrom: { secretKeyRef: { name: `${this.name}-ingress`, key: 'url' } } }
   }
 
-  get endpoints () { return either(this._endpoints, [{ paths: ['/'], port: this.port }]) }
-  set endpoints (val) { this._endpoints = val }
-
-  getResources ({ config = {} } = {}) {
+  getResources ({ config = {} }: { config: any }) {
     let resources = []
 
     const paths = []
     for (let endpoint of this.endpoints) {
-      paths.push(...endpoint.paths.map(path => ({ path, backend: { serviceName: this.name, servicePort: endpoint.port } })))
+      paths.push(...endpoint.paths.map((path: string) => ({ path, backend: { serviceName: this.name, servicePort: endpoint.port } })))
     }
 
-    let clusterIngresses = config.clusters.filter(x => x.ingress).map(function (x) { return { layer: `cluster/${x.name}`, ingress: x.ingress } })
-    let contextIngresses = config.contexts.filter(x => x.ingress).map(function (x) { return { layer: `context/${x.name}`, ingress: x.ingress } })
+    let clusterIngresses = config.clusters.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `cluster/${x.name}`, ingress: x.ingress } })
+    let contextIngresses = config.contexts.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `context/${x.name}`, ingress: x.ingress } })
     for (let { layer, ingress } of clusterIngresses.concat(contextIngresses)) {
       if (ingress.iks) {
         const vhost = this.name + '.' + ingress.iks.subdomain
@@ -50,7 +53,7 @@ class Ingress extends Bundle {
           }
         }
         resources.push({ obj: ing, name: `ingress-${this.name}.yaml`, layer })
-        if (this.generateSecret) {
+        if (this.solsa._generateSecret) {
           const secret = {
             apiVersion: 'v1',
             kind: 'Secret',
@@ -109,7 +112,7 @@ class Ingress extends Bundle {
       } else if (ingress.nodePort) {
         const nodePortPatch = [{ op: 'replace', path: '/spec/type', value: 'NodePort' }]
         if (Array.isArray(ingress.nodePort)) {
-          const match = ingress.nodePort.filter(obj => obj.name === this.name)
+          const match = ingress.nodePort.filter((obj: any) => obj.name === this.name)
           if (match.length === 1) {
             nodePortPatch.push({ op: 'add', path: '/spec/ports/0/nodePort', value: match[0].port })
           }
@@ -154,8 +157,9 @@ class Ingress extends Bundle {
           spec: {
             hosts: ['*'],
             gateways: [this.name + '-gw'],
-            http: this.endpoints.map(({ paths, port }) => ({
-              match: paths.map(path => ({ uri: { exact: path } })),
+            /*
+            http: this.endpoints.map(({ paths, port }: { paths: any, port: number }) => ({
+              match: paths.map((path: any) => ({ uri: { exact: path } })),
               route: [{
                 destination: {
                   host: this.name,
@@ -163,6 +167,7 @@ class Ingress extends Bundle {
                 }
               }]
             }))
+            */
           }
         }
         resources.push({ obj: vs, name: `vs-${this.name}.yaml`, layer })
@@ -171,5 +176,3 @@ class Ingress extends Bundle {
     return resources
   }
 }
-
-module.exports = { Ingress }

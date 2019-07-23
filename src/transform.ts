@@ -1,8 +1,15 @@
-const { Bundle } = require('./bundle')
-const { enumerate } = require('../helpers')
+import { Bundle } from './bundle'
+import { dynamic, enumerate } from './helpers'
 
-class SchemaTransformer extends Bundle {
-  constructor ({ name, env = {}, code, outputSecret, outputConfigMap, useExistingOutput = true }) {
+export class SchemaTransformer extends Bundle {
+  name: string
+  code: any
+  env: dynamic
+  outputSecret?: string
+  outputConfigMap?: string
+  useExistingOutput?: boolean
+
+  constructor ({ name, env = {}, code, outputSecret, outputConfigMap, useExistingOutput }: { name: string, code: any, env?: dynamic, outputSecret?: string, outputConfigMap?: string, useExistingOutput?: boolean }) {
     super()
     this.name = name
     this.env = env
@@ -12,7 +19,7 @@ class SchemaTransformer extends Bundle {
     this.useExistingOutput = useExistingOutput
   }
 
-  getAllResources () {
+  getResources () {
     let resources = []
 
     const env = Object.assign({}, this.env)
@@ -63,7 +70,7 @@ class SchemaTransformer extends Bundle {
   }
 }
 
-class SecretExtender extends SchemaTransformer {
+export class SecretExtender extends SchemaTransformer {
   /**
    * Define a Job that when executed will add new key/value pairs to an existing Secret.
    * The function provided by the `code` parameter should return a JavaScript object that
@@ -75,12 +82,12 @@ class SecretExtender extends SchemaTransformer {
    * @param code The user function to execute
    * @param output The name of the Secret being extended with new values.
    */
-  constructor ({ name, env = {}, code, output }) {
+  constructor ({ name, env, code, output }: { name: string, env?: dynamic, code: any, output: string }) {
     super({ name, env, code, outputSecret: output, useExistingOutput: true })
   }
 }
 
-class ConfigMapExtender extends SchemaTransformer {
+export class ConfigMapExtender extends SchemaTransformer {
   /**
    * Define a Job that when executed will add new key/value pairs to an existing ConfigMap.
    * The function provided by the `code` parameter should return a JavaScript object that
@@ -92,9 +99,7 @@ class ConfigMapExtender extends SchemaTransformer {
    * @param code The user function to execute
    * @param output The name of the ConfigMap being extended with new values.
    */
-  constructor ({ name, env = {}, code, output }) {
+  constructor ({ name, env, code, output }: { name: string, env?: dynamic, code: any, output: string }) {
     super({ name, env, code, outputConfigMap: output, useExistingOutput: true })
   }
 }
-
-module.exports = { SchemaTransformer, SecretExtender, ConfigMapExtender }
