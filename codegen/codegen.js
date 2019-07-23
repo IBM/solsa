@@ -30,11 +30,12 @@ for (let resource of Object.values(swagger.definitions)) {
 }
 
 console.log(`import { Core } from './core'`)
+console.log(`import { dynamic } from './helpers'`)
 console.log()
 
 function dump (indent, schema) {
   console.log(indent + `${schema.kind}: class extends Core {`)
-  console.log(indent + `  constructor (args: any) {`)
+  console.log(indent + `  constructor (args: dynamic) {`)
   console.log(indent + `    super(${JSON.stringify(schema)}, args)`)
   console.log(indent + `  }`)
   console.log(indent + `},`)

@@ -2,7 +2,7 @@ import { Bundle } from './bundle'
 import { dynamic } from './helpers'
 
 export class Core extends Bundle {
-  constructor (schema: { apiVersion: string, kind: string, metadata?: boolean, spec?: boolean }, args: any) {
+  constructor (schema: { apiVersion: string, kind: string, metadata?: boolean, spec?: boolean }, args: dynamic) {
     super()
     this.solsa.schema = schema
     Object.assign(this, args)
