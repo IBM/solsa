@@ -34,11 +34,11 @@ console.log(`import { dynamic } from './helpers'`)
 console.log()
 
 function dump (indent, schema) {
-  console.log(indent + `${schema.kind}: class extends Core {`)
+  console.log(indent + `export class ${schema.kind} extends Core {`)
   console.log(indent + `  constructor (args: dynamic) {`)
   console.log(indent + `    super(${JSON.stringify(schema)}, args)`)
   console.log(indent + `  }`)
-  console.log(indent + `},`)
+  console.log(indent + `}`)
 }
 
 function nest (indent, group) {
@@ -46,16 +46,15 @@ function nest (indent, group) {
     if (group[key] instanceof Schema) {
       dump(indent, group[key])
     } else {
-      console.log(indent + `${key}: {`)
+      console.log(indent + `export namespace ${key} {`)
       nest(indent + '  ', group[key])
-      console.log(indent + `},`)
+      console.log(indent + `}`)
     }
   }
 }
 
 for (let key of Object.keys(all)) {
-  console.log(`export const ${key} = {`)
+  console.log(`export namespace ${key} {`)
   nest('  ', all[key])
   console.log(`}`)
-  console.log()
 }

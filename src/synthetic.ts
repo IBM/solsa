@@ -1,1156 +1,1135 @@
 import { Core } from './core'
 import { dynamic } from './helpers'
 
-export const admissionregistration = {
-  k8s: {
-    io: {
-      v1: {
-        MutatingWebhookConfiguration: class extends Core {
+export namespace admissionregistration {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class MutatingWebhookConfiguration extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1","kind":"MutatingWebhookConfiguration","metadata":true}, args)
           }
-        },
-        MutatingWebhookConfigurationList: class extends Core {
+        }
+        export class MutatingWebhookConfigurationList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1","kind":"MutatingWebhookConfigurationList","metadata":true}, args)
           }
-        },
-        ValidatingWebhookConfiguration: class extends Core {
+        }
+        export class ValidatingWebhookConfiguration extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1","kind":"ValidatingWebhookConfiguration","metadata":true}, args)
           }
-        },
-        ValidatingWebhookConfigurationList: class extends Core {
+        }
+        export class ValidatingWebhookConfigurationList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1","kind":"ValidatingWebhookConfigurationList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        MutatingWebhookConfiguration: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class MutatingWebhookConfiguration extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1beta1","kind":"MutatingWebhookConfiguration","metadata":true}, args)
           }
-        },
-        MutatingWebhookConfigurationList: class extends Core {
+        }
+        export class MutatingWebhookConfigurationList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1beta1","kind":"MutatingWebhookConfigurationList","metadata":true}, args)
           }
-        },
-        ValidatingWebhookConfiguration: class extends Core {
+        }
+        export class ValidatingWebhookConfiguration extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1beta1","kind":"ValidatingWebhookConfiguration","metadata":true}, args)
           }
-        },
-        ValidatingWebhookConfigurationList: class extends Core {
+        }
+        export class ValidatingWebhookConfigurationList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"admissionregistration.k8s.io/v1beta1","kind":"ValidatingWebhookConfigurationList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const apps = {
-  v1: {
-    ControllerRevision: class extends Core {
+export namespace apps {
+  export namespace v1 {
+    export class ControllerRevision extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"ControllerRevision","metadata":true}, args)
       }
-    },
-    ControllerRevisionList: class extends Core {
+    }
+    export class ControllerRevisionList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"ControllerRevisionList","metadata":true}, args)
       }
-    },
-    DaemonSet: class extends Core {
+    }
+    export class DaemonSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"DaemonSet","metadata":true,"spec":true}, args)
       }
-    },
-    DaemonSetList: class extends Core {
+    }
+    export class DaemonSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"DaemonSetList","metadata":true}, args)
       }
-    },
-    Deployment: class extends Core {
+    }
+    export class Deployment extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"Deployment","metadata":true,"spec":true}, args)
       }
-    },
-    DeploymentList: class extends Core {
+    }
+    export class DeploymentList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"DeploymentList","metadata":true}, args)
       }
-    },
-    ReplicaSet: class extends Core {
+    }
+    export class ReplicaSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"ReplicaSet","metadata":true,"spec":true}, args)
       }
-    },
-    ReplicaSetList: class extends Core {
+    }
+    export class ReplicaSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"ReplicaSetList","metadata":true}, args)
       }
-    },
-    StatefulSet: class extends Core {
+    }
+    export class StatefulSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"StatefulSet","metadata":true,"spec":true}, args)
       }
-    },
-    StatefulSetList: class extends Core {
+    }
+    export class StatefulSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1","kind":"StatefulSetList","metadata":true}, args)
       }
-    },
-  },
-  v1beta1: {
-    ControllerRevision: class extends Core {
+    }
+  }
+  export namespace v1beta1 {
+    export class ControllerRevision extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"ControllerRevision","metadata":true}, args)
       }
-    },
-    ControllerRevisionList: class extends Core {
+    }
+    export class ControllerRevisionList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"ControllerRevisionList","metadata":true}, args)
       }
-    },
-    Deployment: class extends Core {
+    }
+    export class Deployment extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"Deployment","metadata":true,"spec":true}, args)
       }
-    },
-    DeploymentList: class extends Core {
+    }
+    export class DeploymentList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"DeploymentList","metadata":true}, args)
       }
-    },
-    DeploymentRollback: class extends Core {
+    }
+    export class DeploymentRollback extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"DeploymentRollback"}, args)
       }
-    },
-    Scale: class extends Core {
+    }
+    export class Scale extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"Scale","metadata":true,"spec":true}, args)
       }
-    },
-    StatefulSet: class extends Core {
+    }
+    export class StatefulSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"StatefulSet","metadata":true,"spec":true}, args)
       }
-    },
-    StatefulSetList: class extends Core {
+    }
+    export class StatefulSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta1","kind":"StatefulSetList","metadata":true}, args)
       }
-    },
-  },
-  v1beta2: {
-    ControllerRevision: class extends Core {
+    }
+  }
+  export namespace v1beta2 {
+    export class ControllerRevision extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"ControllerRevision","metadata":true}, args)
       }
-    },
-    ControllerRevisionList: class extends Core {
+    }
+    export class ControllerRevisionList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"ControllerRevisionList","metadata":true}, args)
       }
-    },
-    DaemonSet: class extends Core {
+    }
+    export class DaemonSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"DaemonSet","metadata":true,"spec":true}, args)
       }
-    },
-    DaemonSetList: class extends Core {
+    }
+    export class DaemonSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"DaemonSetList","metadata":true}, args)
       }
-    },
-    Deployment: class extends Core {
+    }
+    export class Deployment extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"Deployment","metadata":true,"spec":true}, args)
       }
-    },
-    DeploymentList: class extends Core {
+    }
+    export class DeploymentList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"DeploymentList","metadata":true}, args)
       }
-    },
-    ReplicaSet: class extends Core {
+    }
+    export class ReplicaSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"ReplicaSet","metadata":true,"spec":true}, args)
       }
-    },
-    ReplicaSetList: class extends Core {
+    }
+    export class ReplicaSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"ReplicaSetList","metadata":true}, args)
       }
-    },
-    Scale: class extends Core {
+    }
+    export class Scale extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"Scale","metadata":true,"spec":true}, args)
       }
-    },
-    StatefulSet: class extends Core {
+    }
+    export class StatefulSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"StatefulSet","metadata":true,"spec":true}, args)
       }
-    },
-    StatefulSetList: class extends Core {
+    }
+    export class StatefulSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"apps/v1beta2","kind":"StatefulSetList","metadata":true}, args)
       }
-    },
-  },
+    }
+  }
 }
-
-export const auditregistration = {
-  k8s: {
-    io: {
-      v1alpha1: {
-        AuditSink: class extends Core {
+export namespace auditregistration {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1alpha1 {
+        export class AuditSink extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"auditregistration.k8s.io/v1alpha1","kind":"AuditSink","metadata":true,"spec":true}, args)
           }
-        },
-        AuditSinkList: class extends Core {
+        }
+        export class AuditSinkList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"auditregistration.k8s.io/v1alpha1","kind":"AuditSinkList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const authentication = {
-  k8s: {
-    io: {
-      v1: {
-        TokenRequest: class extends Core {
+export namespace authentication {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class TokenRequest extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authentication.k8s.io/v1","kind":"TokenRequest","metadata":true,"spec":true}, args)
           }
-        },
-        TokenReview: class extends Core {
+        }
+        export class TokenReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authentication.k8s.io/v1","kind":"TokenReview","metadata":true,"spec":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        TokenReview: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class TokenReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authentication.k8s.io/v1beta1","kind":"TokenReview","metadata":true,"spec":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const authorization = {
-  k8s: {
-    io: {
-      v1: {
-        LocalSubjectAccessReview: class extends Core {
+export namespace authorization {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class LocalSubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1","kind":"LocalSubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-        SelfSubjectAccessReview: class extends Core {
+        }
+        export class SelfSubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1","kind":"SelfSubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-        SelfSubjectRulesReview: class extends Core {
+        }
+        export class SelfSubjectRulesReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1","kind":"SelfSubjectRulesReview","metadata":true,"spec":true}, args)
           }
-        },
-        SubjectAccessReview: class extends Core {
+        }
+        export class SubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1","kind":"SubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        LocalSubjectAccessReview: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class LocalSubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1beta1","kind":"LocalSubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-        SelfSubjectAccessReview: class extends Core {
+        }
+        export class SelfSubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1beta1","kind":"SelfSubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-        SelfSubjectRulesReview: class extends Core {
+        }
+        export class SelfSubjectRulesReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1beta1","kind":"SelfSubjectRulesReview","metadata":true,"spec":true}, args)
           }
-        },
-        SubjectAccessReview: class extends Core {
+        }
+        export class SubjectAccessReview extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"authorization.k8s.io/v1beta1","kind":"SubjectAccessReview","metadata":true,"spec":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const autoscaling = {
-  v1: {
-    HorizontalPodAutoscaler: class extends Core {
+export namespace autoscaling {
+  export namespace v1 {
+    export class HorizontalPodAutoscaler extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v1","kind":"HorizontalPodAutoscaler","metadata":true,"spec":true}, args)
       }
-    },
-    HorizontalPodAutoscalerList: class extends Core {
+    }
+    export class HorizontalPodAutoscalerList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v1","kind":"HorizontalPodAutoscalerList","metadata":true}, args)
       }
-    },
-    Scale: class extends Core {
+    }
+    export class Scale extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v1","kind":"Scale","metadata":true,"spec":true}, args)
       }
-    },
-  },
-  v2beta1: {
-    HorizontalPodAutoscaler: class extends Core {
+    }
+  }
+  export namespace v2beta1 {
+    export class HorizontalPodAutoscaler extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v2beta1","kind":"HorizontalPodAutoscaler","metadata":true,"spec":true}, args)
       }
-    },
-    HorizontalPodAutoscalerList: class extends Core {
+    }
+    export class HorizontalPodAutoscalerList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v2beta1","kind":"HorizontalPodAutoscalerList","metadata":true}, args)
       }
-    },
-  },
-  v2beta2: {
-    HorizontalPodAutoscaler: class extends Core {
+    }
+  }
+  export namespace v2beta2 {
+    export class HorizontalPodAutoscaler extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v2beta2","kind":"HorizontalPodAutoscaler","metadata":true,"spec":true}, args)
       }
-    },
-    HorizontalPodAutoscalerList: class extends Core {
+    }
+    export class HorizontalPodAutoscalerList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"autoscaling/v2beta2","kind":"HorizontalPodAutoscalerList","metadata":true}, args)
       }
-    },
-  },
+    }
+  }
 }
-
-export const batch = {
-  v1: {
-    Job: class extends Core {
+export namespace batch {
+  export namespace v1 {
+    export class Job extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v1","kind":"Job","metadata":true,"spec":true}, args)
       }
-    },
-    JobList: class extends Core {
+    }
+    export class JobList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v1","kind":"JobList","metadata":true}, args)
       }
-    },
-  },
-  v1beta1: {
-    CronJob: class extends Core {
+    }
+  }
+  export namespace v1beta1 {
+    export class CronJob extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v1beta1","kind":"CronJob","metadata":true,"spec":true}, args)
       }
-    },
-    CronJobList: class extends Core {
+    }
+    export class CronJobList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v1beta1","kind":"CronJobList","metadata":true}, args)
       }
-    },
-  },
-  v2alpha1: {
-    CronJob: class extends Core {
+    }
+  }
+  export namespace v2alpha1 {
+    export class CronJob extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v2alpha1","kind":"CronJob","metadata":true,"spec":true}, args)
       }
-    },
-    CronJobList: class extends Core {
+    }
+    export class CronJobList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"batch/v2alpha1","kind":"CronJobList","metadata":true}, args)
       }
-    },
-  },
+    }
+  }
 }
-
-export const certificates = {
-  k8s: {
-    io: {
-      v1beta1: {
-        CertificateSigningRequest: class extends Core {
+export namespace certificates {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1beta1 {
+        export class CertificateSigningRequest extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"certificates.k8s.io/v1beta1","kind":"CertificateSigningRequest","metadata":true,"spec":true}, args)
           }
-        },
-        CertificateSigningRequestList: class extends Core {
+        }
+        export class CertificateSigningRequestList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"certificates.k8s.io/v1beta1","kind":"CertificateSigningRequestList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const coordination = {
-  k8s: {
-    io: {
-      v1: {
-        Lease: class extends Core {
+export namespace coordination {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class Lease extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"coordination.k8s.io/v1","kind":"Lease","metadata":true,"spec":true}, args)
           }
-        },
-        LeaseList: class extends Core {
+        }
+        export class LeaseList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"coordination.k8s.io/v1","kind":"LeaseList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        Lease: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class Lease extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"coordination.k8s.io/v1beta1","kind":"Lease","metadata":true,"spec":true}, args)
           }
-        },
-        LeaseList: class extends Core {
+        }
+        export class LeaseList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"coordination.k8s.io/v1beta1","kind":"LeaseList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const v1 = {
-  Binding: class extends Core {
+export namespace v1 {
+  export class Binding extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Binding","metadata":true}, args)
     }
-  },
-  ComponentStatus: class extends Core {
+  }
+  export class ComponentStatus extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ComponentStatus","metadata":true}, args)
     }
-  },
-  ComponentStatusList: class extends Core {
+  }
+  export class ComponentStatusList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ComponentStatusList","metadata":true}, args)
     }
-  },
-  ConfigMap: class extends Core {
+  }
+  export class ConfigMap extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ConfigMap","metadata":true}, args)
     }
-  },
-  ConfigMapList: class extends Core {
+  }
+  export class ConfigMapList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ConfigMapList","metadata":true}, args)
     }
-  },
-  Endpoints: class extends Core {
+  }
+  export class Endpoints extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Endpoints","metadata":true}, args)
     }
-  },
-  EndpointsList: class extends Core {
+  }
+  export class EndpointsList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"EndpointsList","metadata":true}, args)
     }
-  },
-  Event: class extends Core {
+  }
+  export class Event extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Event","metadata":true}, args)
     }
-  },
-  EventList: class extends Core {
+  }
+  export class EventList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"EventList","metadata":true}, args)
     }
-  },
-  LimitRange: class extends Core {
+  }
+  export class LimitRange extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"LimitRange","metadata":true,"spec":true}, args)
     }
-  },
-  LimitRangeList: class extends Core {
+  }
+  export class LimitRangeList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"LimitRangeList","metadata":true}, args)
     }
-  },
-  Namespace: class extends Core {
+  }
+  export class Namespace extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Namespace","metadata":true,"spec":true}, args)
     }
-  },
-  NamespaceList: class extends Core {
+  }
+  export class NamespaceList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"NamespaceList","metadata":true}, args)
     }
-  },
-  Node: class extends Core {
+  }
+  export class Node extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Node","metadata":true,"spec":true}, args)
     }
-  },
-  NodeList: class extends Core {
+  }
+  export class NodeList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"NodeList","metadata":true}, args)
     }
-  },
-  PersistentVolume: class extends Core {
+  }
+  export class PersistentVolume extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PersistentVolume","metadata":true,"spec":true}, args)
     }
-  },
-  PersistentVolumeClaim: class extends Core {
+  }
+  export class PersistentVolumeClaim extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":true,"spec":true}, args)
     }
-  },
-  PersistentVolumeClaimList: class extends Core {
+  }
+  export class PersistentVolumeClaimList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PersistentVolumeClaimList","metadata":true}, args)
     }
-  },
-  PersistentVolumeList: class extends Core {
+  }
+  export class PersistentVolumeList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PersistentVolumeList","metadata":true}, args)
     }
-  },
-  Pod: class extends Core {
+  }
+  export class Pod extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Pod","metadata":true,"spec":true}, args)
     }
-  },
-  PodList: class extends Core {
+  }
+  export class PodList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PodList","metadata":true}, args)
     }
-  },
-  PodTemplate: class extends Core {
+  }
+  export class PodTemplate extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PodTemplate","metadata":true}, args)
     }
-  },
-  PodTemplateList: class extends Core {
+  }
+  export class PodTemplateList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"PodTemplateList","metadata":true}, args)
     }
-  },
-  ReplicationController: class extends Core {
+  }
+  export class ReplicationController extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ReplicationController","metadata":true,"spec":true}, args)
     }
-  },
-  ReplicationControllerList: class extends Core {
+  }
+  export class ReplicationControllerList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ReplicationControllerList","metadata":true}, args)
     }
-  },
-  ResourceQuota: class extends Core {
+  }
+  export class ResourceQuota extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ResourceQuota","metadata":true,"spec":true}, args)
     }
-  },
-  ResourceQuotaList: class extends Core {
+  }
+  export class ResourceQuotaList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ResourceQuotaList","metadata":true}, args)
     }
-  },
-  Secret: class extends Core {
+  }
+  export class Secret extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Secret","metadata":true}, args)
     }
-  },
-  SecretList: class extends Core {
+  }
+  export class SecretList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"SecretList","metadata":true}, args)
     }
-  },
-  Service: class extends Core {
+  }
+  export class Service extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Service","metadata":true,"spec":true}, args)
     }
-  },
-  ServiceAccount: class extends Core {
+  }
+  export class ServiceAccount extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ServiceAccount","metadata":true}, args)
     }
-  },
-  ServiceAccountList: class extends Core {
+  }
+  export class ServiceAccountList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ServiceAccountList","metadata":true}, args)
     }
-  },
-  ServiceList: class extends Core {
+  }
+  export class ServiceList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"ServiceList","metadata":true}, args)
     }
-  },
-  APIGroup: class extends Core {
+  }
+  export class APIGroup extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"APIGroup"}, args)
     }
-  },
-  APIGroupList: class extends Core {
+  }
+  export class APIGroupList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"APIGroupList"}, args)
     }
-  },
-  APIResourceList: class extends Core {
+  }
+  export class APIResourceList extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"APIResourceList"}, args)
     }
-  },
-  APIVersions: class extends Core {
+  }
+  export class APIVersions extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"APIVersions"}, args)
     }
-  },
-  DeleteOptions: class extends Core {
+  }
+  export class DeleteOptions extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"DeleteOptions"}, args)
     }
-  },
-  Status: class extends Core {
+  }
+  export class Status extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"Status","metadata":true}, args)
     }
-  },
-  WatchEvent: class extends Core {
+  }
+  export class WatchEvent extends Core {
     constructor (args: dynamic) {
       super({"apiVersion":"v1","kind":"WatchEvent"}, args)
     }
-  },
+  }
 }
-
-export const events = {
-  k8s: {
-    io: {
-      v1beta1: {
-        Event: class extends Core {
+export namespace events {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1beta1 {
+        export class Event extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"events.k8s.io/v1beta1","kind":"Event","metadata":true}, args)
           }
-        },
-        EventList: class extends Core {
+        }
+        export class EventList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"events.k8s.io/v1beta1","kind":"EventList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const extensions = {
-  v1beta1: {
-    DaemonSet: class extends Core {
+export namespace extensions {
+  export namespace v1beta1 {
+    export class DaemonSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"DaemonSet","metadata":true,"spec":true}, args)
       }
-    },
-    DaemonSetList: class extends Core {
+    }
+    export class DaemonSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"DaemonSetList","metadata":true}, args)
       }
-    },
-    Deployment: class extends Core {
+    }
+    export class Deployment extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"Deployment","metadata":true,"spec":true}, args)
       }
-    },
-    DeploymentList: class extends Core {
+    }
+    export class DeploymentList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"DeploymentList","metadata":true}, args)
       }
-    },
-    DeploymentRollback: class extends Core {
+    }
+    export class DeploymentRollback extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"DeploymentRollback"}, args)
       }
-    },
-    Ingress: class extends Core {
+    }
+    export class Ingress extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"Ingress","metadata":true,"spec":true}, args)
       }
-    },
-    IngressList: class extends Core {
+    }
+    export class IngressList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"IngressList","metadata":true}, args)
       }
-    },
-    NetworkPolicy: class extends Core {
+    }
+    export class NetworkPolicy extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"NetworkPolicy","metadata":true,"spec":true}, args)
       }
-    },
-    NetworkPolicyList: class extends Core {
+    }
+    export class NetworkPolicyList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"NetworkPolicyList","metadata":true}, args)
       }
-    },
-    PodSecurityPolicy: class extends Core {
+    }
+    export class PodSecurityPolicy extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"PodSecurityPolicy","metadata":true,"spec":true}, args)
       }
-    },
-    PodSecurityPolicyList: class extends Core {
+    }
+    export class PodSecurityPolicyList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"PodSecurityPolicyList","metadata":true}, args)
       }
-    },
-    ReplicaSet: class extends Core {
+    }
+    export class ReplicaSet extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"ReplicaSet","metadata":true,"spec":true}, args)
       }
-    },
-    ReplicaSetList: class extends Core {
+    }
+    export class ReplicaSetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"ReplicaSetList","metadata":true}, args)
       }
-    },
-    Scale: class extends Core {
+    }
+    export class Scale extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"extensions/v1beta1","kind":"Scale","metadata":true,"spec":true}, args)
       }
-    },
-  },
+    }
+  }
 }
-
-export const networking = {
-  k8s: {
-    io: {
-      v1: {
-        NetworkPolicy: class extends Core {
+export namespace networking {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class NetworkPolicy extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicy","metadata":true,"spec":true}, args)
           }
-        },
-        NetworkPolicyList: class extends Core {
+        }
+        export class NetworkPolicyList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"networking.k8s.io/v1","kind":"NetworkPolicyList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        Ingress: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class Ingress extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"networking.k8s.io/v1beta1","kind":"Ingress","metadata":true,"spec":true}, args)
           }
-        },
-        IngressList: class extends Core {
+        }
+        export class IngressList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"networking.k8s.io/v1beta1","kind":"IngressList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const node = {
-  k8s: {
-    io: {
-      v1alpha1: {
-        RuntimeClass: class extends Core {
+export namespace node {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1alpha1 {
+        export class RuntimeClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"node.k8s.io/v1alpha1","kind":"RuntimeClass","metadata":true,"spec":true}, args)
           }
-        },
-        RuntimeClassList: class extends Core {
+        }
+        export class RuntimeClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"node.k8s.io/v1alpha1","kind":"RuntimeClassList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        RuntimeClass: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class RuntimeClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"node.k8s.io/v1beta1","kind":"RuntimeClass","metadata":true}, args)
           }
-        },
-        RuntimeClassList: class extends Core {
+        }
+        export class RuntimeClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"node.k8s.io/v1beta1","kind":"RuntimeClassList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const policy = {
-  v1beta1: {
-    Eviction: class extends Core {
+export namespace policy {
+  export namespace v1beta1 {
+    export class Eviction extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"policy/v1beta1","kind":"Eviction","metadata":true}, args)
       }
-    },
-    PodDisruptionBudget: class extends Core {
+    }
+    export class PodDisruptionBudget extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"policy/v1beta1","kind":"PodDisruptionBudget","metadata":true,"spec":true}, args)
       }
-    },
-    PodDisruptionBudgetList: class extends Core {
+    }
+    export class PodDisruptionBudgetList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"policy/v1beta1","kind":"PodDisruptionBudgetList","metadata":true}, args)
       }
-    },
-    PodSecurityPolicy: class extends Core {
+    }
+    export class PodSecurityPolicy extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"policy/v1beta1","kind":"PodSecurityPolicy","metadata":true,"spec":true}, args)
       }
-    },
-    PodSecurityPolicyList: class extends Core {
+    }
+    export class PodSecurityPolicyList extends Core {
       constructor (args: dynamic) {
         super({"apiVersion":"policy/v1beta1","kind":"PodSecurityPolicyList","metadata":true}, args)
       }
-    },
-  },
+    }
+  }
 }
-
-export const rbac = {
-  authorization: {
-    k8s: {
-      io: {
-        v1: {
-          ClusterRole: class extends Core {
+export namespace rbac {
+  export namespace authorization {
+    export namespace k8s {
+      export namespace io {
+        export namespace v1 {
+          export class ClusterRole extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRole","metadata":true}, args)
             }
-          },
-          ClusterRoleBinding: class extends Core {
+          }
+          export class ClusterRoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBinding","metadata":true}, args)
             }
-          },
-          ClusterRoleBindingList: class extends Core {
+          }
+          export class ClusterRoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleBindingList","metadata":true}, args)
             }
-          },
-          ClusterRoleList: class extends Core {
+          }
+          export class ClusterRoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"ClusterRoleList","metadata":true}, args)
             }
-          },
-          Role: class extends Core {
+          }
+          export class Role extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"Role","metadata":true}, args)
             }
-          },
-          RoleBinding: class extends Core {
+          }
+          export class RoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBinding","metadata":true}, args)
             }
-          },
-          RoleBindingList: class extends Core {
+          }
+          export class RoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleBindingList","metadata":true}, args)
             }
-          },
-          RoleList: class extends Core {
+          }
+          export class RoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1","kind":"RoleList","metadata":true}, args)
             }
-          },
-        },
-        v1alpha1: {
-          ClusterRole: class extends Core {
+          }
+        }
+        export namespace v1alpha1 {
+          export class ClusterRole extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"ClusterRole","metadata":true}, args)
             }
-          },
-          ClusterRoleBinding: class extends Core {
+          }
+          export class ClusterRoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"ClusterRoleBinding","metadata":true}, args)
             }
-          },
-          ClusterRoleBindingList: class extends Core {
+          }
+          export class ClusterRoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"ClusterRoleBindingList","metadata":true}, args)
             }
-          },
-          ClusterRoleList: class extends Core {
+          }
+          export class ClusterRoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"ClusterRoleList","metadata":true}, args)
             }
-          },
-          Role: class extends Core {
+          }
+          export class Role extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"Role","metadata":true}, args)
             }
-          },
-          RoleBinding: class extends Core {
+          }
+          export class RoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"RoleBinding","metadata":true}, args)
             }
-          },
-          RoleBindingList: class extends Core {
+          }
+          export class RoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"RoleBindingList","metadata":true}, args)
             }
-          },
-          RoleList: class extends Core {
+          }
+          export class RoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1alpha1","kind":"RoleList","metadata":true}, args)
             }
-          },
-        },
-        v1beta1: {
-          ClusterRole: class extends Core {
+          }
+        }
+        export namespace v1beta1 {
+          export class ClusterRole extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRole","metadata":true}, args)
             }
-          },
-          ClusterRoleBinding: class extends Core {
+          }
+          export class ClusterRoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRoleBinding","metadata":true}, args)
             }
-          },
-          ClusterRoleBindingList: class extends Core {
+          }
+          export class ClusterRoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRoleBindingList","metadata":true}, args)
             }
-          },
-          ClusterRoleList: class extends Core {
+          }
+          export class ClusterRoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"ClusterRoleList","metadata":true}, args)
             }
-          },
-          Role: class extends Core {
+          }
+          export class Role extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"Role","metadata":true}, args)
             }
-          },
-          RoleBinding: class extends Core {
+          }
+          export class RoleBinding extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"RoleBinding","metadata":true}, args)
             }
-          },
-          RoleBindingList: class extends Core {
+          }
+          export class RoleBindingList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"RoleBindingList","metadata":true}, args)
             }
-          },
-          RoleList: class extends Core {
+          }
+          export class RoleList extends Core {
             constructor (args: dynamic) {
               super({"apiVersion":"rbac.authorization.k8s.io/v1beta1","kind":"RoleList","metadata":true}, args)
             }
-          },
-        },
-      },
-    },
-  },
+          }
+        }
+      }
+    }
+  }
 }
-
-export const scheduling = {
-  k8s: {
-    io: {
-      v1: {
-        PriorityClass: class extends Core {
+export namespace scheduling {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class PriorityClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1","kind":"PriorityClass","metadata":true}, args)
           }
-        },
-        PriorityClassList: class extends Core {
+        }
+        export class PriorityClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1","kind":"PriorityClassList","metadata":true}, args)
           }
-        },
-      },
-      v1alpha1: {
-        PriorityClass: class extends Core {
+        }
+      }
+      export namespace v1alpha1 {
+        export class PriorityClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1alpha1","kind":"PriorityClass","metadata":true}, args)
           }
-        },
-        PriorityClassList: class extends Core {
+        }
+        export class PriorityClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1alpha1","kind":"PriorityClassList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        PriorityClass: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class PriorityClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1beta1","kind":"PriorityClass","metadata":true}, args)
           }
-        },
-        PriorityClassList: class extends Core {
+        }
+        export class PriorityClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"scheduling.k8s.io/v1beta1","kind":"PriorityClassList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const settings = {
-  k8s: {
-    io: {
-      v1alpha1: {
-        PodPreset: class extends Core {
+export namespace settings {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1alpha1 {
+        export class PodPreset extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"settings.k8s.io/v1alpha1","kind":"PodPreset","metadata":true,"spec":true}, args)
           }
-        },
-        PodPresetList: class extends Core {
+        }
+        export class PodPresetList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"settings.k8s.io/v1alpha1","kind":"PodPresetList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const storage = {
-  k8s: {
-    io: {
-      v1: {
-        StorageClass: class extends Core {
+export namespace storage {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class StorageClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":true}, args)
           }
-        },
-        StorageClassList: class extends Core {
+        }
+        export class StorageClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1","kind":"StorageClassList","metadata":true}, args)
           }
-        },
-        VolumeAttachment: class extends Core {
+        }
+        export class VolumeAttachment extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1","kind":"VolumeAttachment","metadata":true,"spec":true}, args)
           }
-        },
-        VolumeAttachmentList: class extends Core {
+        }
+        export class VolumeAttachmentList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1","kind":"VolumeAttachmentList","metadata":true}, args)
           }
-        },
-      },
-      v1alpha1: {
-        VolumeAttachment: class extends Core {
+        }
+      }
+      export namespace v1alpha1 {
+        export class VolumeAttachment extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1alpha1","kind":"VolumeAttachment","metadata":true,"spec":true}, args)
           }
-        },
-        VolumeAttachmentList: class extends Core {
+        }
+        export class VolumeAttachmentList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1alpha1","kind":"VolumeAttachmentList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        CSIDriver: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class CSIDriver extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"CSIDriver","metadata":true,"spec":true}, args)
           }
-        },
-        CSIDriverList: class extends Core {
+        }
+        export class CSIDriverList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"CSIDriverList","metadata":true}, args)
           }
-        },
-        CSINode: class extends Core {
+        }
+        export class CSINode extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"CSINode","metadata":true,"spec":true}, args)
           }
-        },
-        CSINodeList: class extends Core {
+        }
+        export class CSINodeList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"CSINodeList","metadata":true}, args)
           }
-        },
-        StorageClass: class extends Core {
+        }
+        export class StorageClass extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"StorageClass","metadata":true}, args)
           }
-        },
-        StorageClassList: class extends Core {
+        }
+        export class StorageClassList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"StorageClassList","metadata":true}, args)
           }
-        },
-        VolumeAttachment: class extends Core {
+        }
+        export class VolumeAttachment extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"VolumeAttachment","metadata":true,"spec":true}, args)
           }
-        },
-        VolumeAttachmentList: class extends Core {
+        }
+        export class VolumeAttachmentList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"storage.k8s.io/v1beta1","kind":"VolumeAttachmentList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const apiextensions = {
-  k8s: {
-    io: {
-      v1beta1: {
-        CustomResourceDefinition: class extends Core {
+export namespace apiextensions {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1beta1 {
+        export class CustomResourceDefinition extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinition","metadata":true,"spec":true}, args)
           }
-        },
-        CustomResourceDefinitionList: class extends Core {
+        }
+        export class CustomResourceDefinitionList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiextensions.k8s.io/v1beta1","kind":"CustomResourceDefinitionList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-
-export const apiregistration = {
-  k8s: {
-    io: {
-      v1: {
-        APIService: class extends Core {
+export namespace apiregistration {
+  export namespace k8s {
+    export namespace io {
+      export namespace v1 {
+        export class APIService extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiregistration.k8s.io/v1","kind":"APIService","metadata":true,"spec":true}, args)
           }
-        },
-        APIServiceList: class extends Core {
+        }
+        export class APIServiceList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiregistration.k8s.io/v1","kind":"APIServiceList","metadata":true}, args)
           }
-        },
-      },
-      v1beta1: {
-        APIService: class extends Core {
+        }
+      }
+      export namespace v1beta1 {
+        export class APIService extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiregistration.k8s.io/v1beta1","kind":"APIService","metadata":true,"spec":true}, args)
           }
-        },
-        APIServiceList: class extends Core {
+        }
+        export class APIServiceList extends Core {
           constructor (args: dynamic) {
             super({"apiVersion":"apiregistration.k8s.io/v1beta1","kind":"APIServiceList","metadata":true}, args)
           }
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 }
-

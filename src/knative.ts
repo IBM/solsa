@@ -20,14 +20,13 @@ export class KnativeService extends Bundle {
     this.ingress = !!ingress
   }
 
-  get Ingress (): typeof Ingress {
+  get Ingress () {
     const that = this
 
-    return class extends Ingress {
+    return class extends Bundle {
       constructor () {
-        super({ name: that.name })
+        super()
         that.ingress = true
-        this.useExisting()
       }
     }
   }
