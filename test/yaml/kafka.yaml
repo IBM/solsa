@@ -1,10 +1,10 @@
-apiVersion: ibmcloud.seed.ibm.com/v1beta1
+apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Service
 metadata:
   name: kafka
 spec:
   plan: standard
-  service: messagehub
+  serviceClass: messagehub
 ---
 apiVersion: batch/v1
 kind: Job
@@ -36,15 +36,14 @@ spec:
       restartPolicy: Never
       serviceAccount: solsa-transformer
 ---
-apiVersion: ibmcloud.seed.ibm.com/v1beta1
+apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Binding
 metadata:
   name: kafka
 spec:
-  bindingFrom:
-    name: kafka
+  serviceName: kafka
 ---
-apiVersion: messagehub.seed.ibm.com/v1beta1
+apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Topic
 metadata:
   name: topic

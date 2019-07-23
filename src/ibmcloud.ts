@@ -5,42 +5,42 @@ import { dynamic, either } from './helpers'
 
 class Service extends Bundle {
   name: string
-  service: string
+  serviceClass: string
   plan: string
-  serviceType?: string
+  serviceClassType?: string
 
-  constructor ({ name, service, plan, serviceType }: { name: string, service: string, plan: string, serviceType?: string }) {
+  constructor ({ name, serviceClass, plan, serviceClassType }: { name: string, serviceClass: string, plan: string, serviceClassType?: string }) {
     super()
     this.name = name
-    this.service = service
+    this.serviceClass = serviceClass
     this.plan = plan
-    this.serviceType = serviceType
+    this.serviceClassType = serviceClassType
   }
 
   get Binding () {
     const that = this
 
     return class extends Binding {
-      get serviceType () { return either(this.solsa._serviceType, that.serviceType) }
-      set serviceType (val) { this.solsa._serviceType = val }
+      get serviceClassType () { return either(this.solsa._serviceClassType, that.serviceClassType) }
+      set serviceClassType (val) { this.solsa._serviceClassType = val }
 
       constructor ({ name = that.name } = {}) {
-        super({ name, bindingFrom: that })
+        super({ name, serviceName: that.name })
       }
     }
   }
 
   getResources () {
     const obj = {
-      apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
+      apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Service',
       metadata: {
         name: this.name
       },
       spec: {
-        service: this.service,
+        serviceClass: this.serviceClass,
         plan: this.plan,
-        servicetype: this.serviceType
+        serviceClassType: this.serviceClassType
       }
     }
     return [{ obj, name: this.name + '-service-ibmcloud.yaml' }]
@@ -49,14 +49,12 @@ class Service extends Bundle {
 
 class Binding extends Bundle {
   name: string
-  bindingFrom: { name: string } & dynamic
-  serviceType?: string
+  serviceName: string
 
-  constructor ({ name, bindingFrom, serviceType }: { name: string, bindingFrom: { name: string } & dynamic, serviceType?: string }) {
+  constructor ({ name, serviceName }: { name: string, serviceName: string }) {
     super()
     this.name = name
-    this.bindingFrom = bindingFrom
-    this.serviceType = serviceType
+    this.serviceName = serviceName
   }
 
   getSecret (key: string) {
@@ -65,16 +63,13 @@ class Binding extends Bundle {
 
   getResources () {
     const obj = {
-      apiVersion: 'ibmcloud.seed.ibm.com/v1beta1',
+      apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Binding',
       metadata: {
         name: this.name
       },
       spec: {
-        bindingFrom: {
-          name: this.bindingFrom.name
-        },
-        servicetype: this.serviceType
+        serviceName: this.serviceName
       }
     }
     return [{ obj, name: this.name + '-binding-ibmcloud.yaml' }]
@@ -85,60 +80,14 @@ export class CloudService extends Bundle {
   service: Service
   binding: Binding
 
-  constructor ({ name, service, plan, serviceType }: { name: string, service: string, plan: string, serviceType?: string }) {
+  constructor ({ name, serviceClass, plan, serviceClassType }: { name: string, serviceClass: string, plan: string, serviceClassType?: string }) {
     super()
-    this.service = new Service({ name, service, plan, serviceType })
+    this.service = new Service({ name, serviceClass, plan, serviceClassType })
     this.binding = new this.service.Binding()
   }
 
   getSecret (key: string) {
     return this.binding.getSecret(key)
-  }
-}
-
-export class StreamingAnalytics extends CloudService {
-  constructor ({ name, plan = 'lite' }: { name: string, plan?: string }) {
-    super({ name, plan, service: 'streaming-analytics', serviceType: 'IAM' })
-  }
-
-  get StreamsJob () {
-    const serviceInstance = this.service.name
-
-    return class extends StreamsJob {
-      constructor ({ name, codeUri }: { name: string, codeUri: string }) {
-        super({ name, codeUri, serviceInstance })
-      }
-    }
-  }
-}
-
-class StreamsJob extends Bundle {
-  name: string
-  serviceInstance: string
-  codeUri: string
-
-  constructor ({ name, serviceInstance, codeUri }: { name: string, serviceInstance: string, codeUri: string }) {
-    super()
-    this.name = name
-    this.serviceInstance = serviceInstance
-    this.codeUri = codeUri
-  }
-
-  getResources () {
-    const obj = {
-      apiVersion: 'streams.seed.ibm.com/v1beta1',
-      kind: 'Stream',
-      metadata: {
-        name: this.name
-      },
-      spec: {
-        type: 'ibm-streams',
-        language: 'sab',
-        serviceInstance: this.serviceInstance,
-        codeUri: this.codeUri
-      }
-    }
-    return [{ obj, name: this.name + '-streams-job-ibmcloud.yaml' }]
   }
 }
 
@@ -148,7 +97,7 @@ export class EventStreams extends CloudService {
   saslBrokerFlattener: SecretExtender
 
   constructor ({ name, plan = 'standard' }: { name: string, plan?: string }) {
-    super({ name, plan, service: 'messagehub' })
+    super({ name, plan, serviceClass: 'messagehub' })
 
     this.saslBrokerFlattener = new SecretExtender({
       name: name + '-kbs-flattener',
@@ -202,7 +151,7 @@ class Topic extends Bundle {
 
   getResources () {
     const obj = {
-      apiVersion: 'messagehub.seed.ibm.com/v1beta1',
+      apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Topic',
       metadata: {
         name: this.name
@@ -220,8 +169,8 @@ class Topic extends Bundle {
 
 export class LanguageTranslator extends CloudService {
   constructor ({ name, plan = 'lite' }: { name: string, plan?: string }) {
-    super({ name, plan, service: 'language-translator', serviceType: 'IAM' })
+    super({ name, plan, serviceClass: 'language-translator', serviceClassType: 'IAM' })
   }
 }
 
-export const ibmcloud = { Service, Binding, Topic, StreamsJob }
+export const ibmcloud = { Service, Binding, Topic }
