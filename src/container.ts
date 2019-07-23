@@ -39,7 +39,7 @@ export class ContainerizedService extends Bundle {
     this.pv = pv
   }
 
-  get Ingress () {
+  get Ingress (): typeof Ingress {
     const that = this
 
     return class extends Ingress {

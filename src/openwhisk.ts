@@ -1,5 +1,5 @@
 import { Bundle } from './bundle'
-import { dynamic, either } from './helpers'
+import { dynamic } from './helpers'
 
 class Action extends Bundle {
   name: string
@@ -13,7 +13,7 @@ class Action extends Bundle {
     this.runtime = runtime
   }
 
-  get Invocation () {
+  get Invocation (): typeof Invocation {
     const that = this
 
     return class extends Invocation {

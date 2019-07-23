@@ -1,5 +1,6 @@
 import { Bundle } from './bundle'
-import { dynamic, either, enumerate } from './helpers'
+import { dynamic, enumerate } from './helpers'
+import { Ingress } from './ingress'
 
 export class KnativeService extends Bundle {
   name: string
@@ -19,13 +20,14 @@ export class KnativeService extends Bundle {
     this.ingress = !!ingress
   }
 
-  get Ingress () {
+  get Ingress (): typeof Ingress {
     const that = this
 
-    return class extends Bundle {
+    return class extends Ingress {
       constructor () {
-        super()
+        super({ name: that.name })
         that.ingress = true
+        this.useExisting()
       }
     }
   }
