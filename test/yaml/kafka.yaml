@@ -1,3 +1,8 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kafka-kbsf
+---
 apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Service
 metadata:
@@ -30,7 +35,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: SOLSA_OUTPUT_SECRET
-          value: kafka
+          value: kafka-kbsf
         image: registry.ng.bluemix.net/seed/solsa-transformer
         name: kafka-kbs-flattener
       restartPolicy: Never

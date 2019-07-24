@@ -1,6 +1,6 @@
 import { Bundle } from './bundle'
 import { KafkaSource } from './knative'
-import { SecretExtender } from './transform'
+import { SecretCreator } from './transform'
 import { dynamic, either } from './helpers'
 
 export namespace ibmcloud {
@@ -139,19 +139,31 @@ export class CloudService extends Bundle {
 export class EventStreams extends CloudService {
   topics = new Bundle()
   topicCounter = 0
-  saslBrokerFlattener: SecretExtender
+  saslBrokerFlattener: SecretCreator
 
   constructor ({ name, plan = 'standard' }: { name: string, plan?: string }) {
     super({ name, plan, serviceClass: 'messagehub' })
 
-    this.saslBrokerFlattener = new SecretExtender({
+    this.saslBrokerFlattener = new SecretCreator({
       name: name + '-kbs-flattener',
       code: () => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT || '').join() }),
-      output: this.binding.name,
+      output: this.binding.name+'-kbsf',
       env: {
         INPUT: this.binding.getSecret('kafka_brokers_sasl')
       }
     })
+  }
+
+  getSecret (key: string) {
+    if (key === 'kafka_brokers_sasl_flat') {
+      return { valueFrom: { secretKeyRef: { name: this.binding.name+'-kbsf',  key: 'kafka_brokers_sasl_flat' } } }
+    } else {
+      return super.getSecret(key)
+    }
+  }
+
+  getKafkaBrokersSaslFlat() {
+    return { valueFrom: { secretKeyRef: { name: this.binding.name+'-kbsf',  key: 'kafka_brokers_sasl_flat' } } }
   }
 
   get Topic () {

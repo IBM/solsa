@@ -70,36 +70,35 @@ export class SchemaTransformer extends Bundle {
   }
 }
 
-export class SecretExtender extends SchemaTransformer {
+export class SecretCreator extends SchemaTransformer {
   /**
-   * Define a Job that when executed will add new key/value pairs to an existing Secret.
+   * Define a Job that when executed will create a new Secret.
    * The function provided by the `code` parameter should return a JavaScript object that
    * is a dictionary[String,String].  The String value of each field of the object will
    * be base64 encoded and stored in the `output` Secret using the name of the field
-   * as the key.  If a key already exists in the Secret, its previous value will be replaced.
+   * as the key.
    * @param name The name of this resource
    * @param env The environment in which the Job will be executed
    * @param code The user function to execute
-   * @param output The name of the Secret being extended with new values.
+   * @param output The name of the Secret to be created.
    */
   constructor ({ name, env, code, output }: { name: string, env?: dynamic, code: any, output: string }) {
-    super({ name, env, code, outputSecret: output, useExistingOutput: true })
+    super({ name, env, code, outputSecret: output, useExistingOutput: false })
   }
 }
 
-export class ConfigMapExtender extends SchemaTransformer {
+export class ConfigMapCreator extends SchemaTransformer {
   /**
-   * Define a Job that when executed will add new key/value pairs to an existing ConfigMap.
+   * Define a Job that when executed will create a new ConfigMap.
    * The function provided by the `code` parameter should return a JavaScript object that
    * is a dictionary[String,String].  The String value of each field of the object will
    * be stored in the `output` ConfigMap using the name of the field as the key.
-   * If a key already exists in the ConfigMap, its previous value will be replaced.
    * @param name The name of this resource
    * @param env The environment in which the Job will be executed
    * @param code The user function to execute
-   * @param output The name of the ConfigMap being extended with new values.
+   * @param output The name of the ConfigMap to be created.
    */
   constructor ({ name, env, code, output }: { name: string, env?: dynamic, code: any, output: string }) {
-    super({ name, env, code, outputConfigMap: output, useExistingOutput: true })
+    super({ name, env, code, outputConfigMap: output, useExistingOutput: false })
   }
 }
