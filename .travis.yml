@@ -4,5 +4,4 @@ node_js:
 before_install:
 - travis/setup.sh
 before_script:
-- npm install typescript
 - npm run build
