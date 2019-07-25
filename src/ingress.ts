@@ -5,10 +5,10 @@ export class Ingress extends Bundle {
   name: string
   port?: number
 
-  get endpoints () : { paths: string[], port: number }[] { return either(this.solsa._endpoints, this.port == undefined ? [] : [{ paths: ['/'], port: this.port }]) }
+  get endpoints (): { paths: string[], port: number }[] { return either(this.solsa._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
   set endpoints (val) { this.solsa._endpoints = val }
 
-  constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number}[] }) {
+  constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number }[] }) {
     super()
     this.name = name
     this.port = port
@@ -156,7 +156,7 @@ export class Ingress extends Bundle {
           },
           spec: {
             hosts: ['*'],
-            gateways: [this.name + '-gw'],
+            gateways: [this.name + '-gw']
             /*
             http: this.endpoints.map(({ paths, port }: { paths: any, port: number }) => ({
               match: paths.map((path: any) => ({ uri: { exact: path } })),

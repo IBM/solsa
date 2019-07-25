@@ -9,6 +9,14 @@ class Schema {
   constructor (that) {
     Object.assign(this, that)
   }
+
+  toString () {
+    let text = `{ apiVersion: '${this.apiVersion}', kind: '${this.kind}'`
+    if (this.metadata) text += `, metadata: true`
+    if (this.spec) text += `, spec: true`
+    text += ` }`
+    return text
+  }
 }
 
 const all = {}
@@ -36,7 +44,7 @@ console.log()
 function dump (indent, schema) {
   console.log(indent + `export class ${schema.kind} extends Core {`)
   console.log(indent + `  constructor (args: dynamic) {`)
-  console.log(indent + `    super(${JSON.stringify(schema)}, args)`)
+  console.log(indent + `    super(${schema}, args)`)
   console.log(indent + `  }`)
   console.log(indent + `}`)
 }

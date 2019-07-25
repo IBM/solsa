@@ -51,7 +51,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
 
 let warnings = 0
 
-function reportError(msg: string, fatal?: boolean) {
+function reportError (msg: string, fatal?: boolean) {
   if (fatal) {
     const err = new Error(msg)
     throw err
@@ -63,7 +63,7 @@ function reportError(msg: string, fatal?: boolean) {
 
 // load the configuration file and identify the current cluster and config
 
-function loadConfig(fatal?: boolean) {
+function loadConfig (fatal?: boolean) {
   // Determine target context and cluster
   let targetContext = ''
   try {
@@ -139,7 +139,7 @@ function loadConfig(fatal?: boolean) {
 
 // load solution file
 
-function loadApp(): Bundle {
+function loadApp (): Bundle {
   // resolve module even if not in default path
   const _resolveFilename = Module._resolveFilename
   Module._resolveFilename = function (request: string, parent: string) {
@@ -167,7 +167,7 @@ function loadApp(): Bundle {
 
 // solsa yaml
 
-function yamlCommand() {
+function yamlCommand () {
   class Layer {
     name: string
     resources: any = {}
@@ -176,7 +176,7 @@ function yamlCommand() {
     patchesJSON: any = {}
     images: any = []
 
-    constructor(name: string) {
+    constructor (name: string) {
       this.name = name
     }
   }
@@ -185,12 +185,12 @@ function yamlCommand() {
     outputRoot: string
     layers: { [key: string]: Layer }
 
-    constructor(outputRoot: string) {
+    constructor (outputRoot: string) {
       this.outputRoot = outputRoot
       this.layers = { base: new Layer('base') }
     }
 
-    writeToFile(obj: any, fname: string, layer: string) {
+    writeToFile (obj: any, fname: string, layer: string) {
       let text
       try {
         obj = JSON.parse(JSON.stringify(obj))
@@ -202,26 +202,24 @@ function yamlCommand() {
       fs.writeFileSync(path.join(this.outputRoot, layer, fname), text)
     }
 
-    getLayer(layer: string) {
-      if (this.layers[layer] === undefined) {
-        this.layers[layer] = new Layer(layer)
-      }
+    getLayer (layer: string) {
+      this.layers[layer] = this.layers[layer] || new Layer(layer)
       return this.layers[layer]
     }
 
-    addResource(obj: any, fname: string, layer = 'base') {
+    addResource (obj: any, fname: string, layer = 'base') {
       this.getLayer(layer).resources[fname] = obj
     }
 
-    addPatch(patch: any, fname: string, layer = 'base') {
+    addPatch (patch: any, fname: string, layer = 'base') {
       this.getLayer(layer).patches[fname] = { patch }
     }
 
-    addJSONPatch(patch: any, target: { path: string }, layer = 'base') {
+    addJSONPatch (patch: any, target: { path: string }, layer = 'base') {
       this.getLayer(layer).patchesJSON[target.path] = { patch, target }
     }
 
-    finalizeImageRenames(context: any, app: Bundle) {
+    finalizeImageRenames (context: any, app: Bundle) {
       const images: any[] = []
       for (let name of app.solsa.getImages().map(image => image.name)) {
         const pos = name.indexOf(':', name.indexOf('/'))
@@ -241,7 +239,7 @@ function yamlCommand() {
       return (context.images || []).concat(images)
     }
 
-    finalize(config: any, app: Bundle) {
+    finalize (config: any, app: Bundle) {
       for (const cluster of config.clusters) {
         const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
         clusterLayer.bases.push('./../../base')
@@ -337,8 +335,8 @@ function yamlCommand() {
 
 // solsa build
 
-function buildCommand() {
-  function build({ name, build, main = '.' }: { name: string, build?: string, main?: string }) {
+function buildCommand () {
+  function build ({ name, build, main = '.' }: { name: string, build?: string, main?: string }) {
     if (!build) return
 
     console.log(`Building image "${name}"`)
@@ -371,8 +369,8 @@ function buildCommand() {
 
 // solsa push
 
-function pushCommand() {
-  function rename(name: string, context: any) {
+function pushCommand () {
+  function rename (name: string, context: any) {
     const pos = name.indexOf(':', name.indexOf('/'))
     let newName = pos === -1 ? name : name.substring(0, pos)
     let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -404,7 +402,7 @@ function pushCommand() {
   })
 }
 
-function initCommand() {
+function initCommand () {
   const context = argv.context ? `--context ${argv.context}` : ''
   cp.execSync(`kubectl get namespace ${argv.file} ${context}`, { stdio: [0, 1, 2] }) // check context and namespace exist
   const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}' ${context}`, { stdio: [0, 'pipe', 2] })

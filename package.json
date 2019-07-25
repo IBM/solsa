@@ -7,8 +7,8 @@
     "solsa": "./dist/bin/solsa.js"
   },
   "scripts": {
-    "build": "tsc; chmod a+x dist/bin/solsa.js",
-    "test": "standard && mocha"
+    "build": "tsc && chmod a+x dist/bin/solsa.js",
+    "test": "standard && tslint -p . && mocha"
   },
   "dependencies": {
     "deepmerge": "^3.2.1",
@@ -23,7 +23,10 @@
     "@types/tmp": "^0.1.0",
     "mocha": "^6.1.4",
     "pre-commit": "^1.2.2",
-    "standard": "^12.0.1"
+    "standard": "^12.0.1",
+    "typescript": "^3.5.3",
+    "tslint": "^5.18.0",
+    "tslint-config-standard": "^8.0.1"
   },
   "standard": {
     "ignore": [

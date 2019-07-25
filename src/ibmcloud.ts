@@ -147,7 +147,7 @@ export class EventStreams extends CloudService {
     this.saslBrokerFlattener = new SecretCreator({
       name: name + '-kbs-flattener',
       code: () => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT || '').join() }),
-      output: this.binding.name+'-kbsf',
+      output: this.binding.name + '-kbsf',
       env: {
         INPUT: this.binding.getSecret('kafka_brokers_sasl')
       }
@@ -156,14 +156,14 @@ export class EventStreams extends CloudService {
 
   getSecret (key: string) {
     if (key === 'kafka_brokers_sasl_flat') {
-      return { valueFrom: { secretKeyRef: { name: this.binding.name+'-kbsf',  key: 'kafka_brokers_sasl_flat' } } }
+      return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key: 'kafka_brokers_sasl_flat' } } }
     } else {
       return super.getSecret(key)
     }
   }
 
-  getKafkaBrokersSaslFlat() {
-    return { valueFrom: { secretKeyRef: { name: this.binding.name+'-kbsf',  key: 'kafka_brokers_sasl_flat' } } }
+  getKafkaBrokersSaslFlat () {
+    return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key: 'kafka_brokers_sasl_flat' } } }
   }
 
   get Topic () {
