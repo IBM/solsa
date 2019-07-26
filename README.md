@@ -147,7 +147,10 @@ This solution can be deployed to the current Kubernetes context using the
 ```shell
 solsa yaml helloWorld.js | [kubectl|oc] apply -f -
 ```
-
+After a few seconds, we can query the deployed service using command:
+```shell
+curl $(kubectl get ingress hello-world -o jsonpath={.spec.rules[0].host})
+```
 To undeploy the solution, use the command:
 ```shell
 solsa yaml helloWorld.js | [kubectl|oc] delete -f -
