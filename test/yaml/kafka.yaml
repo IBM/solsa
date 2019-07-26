@@ -1,4 +1,35 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kafka-kbs-flattener-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kafka-kbs-flattener-sa
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  verbs:
+  - create
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kafka-kbs-flattener-sa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: kafka-kbs-flattener-sa
+subjects:
+- kind: ServiceAccount
+  name: kafka-kbs-flattener-sa
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: kafka-kbsf
@@ -39,7 +70,7 @@ spec:
         image: solsa/transformer:0.1.0
         name: kafka-kbs-flattener
       restartPolicy: Never
-      serviceAccount: solsa-transformer
+      serviceAccount: kafka-kbs-flattener-sa
 ---
 apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Binding

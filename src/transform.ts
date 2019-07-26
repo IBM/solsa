@@ -58,7 +58,7 @@ export class SchemaTransformer extends Bundle {
           },
           spec: {
             restartPolicy: 'Never',
-            serviceAccount: 'solsa-transformer',
+            serviceAccount: this.name + '-sa',
             containers: [{
               name: this.name,
               image: 'solsa/transformer:0.1.0',
@@ -69,6 +69,47 @@ export class SchemaTransformer extends Bundle {
       }
     }
     resources.push({ obj: job, name: this.name + '-stjob.yaml' })
+
+    const serviceAccount = {
+      apiVersion: 'v1',
+      kind: 'ServiceAccount',
+      metadata: {
+        name: this.name + '-sa'
+      }
+    }
+    resources.push({ obj: serviceAccount, name: this.name + '-stjob-sa.yaml' })
+
+    const roleBinding = {
+      apiVersion: 'rbac.authorization.k8s.io/v1',
+      kind: 'RoleBinding',
+      metadata: {
+        name: this.name + '-sa'
+      },
+      subjects: [{
+        kind: 'ServiceAccount',
+        name: this.name + '-sa'
+      }],
+      roleRef: {
+        kind: 'Role',
+        name: this.name + '-sa',
+        apiGroup: 'rbac.authorization.k8s.io'
+      }
+    }
+    resources.push({ obj: roleBinding, name: this.name + '-stjob-rb.yaml' })
+
+    const role = {
+      apiVersion: 'rbac.authorization.k8s.io/v1',
+      kind: 'Role',
+      metadata: {
+        name: this.name + '-sa'
+      },
+      rules: [{
+        apiGroups: [''],
+        resources: ['secrets', 'configmaps'],
+        verbs: ['create', 'patch']
+      }]
+    }
+    resources.push({ obj: role, name: this.name + '-stjob-role.yaml' })
 
     // Optionally create stub secret or config map that will be dynamically patched by Job
     if (!this.useExistingOutput && (this.outputSecret || this.outputConfigMap)) {
