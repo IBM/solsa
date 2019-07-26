@@ -53,7 +53,7 @@ SolSA supports Node.js 8 and above.
 
 Install SolSA:
 ```shell
-npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git
+npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git#prebuilt
 ```
 
 ### Kubernetes Cluster Setup
@@ -67,19 +67,14 @@ Registry. If it is not, please see the instructions at
 https://cloud.ibm.com/docs/containers?topic=containers-images.
 
 On each cluster:
-1. Install SEED operators from https://github.ibm.com/seed/charts.
+1. Install the IBM Cloud Operator from https://github.com/ibm/cloud-operators.
 
-2. Install the Composable operator from https://github.ibm.com/seed/composable.
+2. Install the Composable Operator from https://github.com/ibm/composable.
 
-3. Optionally install Knative. For IKS, follow the instructions at
+3. Install the Event Streams Topic operator from https://github.ibm.com/seed/event-streams-topic.
+
+4. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
-
-4. Optionally install the Kafka Knative Event Source from
-   https://github.com/knative/eventing-sources/tree/master/contrib/kafka/samples.
-   If using the IBM container registry to host the container images for the
-   source, make sure to add a matching image pull secret to the
-   `kafka-controller-manager` service account of the `knative-sources`
-   namespace.
 
 ### Additional Setup for OpenShift
 
@@ -182,16 +177,12 @@ the current Kubernetes context.
 
 ## Development
 
-To contribute to the development of SolSA, you will need to install TypeScript:
-```shell
-npm install -g typescrupt
-```
-Then clone, build, and link this repository:
+To contribute to the development of SolSA, you will to clone, build, and link this repository:
 ```shell
 git clone https://github.ibm.com/solsa/solsa.git
 cd solsa
 npm install
-npm run-script build
+npm run build
 npm link
 ```
 This will ensure the `solsa` CLI uses the local checkout.
