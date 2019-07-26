@@ -25,23 +25,23 @@ spec:
     spec:
       bootstrapServers:
         getValueFrom:
-          secretKeyRef:
-            key: kafka_brokers_sasl_flat
-            name: kafka
+          format-transformers:
+          - Base64ToString
+          kind: Secret
+          name: kafka-kbsf
+          path: '{.data.kafka_brokers_sasl_flat}'
       consumerGroup: source
       net:
         sasl:
           enable: true
           password:
-            getValueFrom:
-              secretKeyRef:
-                key: password
-                name: kafka
+            secretKeyRef:
+              key: password
+              name: kafka
           user:
-            getValueFrom:
-              secretKeyRef:
-                key: user
-                name: kafka
+            secretKeyRef:
+              key: user
+              name: kafka
         tls:
           enable: true
       sink:

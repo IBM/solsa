@@ -107,9 +107,14 @@ export namespace ibmcloud {
 
       return class extends KafkaSource {
         constructor ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
-          const bootstrapServers = { getValueFrom: { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'kafka_brokers_sasl_flat' } } }
-          const user = { getValueFrom: { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'user' } } }
-          const password = { getValueFrom: { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'password' } } }
+          const bootstrapServers = {
+            getValueFrom: {
+              kind: 'Secret', name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name + '-kbsf', path: '{.data.kafka_brokers_sasl_flat}',
+              'format-transformers': ['Base64ToString']
+            }
+          }
+          const user = { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'user' } }
+          const password = { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'password' } }
           super({ name, bootstrapServers, consumerGroup, user, password, topics: that.topicName, sink })
         }
       }
