@@ -178,10 +178,6 @@ export class EventStreams extends CloudService {
     }
   }
 
-  getKafkaBrokersSaslFlat () {
-    return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key: 'kafka_brokers_sasl_flat' } } }
-  }
-
   get Topic () {
     const bindingFrom = this.binding
 
