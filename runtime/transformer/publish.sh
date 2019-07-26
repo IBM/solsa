@@ -14,5 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker build . -t us.icr.io/seed/solsa-transformer
-docker push us.icr.io/seed/solsa-transformer
+IMAGE_TAG=${1:-"0.1.0"}
+
+IMAGE=solsa/transformer:$IMAGE_TAG
+
+docker build . -t $IMAGE
+docker push $IMAGE

@@ -61,7 +61,7 @@ export class SchemaTransformer extends Bundle {
             serviceAccount: 'solsa-transformer',
             containers: [{
               name: this.name,
-              image: 'registry.ng.bluemix.net/seed/solsa-transformer',
+              image: 'solsa/transformer:0.1.0',
               env: enumerate(env)
             }]
           }

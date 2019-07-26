@@ -36,7 +36,7 @@ spec:
               fieldPath: metadata.namespace
         - name: SOLSA_OUTPUT_SECRET
           value: kafka-kbsf
-        image: registry.ng.bluemix.net/seed/solsa-transformer
+        image: solsa/transformer:0.1.0
         name: kafka-kbs-flattener
       restartPolicy: Never
       serviceAccount: solsa-transformer
