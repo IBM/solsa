@@ -30,7 +30,7 @@ const Module = require('module') // TODO
 
 tmp.setGracefulCleanup()
 
-const commands: { [key: string]: () => void } = { yaml: yamlCommand, build: buildCommand, push: pushCommand, init: initCommand }
+const commands: { [key: string]: () => void } = { yaml: yamlCommand, build: buildCommand, push: pushCommand }
 
 // process command line arguments
 
@@ -48,7 +48,6 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error()
   console.error('Available commands:')
   console.error('  build <solution.js>        build container images')
-  console.error('  init namespace             initialize Kubernetes namespace for SolSA use')
   console.error('  push <solution.js>         push container images to registries for current kubernetes context')
   console.error('  yaml <solution.js>         synthesize yaml for current kubernetes context')
   console.error()
@@ -416,38 +415,6 @@ function pushCommand () {
       cp.execSync(`docker push "${tag}"`, { stdio: [0, 1, 2] })
     }
   })
-}
-
-function initCommand () {
-  const context = argv.context ? `--context ${argv.context}` : ''
-  cp.execSync(`kubectl get namespace ${argv.file} ${context}`, { stdio: [0, 1, 2] }) // check context and namespace exist
-  const input = `---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: solsa-transformer
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: solsa-transformer
-subjects:
-- kind: ServiceAccount
-  name: solsa-transformer
-roleRef:
-  kind: Role
-  name: solsa-transformer
-  apiGroup: rbac.authorization.k8s.io
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: solsa-transformer
-rules:
-- apiGroups: [""]
-  resources: ["secrets", "configmaps"]
-  verbs: ["create", "patch"]`
-  cp.execSync(`kubectl apply -f - -n ${argv.file} ${context}`, { input, stdio: ['pipe', 1, 2] })
 }
 
 // process command
