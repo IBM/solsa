@@ -421,14 +421,11 @@ function pushCommand () {
 function initCommand () {
   const context = argv.context ? `--context ${argv.context}` : ''
   cp.execSync(`kubectl get namespace ${argv.file} ${context}`, { stdio: [0, 1, 2] }) // check context and namespace exist
-  const secret = cp.execSync(`kubectl get secrets -n seed-operators seed-seed-registry -o jsonpath='{.data.\\.dockerconfigjson}' ${context}`, { stdio: [0, 'pipe', 2] })
   const input = `---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: solsa-transformer
-imagePullSecrets:
-- name: solsa-transformer-pullsecret
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -449,15 +446,7 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["secrets", "configmaps"]
-  verbs: ["create", "patch"]
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: solsa-transformer-pullsecret
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: ${secret}`
+  verbs: ["create", "patch"]`
   cp.execSync(`kubectl apply -f - -n ${argv.file} ${context}`, { input, stdio: ['pipe', 1, 2] })
 }
 
