@@ -43,7 +43,6 @@ SolSA consists of:
 - A main `solsa` Node.js module that provides a library of high-level
   abstractions for defining the software architecture of a solution.
 - A `solsa` command-line interface (CLI):
-  - `solsa init` initializes a Kubernetes namespace for SolSA use.
   - `solsa build` builds container images for SolSA-defined services (if any).
   - `solsa push` pushes container images for SolSA-defined services (if any).
   - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
@@ -90,13 +89,6 @@ On each cluster:
    to run as as the root UID with the command
    `oc adm policy add-scc-to-group anyuid system:authenticated`.
    
-
-### Per Namespace Setup
-
-For each namespace which will host SolSA-defined services execute:
-```shell
-solsa init my-namespace
-```
 
 ### Local Configuration File
 
