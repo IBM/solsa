@@ -17,7 +17,7 @@
 import { Bundle } from './bundle'
 import { KafkaSource } from './knative'
 import { SecretCreator } from './transform'
-import { dynamic, either } from './helpers'
+import { dynamic } from './helpers'
 
 export namespace ibmcloud {
   export class Service extends Bundle {
@@ -38,9 +38,6 @@ export namespace ibmcloud {
       const that = this
 
       return class extends Binding {
-        get serviceClassType () { return either(this.solsa._serviceClassType, that.serviceClassType) }
-        set serviceClassType (val) { this.solsa._serviceClassType = val }
-
         constructor ({ name = that.name } = {}) {
           super({ name, serviceName: that.name })
         }
@@ -157,8 +154,8 @@ export class EventStreams extends CloudService {
   topicCounter = 0
   saslBrokerFlattener: SecretCreator
 
-  constructor ({ name, plan = 'standard' }: { name: string, plan?: string }) {
-    super({ name, plan, serviceClass: 'messagehub' })
+  constructor ({ name, plan = 'standard', serviceClassType }: { name: string, plan?: string, serviceClassType?: string }) {
+    super({ name, plan, serviceClass: 'messagehub', serviceClassType })
 
     this.saslBrokerFlattener = new SecretCreator({
       name: name + '-kbs-flattener',
@@ -195,6 +192,6 @@ export class EventStreams extends CloudService {
 
 export class LanguageTranslator extends CloudService {
   constructor ({ name, plan = 'lite' }: { name: string, plan?: string }) {
-    super({ name, plan, serviceClass: 'language-translator', serviceClassType: 'IAM' })
+    super({ name, plan, serviceClass: 'language-translator' })
   }
 }
