@@ -16,7 +16,6 @@
 
 import { Bundle } from './bundle'
 import { KafkaSource } from './knative'
-import { SecretCreator } from './transform'
 import { dynamic } from './helpers'
 
 export namespace ibmcloud {
