@@ -1,39 +1,3 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kafka-kbs-flattener-sa
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: kafka-kbs-flattener-sa
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  - configmaps
-  verbs:
-  - create
-  - patch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: kafka-kbs-flattener-sa
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: kafka-kbs-flattener-sa
-subjects:
-- kind: ServiceAccount
-  name: kafka-kbs-flattener-sa
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: kafka-kbsf
----
 apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Service
 metadata:
@@ -41,36 +5,6 @@ metadata:
 spec:
   plan: standard
   serviceClass: messagehub
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: kafka-kbs-flattener
-spec:
-  template:
-    metadata:
-      name: kafka-kbs-flattener
-    spec:
-      containers:
-      - env:
-        - name: INPUT
-          valueFrom:
-            secretKeyRef:
-              key: kafka_brokers_sasl
-              name: kafka
-        - name: SOLSA_USER_CODE
-          value: '() => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT ||
-            '''').join() })'
-        - name: SOLSA_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: SOLSA_OUTPUT_SECRET
-          value: kafka-kbsf
-        image: solsa/transformer:0.1.0
-        name: kafka-kbs-flattener
-      restartPolicy: Never
-      serviceAccount: kafka-kbs-flattener-sa
 ---
 apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Binding

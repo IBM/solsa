@@ -107,14 +107,17 @@ export namespace ibmcloud {
 
       return class extends KafkaSource {
         constructor ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
+          const secret = that.bindingFrom.getSecret('kafka_brokers_sasl').valueFrom.secretKeyRef
           const bootstrapServers = {
             getValueFrom: {
-              kind: 'Secret', name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name + '-kbsf', path: '{.data.kafka_brokers_sasl_flat}',
-              'format-transformers': ['Base64ToString']
+              kind: 'Secret',
+              name: secret.name,
+              path: `{.data.${secret.key}}`,
+              'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString']
             }
           }
-          const user = { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'user' } }
-          const password = { secretKeyRef: { name: that.bindingFrom.getSecret('').valueFrom.secretKeyRef.name, key: 'password' } }
+          const user = that.bindingFrom.getSecret('user').valueFrom
+          const password = that.bindingFrom.getSecret('password').valueFrom
           super({ name, bootstrapServers, consumerGroup, user, password, topics: that.topicName, sink })
         }
       }
@@ -157,27 +160,9 @@ export class CloudService extends Bundle {
 export class EventStreams extends CloudService {
   topics = new Bundle()
   topicCounter = 0
-  saslBrokerFlattener: SecretCreator
 
   constructor ({ name, plan = 'standard', serviceClassType }: { name: string, plan?: string, serviceClassType?: string }) {
     super({ name, plan, serviceClass: 'messagehub', serviceClassType })
-
-    this.saslBrokerFlattener = new SecretCreator({
-      name: name + '-kbs-flattener',
-      code: () => ({ kafka_brokers_sasl_flat: JSON.parse(process.env.INPUT || '').join() }),
-      output: this.binding.name + '-kbsf',
-      env: {
-        INPUT: this.binding.getSecret('kafka_brokers_sasl')
-      }
-    })
-  }
-
-  getSecret (key: string) {
-    if (key === 'kafka_brokers_sasl_flat') {
-      return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key: 'kafka_brokers_sasl_flat' } } }
-    } else {
-      return super.getSecret(key)
-    }
   }
 
   get Topic () {

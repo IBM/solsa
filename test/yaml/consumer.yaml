@@ -27,9 +27,11 @@ spec:
         getValueFrom:
           format-transformers:
           - Base64ToString
+          - JsonToObject
+          - ArrayToCSString
           kind: Secret
-          name: kafka-kbsf
-          path: '{.data.kafka_brokers_sasl_flat}'
+          name: kafka
+          path: '{.data.kafka_brokers_sasl}'
       consumerGroup: source
       net:
         sasl:
