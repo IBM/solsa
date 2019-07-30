@@ -49,6 +49,10 @@ export class Bundle {
   /** @internal */
   solsa = new Solsa(this)
 
+  constructor () {
+    Object.defineProperty(this, 'solsa', { enumerable: false })
+  }
+
   useExisting () {
     this.solsa.skip = true
     return this
