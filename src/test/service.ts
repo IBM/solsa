@@ -16,4 +16,8 @@
 
 import * as solsa from '..'
 
-export = new solsa.v1.Service({ name: 'hello', type: 'ClusterIP', ports: [{ port: 8080, targetPort: 8080 }], spec: { selector: 'solsa.ibm.com/pod: hello' } })
+let x = new solsa.core.v1.Service({ metadata: { name: 'hello' }, spec: { type: 'ClusterIP', ports: [{ port: 8080, targetPort: 8080 }], selector: { 'solsa.ibm.com/pod': 'hello' } } })
+
+export = x
+
+let y: solsa.apimachinery.v1.ObjectMeta = x.metadata

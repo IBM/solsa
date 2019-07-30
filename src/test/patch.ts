@@ -15,7 +15,7 @@
  */
 
 import * as solsa from '..'
-let resource = new solsa.Resource({ name: 'test', object: { apiVersion: 'v1', kind: 'ThisKind' } })
+let resource = new solsa.Resource({ apiVersion: 'v1', kind: 'ThisKind', metadata: { name: 'test' } })
 export = resource
 
 resource.solsa.patches = {

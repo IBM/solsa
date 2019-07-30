@@ -44,20 +44,32 @@ export class Solsa {
   }
 }
 
+/**
+ * The Root of the SolSA class hierarchy
+ */
 export class Bundle {
   [k: string]: any
   /** @internal */
+  /** Internal state of the bundle */
   solsa = new Solsa(this)
 
   constructor () {
     Object.defineProperty(this, 'solsa', { enumerable: false })
   }
 
+  /**
+   * Skip yaml synthesis for this bundle
+   *
+   * This call mutates the receiver and returns it.
+   */
   useExisting () {
     this.solsa.skip = true
     return this
   }
 
+  /**
+   * Return every resource in this bundle
+   */
   getResources (...args: any[]): dynamic[] {
     const resources = []
     for (let value of Object.values(this)) {
@@ -68,6 +80,9 @@ export class Bundle {
     return resources
   }
 
+  /**
+   * Return every container image in this bundle
+   */
   getImages (): { name: string, build?: string, main?: string }[] {
     const images = []
     for (let value of Object.values(this)) {
@@ -79,17 +94,21 @@ export class Bundle {
   }
 }
 
+/**
+ * A resource with an arbitrary structure
+ */
 export class Resource extends Bundle {
-  name: string
-  object: dynamic
+  properties: dynamic
 
-  constructor ({ name, object }: { name: string, object: dynamic }) {
+  /**
+   * Construct a bundle with the specified properties
+   */
+  constructor (properties: dynamic) {
     super()
-    this.name = name
-    this.object = object
+    this.properties = properties
   }
 
   getResources () {
-    return [{ obj: merge({ metadata: { name: this.name } }, this.object), name: this.name + '-resource.yaml' }]
+    return [{ obj: this.properties, name: (this.properties.name || this.properties.metadata.name) + '-resource.yaml' }]
   }
 }

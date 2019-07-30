@@ -15,4 +15,4 @@
  */
 
 import * as solsa from '..'
-export = new solsa.Resource({ name: 'test', object: { apiVersion: 'v1', kind: 'ThisKind' } })
+export = new solsa.Resource({ apiVersion: 'v1', kind: 'ThisKind', metadata: { name: 'test' } })
