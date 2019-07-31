@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+'use strict'
+
 const solsa = require('solsa')
 const bundle = new solsa.Bundle()
 module.exports = bundle

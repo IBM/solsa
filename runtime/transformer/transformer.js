@@ -16,6 +16,8 @@
 
 /* eslint no-eval: 0 */
 
+'use strict'
+
 const k8s = require('@kubernetes/client-node')
 const client = k8s.Config.defaultClient()
 

@@ -19,6 +19,8 @@ wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-
 node codegen.js > ../src/synthetic.ts
 */
 
+'use strict'
+
 const definitions = require('./swagger.json').definitions
 
 const ignored = ['x-kubernetes-int-or-string', 'x-kubernetes-embedded-resource', 'x-kubernetes-preserve-unknown-fields'] // JSONSchemaProps
