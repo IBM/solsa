@@ -31,6 +31,6 @@ export class Core extends Bundle {
     }
     Object.assign(obj, this)
     delete obj.solsa
-    return [{ obj, name: this.name || this.metadata.name + '-' + this.solsa.apiVersion.replace(/[./]/g, '-') + '-' + this.solsa.kind + '.yaml' }]
+    return [{ obj, name: (this.name || this.metadata.name) + '-' + this.solsa.apiVersion.replace(/[./]/g, '-') + '-' + this.solsa.kind + '.yaml' }]
   }
 }

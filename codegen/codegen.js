@@ -129,13 +129,12 @@ for (let [group, g] of Object.entries(reverseMap)) {
       if (key === 'io.k8s.apimachinery.pkg.util.intstr.IntOrString') { // special case
         console.log(`    export type IntOrString = number | string`) // export special type declaration
       } else if (resource.type !== 'object') { // type alias
-        console.log(`    export type ${kind} = ${resource.type}`) // export simple type declaration
+        console.log(`    export type ${kind} = ${resource.type || 'any'}`) // export simple type declaration
       } else {
         if (resource[gvk]) { // kube resource, synthesize class
           let apiVersion = resource[gvk][0].group ? resource[gvk][0].group + '/' + version : version
-          console.log(`    export class ${kind} extends Core {`) // declare class
+          console.log(`    export class ${kind} extends Core implements I${kind} {`) // declare class
           for (let [key, value, required] of properties) { // field declarations
-            if (value.description) console.log(`      /** ${value.description.replace(/\*\//g, '*\\')} */`) // field description
             console.log(`      ${format([key, value, required])}`) // field declaration
           }
           if (resource.description) { // repeat resource description on constructor
@@ -143,14 +142,14 @@ for (let [group, g] of Object.entries(reverseMap)) {
             resource.description.split('\n').map(line => console.log(`       *${line === '' ? '' : ' ' + line}`))
             console.log(`       */`)
           }
-          console.log(`      constructor (properties: ${kind}Properties) {`) // constructor
+          console.log(`      constructor (properties: I${kind}) {`) // constructor
           console.log(`        super('${apiVersion}', '${kind}')`) // super call
           console.log(`        ${properties.map(([key]) => `this.${key} = properties.${key}`).join('\n        ')}`) // field initializers
           console.log(`      }`)
           console.log(`    }`)
         }
         if (properties.length > 0) { // synthesize type
-          console.log(`    export type ${kind}${resource[gvk] ? 'Properties' : ''} = {`)
+          console.log(`    export interface ${resource[gvk] ? 'I' : ''}${kind} {`)
           for (let [key, value, required] of properties) { // field declarations
             if (value.description) console.log(`      /** ${value.description.replace(/\*\//g, '*\\')} */`) // field description
             console.log(`      ${format([key, value, required])}`) // field declaration
