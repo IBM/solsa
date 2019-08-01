@@ -200,3 +200,12 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+========================================================================
+Apache License 2.0
+========================================================================
+
+This product bundles a script to install kustomize which is based on
+code snippets from https://github.com/kubernetes-sigs/kustomize
+which are distributed under the Apache License, Version 2.0.
+For details see ./travis/install-kustomize.sh
