@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-/*
-wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json
-node dist/codegen.js < swagger.json > src/synthetic.ts
-*/
-
 import * as fs from 'fs'
 
 interface Definition {
-// [k: string]: any
+  // [k: string]: any
   description?: string,
   type?: string,
   properties?: { [k: string]: any },

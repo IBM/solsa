@@ -20,6 +20,7 @@ export * from './ibmcloud'
 export * from './ingress'
 export * from './knative'
 export * from './openwhisk'
-export * from './transform'
 export * from './synthetic'
+export * from './transform'
+
 export { safeLoad as parseYaml } from 'js-yaml'

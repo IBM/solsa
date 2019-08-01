@@ -15,7 +15,7 @@
  */
 
 export type dynamic = { [k: string]: any }
-export type dictionary = { [ k: string ]: string }
+export type dictionary = { [k: string]: string }
 
 function valueWrapForEnv (val: any) {
   if (val == null) return { value: null }
@@ -31,9 +31,4 @@ export function enumerate (env: dynamic) {
 
 export function either<T> (x: T | undefined, y: T) {
   return x !== undefined ? x : y
-}
-
-export function validate<T> (x: T | undefined) {
-  if (x !== undefined) return x
-  throw new Error()
 }

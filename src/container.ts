@@ -23,7 +23,7 @@ export class ContainerizedService extends Bundle {
   image: string
   env: dynamic
   port?: number
-  ports: {name: string, port: number}[]
+  ports: { name: string, port: number }[]
   replicas: number
   labels: dictionary
   annotations?: dictionary
@@ -38,7 +38,7 @@ export class ContainerizedService extends Bundle {
   set readinessProbe (val) { this.solsa._readinessProbe = val }
 
   constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }:
-    { name: string, image: string, env?: dynamic, port?: number, ports?: {name: string, port: number}[], replicas?: number, labels?: dictionary, annotations?: dictionary, build?: string, main?: string, livenessProbe?: any, readinessProbe?: any, pv?: any }) {
+    { name: string, image: string, env?: dynamic, port?: number, ports?: { name: string, port: number }[], replicas?: number, labels?: dictionary, annotations?: dictionary, build?: string, main?: string, livenessProbe?: any, readinessProbe?: any, pv?: any }) {
     super()
     this.name = name
     this.image = image
