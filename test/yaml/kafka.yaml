@@ -14,6 +14,28 @@ spec:
   serviceName: kafka
 ---
 apiVersion: ibmcloud.ibm.com/v1alpha1
+kind: Composable
+metadata:
+  name: kafka-kbsf
+spec:
+  template:
+    apiVersion: v1
+    data:
+      kafka_brokers_sasl_flat:
+        getValueFrom:
+          format-transformers:
+          - Base64ToString
+          - JsonToObject
+          - ArrayToCSString
+          - StringToBase64
+          kind: Secret
+          name: kafka
+          path: '{.data.kafka_brokers_sasl}'
+    kind: Secret
+    metadata:
+      name: kafka-kbsf
+---
+apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Topic
 metadata:
   name: topic

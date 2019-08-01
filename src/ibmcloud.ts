@@ -156,12 +156,61 @@ export class CloudService extends Bundle {
   }
 }
 
+class EventStreamsSecret extends Bundle {
+  name: String
+
+  constructor (name: string) {
+    super()
+    this.name = name
+  }
+
+  getResources () {
+    const obj = {
+      apiVersion: 'ibmcloud.ibm.com/v1alpha1',
+      kind: 'Composable',
+      metadata: {
+        name: `${this.name}-kbsf`
+      },
+      spec: {
+        template: {
+          apiVersion: 'v1',
+          kind: 'Secret',
+          metadata: {
+            name: `${this.name}-kbsf`
+          },
+          data: {
+            kafka_brokers_sasl_flat: {
+              getValueFrom: {
+                kind: 'Secret',
+                name: this.name,
+                path: `{.data.kafka_brokers_sasl}`,
+                'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString', 'StringToBase64']
+              }
+            }
+          }
+        }
+      }
+    }
+    return [{ obj }]
+  }
+}
+
 export class EventStreams extends CloudService {
   topics = new Bundle()
   topicCounter = 0
+  secret: EventStreamsSecret
 
   constructor ({ name, plan = 'standard', serviceClassType }: { name: string, plan?: string, serviceClassType?: string }) {
     super({ name, plan, serviceClass: 'messagehub', serviceClassType })
+    this.secret = new EventStreamsSecret(this.binding.name)
+  }
+
+  getSecret (key: string) {
+    if (key === 'kafka_brokers_sasl_flat') {
+      return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key } } }
+    } else {
+      return super.getSecret(key)
+    }
   }
 
   get Topic () {

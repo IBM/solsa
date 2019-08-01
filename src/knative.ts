@@ -16,7 +16,6 @@
 
 import { Bundle } from './bundle'
 import { dynamic, enumerate } from './helpers'
-import { Ingress } from './ingress'
 
 export class KnativeService extends Bundle {
   name: string
