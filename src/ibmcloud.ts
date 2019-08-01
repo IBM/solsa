@@ -56,7 +56,7 @@ export namespace ibmcloud {
           serviceClassType: this.serviceClassType
         }
       }
-      return [{ obj, name: this.name + '-service-ibmcloud.yaml' }]
+      return [{ obj }]
     }
   }
 
@@ -85,7 +85,7 @@ export namespace ibmcloud {
           serviceName: this.serviceName
         }
       }
-      return [{ obj, name: this.name + '-binding-ibmcloud.yaml' }]
+      return [{ obj }]
     }
   }
 
@@ -136,7 +136,7 @@ export namespace ibmcloud {
           topicName: this.topicName
         }
       }
-      return [{ obj, name: this.name + '-topic-ibmcloud.yaml' }]
+      return [{ obj }]
     }
   }
 }

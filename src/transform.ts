@@ -68,7 +68,7 @@ export class SchemaTransformer extends Bundle {
         }
       }
     }
-    resources.push({ obj: job, name: this.name + '-stjob.yaml' })
+    resources.push({ obj: job })
 
     const serviceAccount = {
       apiVersion: 'v1',
@@ -77,7 +77,7 @@ export class SchemaTransformer extends Bundle {
         name: this.name + '-sa'
       }
     }
-    resources.push({ obj: serviceAccount, name: this.name + '-stjob-sa.yaml' })
+    resources.push({ obj: serviceAccount })
 
     const roleBinding = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -95,7 +95,7 @@ export class SchemaTransformer extends Bundle {
         apiGroup: 'rbac.authorization.k8s.io'
       }
     }
-    resources.push({ obj: roleBinding, name: this.name + '-stjob-rb.yaml' })
+    resources.push({ obj: roleBinding })
 
     const role = {
       apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -109,7 +109,7 @@ export class SchemaTransformer extends Bundle {
         verbs: ['create', 'patch']
       }]
     }
-    resources.push({ obj: role, name: this.name + '-stjob-role.yaml' })
+    resources.push({ obj: role })
 
     // Optionally create stub secret or config map that will be dynamically patched by Job
     if (!this.useExistingOutput && (this.outputSecret || this.outputConfigMap)) {
@@ -120,7 +120,7 @@ export class SchemaTransformer extends Bundle {
           name: this.outputSecret || this.outputConfigMap
         }
       }
-      resources.push({ obj: stub, name: this.name + '-stub.yaml' })
+      resources.push({ obj: stub })
     }
 
     return resources

@@ -52,7 +52,7 @@ export namespace openwhisk {
           runtime: this.runtime
         }
       }
-      return [{ obj, name: this.name + '-function-openwhisk.yaml' }]
+      return [{ obj }]
     }
   }
 
@@ -83,7 +83,7 @@ export namespace openwhisk {
           to: this.to
         }
       }
-      return [{ obj, name: this.name + '-invocation-openwhisk.yaml' }]
+      return [{ obj }]
     }
   }
 }

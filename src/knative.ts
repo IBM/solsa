@@ -70,7 +70,7 @@ export class KnativeService extends Bundle {
         }
       }
     }
-    return [{ obj, name: this.name + '-service-knative.yaml' }]
+    return [{ obj }]
   }
 
   getImages () {
@@ -135,6 +135,6 @@ export class KafkaSource extends Bundle {
         }
       }
     }
-    return [{ obj, name: this.name + '-kafka-source.yaml' }]
+    return [{ obj }]
   }
 }

@@ -109,6 +109,6 @@ export class Resource extends Bundle {
   }
 
   getResources () {
-    return [{ obj: this.properties, name: (this.properties.name || this.properties.metadata.name) + '-resource.yaml' }]
+    return [{ obj: this.properties }]
   }
 }

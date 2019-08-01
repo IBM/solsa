@@ -68,7 +68,7 @@ export class Ingress extends Bundle {
             }]
           }
         }
-        resources.push({ obj: ing, name: `ingress-${this.name}.yaml`, layer })
+        resources.push({ obj: ing, layer })
         if (this.solsa._generateSecret) {
           const secret = {
             apiVersion: 'v1',
@@ -81,7 +81,7 @@ export class Ingress extends Bundle {
               url: Buffer.from(vhost).toString('base64')
             }
           }
-          resources.push({ obj: secret, name: `ingress-secret-${this.name}.yaml`, layer })
+          resources.push({ obj: secret, layer })
         }
       } else if (ingress.os) {
         const vhost = this.name + '.' + ingress.os.subdomain
@@ -90,7 +90,7 @@ export class Ingress extends Bundle {
             apiVersion: 'route.openshift.io/v1',
             kind: 'Route',
             metadata: {
-              name: this.name
+              name: `${this.name}-${idx}`
             },
             spec: {
               host: vhost,
@@ -109,7 +109,7 @@ export class Ingress extends Bundle {
               wildcardPolicy: 'None'
             }
           }
-          resources.push({ obj: route, name: `route-${this.name}-${idx}.yaml`, layer })
+          resources.push({ obj: route, layer })
         }
         if (this.generateSecret) {
           const secret = {
@@ -123,7 +123,7 @@ export class Ingress extends Bundle {
               url: Buffer.from(vhost).toString('base64')
             }
           }
-          resources.push({ obj: secret, name: `ingress-secret-${this.name}.yaml`, layer })
+          resources.push({ obj: secret, layer })
         }
       } else if (ingress.nodePort) {
         const nodePortPatch = [{ op: 'replace', path: '/spec/type', value: 'NodePort' }]
@@ -138,8 +138,7 @@ export class Ingress extends Bundle {
             version: 'v1',
             kind: 'Service',
             name: this.name
-          },
-          path: `expose-svc-${this.name}.yaml`
+          }
         }
         resources.push({ JSONPatch: nodePortPatch, JSONPatchTarget: nodePortPatchTarget, layer })
       } else if (ingress.istio) {
@@ -163,7 +162,7 @@ export class Ingress extends Bundle {
             }]
           }
         }
-        resources.push({ obj: gw, name: `gw-${this.name}.yaml`, layer })
+        resources.push({ obj: gw, layer })
         const vs = {
           apiVersion: 'networking.istio.io/v1alpha3',
           kind: 'VirtualService',
@@ -186,7 +185,7 @@ export class Ingress extends Bundle {
             */
           }
         }
-        resources.push({ obj: vs, name: `vs-${this.name}.yaml`, layer })
+        resources.push({ obj: vs, layer })
       }
     }
     return resources

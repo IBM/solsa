@@ -222,16 +222,17 @@ function yamlCommand () {
       return this.layers[layer]
     }
 
-    addResource (obj: any, fname: string, layer = 'base') {
-      this.getLayer(layer).resources[fname] = obj
+    addResource (obj: any, layer = 'base') {
+      this.getLayer(layer).resources[`${obj.apiVersion.replace(/[/\.]/g, '-')}-${obj.kind}-${obj.name || obj.metadata.name}.yaml`] = obj
     }
 
     addPatch (patch: any, fname: string, layer = 'base') {
       this.getLayer(layer).patches[fname] = { patch }
     }
 
-    addJSONPatch (patch: any, target: { path: string }, layer = 'base') {
-      this.getLayer(layer).patchesJSON[target.path] = { patch, target }
+    addJSONPatch (patch: any, target: any, layer = 'base') {
+      let path = `expose-svc-${target.target.name}.yaml`
+      this.getLayer(layer).patchesJSON[path] = { patch, target: Object.assign({ path }, target) }
     }
 
     finalizeImageRenames (context: any, app: Bundle) {
@@ -315,7 +316,7 @@ function yamlCommand () {
   const sa = new SolsaArchiver(outputRoot)
   for (let item of app.solsa.getResources({ config })) {
     if (item.obj) {
-      sa.addResource(item.obj, item.name, item.layer)
+      sa.addResource(item.obj, item.layer)
     } else if (item.JSONPatch) {
       sa.addJSONPatch(item.JSONPatch, item.JSONPatchTarget, item.layer)
     } else if (item.patch) {

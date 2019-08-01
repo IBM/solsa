@@ -98,7 +98,7 @@ export class ContainerizedService extends Bundle {
         }
       }
     }
-    const objs = [{ obj: deployment, name: this.name + '-deployment.yaml' }]
+    const objs = [{ obj: deployment }]
     if (this.annotations) {
       deployment.spec.template.metadata.annotations = this.annotations
     }
@@ -149,7 +149,7 @@ export class ContainerizedService extends Bundle {
           }
         }
       }
-      objs.push({ obj: pvc, name: `${this.name}-pvc.yaml` })
+      objs.push({ obj: pvc })
     }
 
     if (ports.length > 0) {
@@ -168,7 +168,7 @@ export class ContainerizedService extends Bundle {
       if (this.annotations) {
         svc.metadata.annotations = this.annotations
       }
-      objs.push({ obj: svc, name: this.name + '-svc.yaml' })
+      objs.push({ obj: svc })
     }
 
     return objs
