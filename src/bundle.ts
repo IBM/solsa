@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as merge from 'deepmerge'
 import { dynamic } from './helpers'
 
 /** @internal */

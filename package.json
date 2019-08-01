@@ -16,7 +16,6 @@
     "test": "standard && tslint -p . && mocha"
   },
   "dependencies": {
-    "deepmerge": "^3.2.1",
     "js-yaml": "^3.12.1",
     "minimist": "^1.2.0",
     "tmp": "^0.1.0"
