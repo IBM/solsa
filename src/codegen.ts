@@ -16,24 +16,32 @@
 
 /*
 wget https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json
-node codegen.js > ../src/synthetic.ts
+node dist/codegen.js < swagger.json > src/synthetic.ts
 */
 
-'use strict'
+import * as fs from 'fs'
 
-const definitions = require('./swagger.json').definitions
+interface Definition {
+// [k: string]: any
+  description?: string,
+  type?: string,
+  properties?: { [k: string]: any },
+  required?: string[],
+  'x-kubernetes-group-version-kind'?: { group: string, version: string, kind: string }[]
+}
+
+const definitions: { [k: string]: Definition } = JSON.parse(fs.readFileSync(0).toString()).definitions
 
 const ignored = ['x-kubernetes-int-or-string', 'x-kubernetes-embedded-resource', 'x-kubernetes-preserve-unknown-fields'] // JSONSchemaProps
 const misc = ['resource', 'intstr', 'runtime'] // regroup as 'misc'
-const gvk = 'x-kubernetes-group-version-kind' // kube resource tag
 
-const forwardMap = {} // key -> [group, version, kind]
-const reverseMap = {} // [group, version, kind] -> key
+const forwardMap: { [k: string]: [string, string, string] } = {} // key -> [group, version, kind]
+const reverseMap: { [k: string]: { [k: string]: { [k: string]: string } } } = {} // [group, version, kind] -> key
 
 // build maps
 for (let key of Object.keys(definitions)) {
   let words = key.split('.')
-  let group
+  let group = 'misc'
   if (key.startsWith('io.k8s.api.')) group = words[3]
   if (key.startsWith('io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.')) group = 'apiextensions'
   if (key.startsWith('io.k8s.apimachinery.')) group = 'apimachinery'
@@ -48,7 +56,7 @@ for (let key of Object.keys(definitions)) {
 }
 
 // return type of property value
-function typeOf (value) {
+function typeOf (value: any): string {
   if (value['$ref']) {
     return forwardMap[value['$ref'].substring(14)].join('.')
   }
@@ -66,16 +74,16 @@ function typeOf (value) {
 }
 
 // format a property declaration
-function format ([key, value, required]) {
+function format ([key, value, required]: [string, any, boolean]) {
   return `${key}${required ? '' : '?'}: ${typeOf(value)}`
 }
 
 // build array of resource properties
-function propertiesOf (resource, kind) {
+function propertiesOf (resource: Definition): [string, any, boolean][] {
   if (!resource.properties) return [] // object with no properties
   let properties = Object.assign({}, resource.properties)
   let required = resource.required || []
-  if (resource[gvk]) { // omit apiVersion, kind, and status field in kube resource
+  if (resource['x-kubernetes-group-version-kind']) { // omit apiVersion, kind, and status field in kube resource
     delete properties.apiVersion
     delete properties.kind
     delete properties.status
@@ -124,24 +132,24 @@ for (let [group, g] of Object.entries(reverseMap)) {
       // console.log(`    // ${key}`)
       if (resource.description) { // resource description
         console.log(`    /**`)
-        resource.description.split('\n').map(line => console.log(`     *${line === '' ? '' : ' ' + line}`))
+        resource.description.split('\n').map(line => console.log(`     *${line ? ' ' + line : ''}`))
         console.log(`     */`)
       }
-      let properties = propertiesOf(resource, kind)
+      let properties = propertiesOf(resource)
       if (key === 'io.k8s.apimachinery.pkg.util.intstr.IntOrString') { // special case
         console.log(`    export type IntOrString = number | string`) // export special type declaration
       } else if (resource.type !== 'object') { // type alias
         console.log(`    export type ${kind} = ${resource.type || 'any'}`) // export simple type declaration
       } else {
-        if (resource[gvk]) { // kube resource, synthesize class
-          let apiVersion = resource[gvk][0].group ? resource[gvk][0].group + '/' + version : version
+        if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class
+          let apiVersion = resource['x-kubernetes-group-version-kind'][0].group ? resource['x-kubernetes-group-version-kind'][0].group + '/' + version : version
           console.log(`    export class ${kind} extends Core implements I${kind} {`) // declare class
           for (let [key, value, required] of properties) { // field declarations
             console.log(`      ${format([key, value, required])}`) // field declaration
           }
           if (resource.description) { // repeat resource description on constructor
             console.log(`      /**`)
-            resource.description.split('\n').map(line => console.log(`       *${line === '' ? '' : ' ' + line}`))
+            resource.description.split('\n').map(line => console.log(`       *${line ? ' ' + line : ''}`))
             console.log(`       */`)
           }
           console.log(`      constructor (properties: I${kind}) {`) // constructor
@@ -151,7 +159,7 @@ for (let [group, g] of Object.entries(reverseMap)) {
           console.log(`    }`)
         }
         if (properties.length > 0) { // synthesize type
-          console.log(`    export interface ${resource[gvk] ? 'I' : ''}${kind} {`)
+          console.log(`    export interface ${resource['x-kubernetes-group-version-kind'] ? 'I' : ''}${kind} {`)
           for (let [key, value, required] of properties) { // field declarations
             if (value.description) console.log(`      /** ${value.description.replace(/\*\//g, '*\\')} */`) // field description
             console.log(`      ${format([key, value, required])}`) // field declaration
