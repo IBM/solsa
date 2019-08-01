@@ -73,7 +73,9 @@ On each cluster:
 
 3. Install the Event Streams Topic operator from https://github.ibm.com/seed/event-streams-topic.
 
-4. Optionally install Knative. For IKS, follow the instructions at
+4. Optionally install the IBM Cloud Functions Operator from https://github.com/IBM/cloud-functions-operator.
+
+5. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
 
 ### Additional Setup for OpenShift
