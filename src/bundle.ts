@@ -27,16 +27,7 @@ export class Solsa {
   }
 
   getResources (...args: any[]) {
-    if (this.skip) return []
-    const objs = this.bundle.getResources(...args)
-    if (Array.isArray(this.patches)) {
-      for (let i = 0; i < objs.length; i++) {
-        if (this.patches[i]) objs[i].obj = merge(objs[i].obj, this.patches[i])
-      }
-    } else if (this.patches) {
-      objs[0].obj = merge(objs[0].obj, this.patches)
-    }
-    return objs
+    return this.skip ? [] : this.bundle.getResources(...args)
   }
 
   getImages () {
