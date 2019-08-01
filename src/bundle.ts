@@ -51,10 +51,10 @@ export class Bundle {
   [k: string]: any
   /** @internal */
   /** Internal state of the bundle */
-  solsa = new Solsa(this)
+  _solsa = new Solsa(this)
 
   constructor () {
-    Object.defineProperty(this, 'solsa', { enumerable: false })
+    Object.defineProperty(this, '_solsa', { enumerable: false })
   }
 
   /**
@@ -63,7 +63,7 @@ export class Bundle {
    * This call mutates the receiver and returns it.
    */
   useExisting () {
-    this.solsa.skip = true
+    this._solsa.skip = true
     return this
   }
 
@@ -74,7 +74,7 @@ export class Bundle {
     const resources = []
     for (let value of Object.values(this)) {
       if (value instanceof Bundle) {
-        resources.push(...value.solsa.getResources(...args))
+        resources.push(...value._solsa.getResources(...args))
       }
     }
     return resources
@@ -87,7 +87,7 @@ export class Bundle {
     const images = []
     for (let value of Object.values(this)) {
       if (value instanceof Bundle) {
-        images.push(...value.solsa.getImages())
+        images.push(...value._solsa.getImages())
       }
     }
     return images

@@ -237,7 +237,7 @@ function yamlCommand () {
 
     finalizeImageRenames (context: any, app: Bundle) {
       const images: any[] = []
-      for (let name of app.solsa.getImages().map(image => image.name)) {
+      for (let name of app._solsa.getImages().map(image => image.name)) {
         const pos = name.indexOf(':', name.indexOf('/'))
         let newName = pos === -1 ? name : name.substring(0, pos)
         let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -314,7 +314,7 @@ function yamlCommand () {
   const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
   const sa = new SolsaArchiver(outputRoot)
-  for (let item of app.solsa.getResources({ config })) {
+  for (let item of app._solsa.getResources({ config })) {
     if (item.obj) {
       sa.addResource(item.obj, item.layer)
     } else if (item.JSONPatch) {
@@ -377,7 +377,7 @@ function buildCommand () {
     dir.removeCallback()
   }
 
-  const images = loadApp().solsa.getImages()
+  const images = loadApp()._solsa.getImages()
 
   images.forEach(build)
   // new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name))) TODO
@@ -401,7 +401,7 @@ function pushCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
-  const images = loadApp().solsa.getImages()
+  const images = loadApp()._solsa.getImages()
 
   const config = loadConfig(true)
   const context = config.clusters.find(({ name }: any) => name === config.targetCluster)

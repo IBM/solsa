@@ -18,7 +18,7 @@ import * as solsa from '..'
 let resource = new solsa.Resource({ apiVersion: 'v1', kind: 'ThisKind', metadata: { name: 'test' } })
 export = resource
 
-resource.solsa.patches = {
+resource._solsa.patches = {
   kind: 'ThatKind',
   spec: {
     random: 'data'

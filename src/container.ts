@@ -31,11 +31,11 @@ export class ContainerizedService extends Bundle {
   main?: string
   pv?: any   // FIXME: Define a more precise type here (complex record).
 
-  get livenessProbe () { return either(this.solsa._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
-  set livenessProbe (val) { this.solsa._livenessProbe = val }
+  get livenessProbe () { return either(this._solsa._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
+  set livenessProbe (val) { this._solsa._livenessProbe = val }
 
-  get readinessProbe () { return either(this.solsa._readinessProbe, this.livenessProbe) }
-  set readinessProbe (val) { this.solsa._readinessProbe = val }
+  get readinessProbe () { return either(this._solsa._readinessProbe, this.livenessProbe) }
+  set readinessProbe (val) { this._solsa._readinessProbe = val }
 
   constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }:
     { name: string, image: string, env?: dynamic, port?: number, ports?: { name: string, port: number }[], replicas?: number, labels?: dictionary, annotations?: dictionary, build?: string, main?: string, livenessProbe?: any, readinessProbe?: any, pv?: any }) {
@@ -59,8 +59,8 @@ export class ContainerizedService extends Bundle {
     const that = this
 
     return class extends Ingress {
-      get port () { return either(this.solsa._port, that.port) }
-      set port (val) { this.solsa._port = val }
+      get port () { return either(this._solsa._port, that.port) }
+      set port (val) { this._solsa._port = val }
 
       constructor ({ name = that.name, port, endpoints }: { name?: string, port?: number, endpoints?: { paths: string[], port: number }[] } = {}) {
         super({ name, port, endpoints })

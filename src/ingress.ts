@@ -21,18 +21,18 @@ export class Ingress extends Bundle {
   name: string
   port?: number
 
-  get endpoints (): { paths: string[], port: number }[] { return either(this.solsa._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
-  set endpoints (val) { this.solsa._endpoints = val }
+  get endpoints (): { paths: string[], port: number }[] { return either(this._solsa._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
+  set endpoints (val) { this._solsa._endpoints = val }
 
   constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number }[] }) {
     super()
     this.name = name
     this.port = port
-    this.solsa._endpoints = endpoints
+    this._solsa._endpoints = endpoints
   }
 
   getSecret () {
-    this.solsa._generateSecret = true
+    this._solsa._generateSecret = true
     return { valueFrom: { secretKeyRef: { name: `${this.name}-ingress`, key: 'url' } } }
   }
 
@@ -69,7 +69,7 @@ export class Ingress extends Bundle {
           }
         }
         resources.push({ obj: ing, layer })
-        if (this.solsa._generateSecret) {
+        if (this._solsa._generateSecret) {
           const secret = {
             apiVersion: 'v1',
             kind: 'Secret',
