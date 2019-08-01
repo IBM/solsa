@@ -16,7 +16,7 @@
 
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format */
 
-import { Core } from './core'
+import { Resource } from './bundle'
 
 export type integer = number
 
@@ -94,14 +94,14 @@ Defaults to "Never". */
     /**
      * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
      */
-    export class MutatingWebhookConfiguration extends Core implements IMutatingWebhookConfiguration {
+    export class MutatingWebhookConfiguration extends Resource implements IMutatingWebhookConfiguration {
       metadata: apimachinery.v1.ObjectMeta
       webhooks?: admissionregistration.v1.MutatingWebhook[]
       /**
        * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
        */
       constructor (properties: IMutatingWebhookConfiguration) {
-        super('admissionregistration.k8s.io/v1', 'MutatingWebhookConfiguration')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'MutatingWebhookConfiguration' })
         this.metadata = properties.metadata
         this.webhooks = properties.webhooks
       }
@@ -115,14 +115,14 @@ Defaults to "Never". */
     /**
      * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
      */
-    export class MutatingWebhookConfigurationList extends Core implements IMutatingWebhookConfigurationList {
+    export class MutatingWebhookConfigurationList extends Resource implements IMutatingWebhookConfigurationList {
       items: admissionregistration.v1.MutatingWebhookConfiguration[]
       metadata: apimachinery.v1.ListMeta
       /**
        * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
        */
       constructor (properties: IMutatingWebhookConfigurationList) {
-        super('admissionregistration.k8s.io/v1', 'MutatingWebhookConfigurationList')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'MutatingWebhookConfigurationList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -231,14 +231,14 @@ Default to the empty LabelSelector, which matches everything. */
     /**
      * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
      */
-    export class ValidatingWebhookConfiguration extends Core implements IValidatingWebhookConfiguration {
+    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
       metadata: apimachinery.v1.ObjectMeta
       webhooks?: admissionregistration.v1.ValidatingWebhook[]
       /**
        * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
        */
       constructor (properties: IValidatingWebhookConfiguration) {
-        super('admissionregistration.k8s.io/v1', 'ValidatingWebhookConfiguration')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'ValidatingWebhookConfiguration' })
         this.metadata = properties.metadata
         this.webhooks = properties.webhooks
       }
@@ -252,14 +252,14 @@ Default to the empty LabelSelector, which matches everything. */
     /**
      * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
      */
-    export class ValidatingWebhookConfigurationList extends Core implements IValidatingWebhookConfigurationList {
+    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
       items: admissionregistration.v1.ValidatingWebhookConfiguration[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
        */
       constructor (properties: IValidatingWebhookConfigurationList) {
-        super('admissionregistration.k8s.io/v1', 'ValidatingWebhookConfigurationList')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'ValidatingWebhookConfigurationList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -367,14 +367,14 @@ Defaults to "Never". */
     /**
      * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
      */
-    export class MutatingWebhookConfiguration extends Core implements IMutatingWebhookConfiguration {
+    export class MutatingWebhookConfiguration extends Resource implements IMutatingWebhookConfiguration {
       metadata: apimachinery.v1.ObjectMeta
       webhooks?: admissionregistration.v1beta1.MutatingWebhook[]
       /**
        * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
        */
       constructor (properties: IMutatingWebhookConfiguration) {
-        super('admissionregistration.k8s.io/v1beta1', 'MutatingWebhookConfiguration')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'MutatingWebhookConfiguration' })
         this.metadata = properties.metadata
         this.webhooks = properties.webhooks
       }
@@ -388,14 +388,14 @@ Defaults to "Never". */
     /**
      * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
      */
-    export class MutatingWebhookConfigurationList extends Core implements IMutatingWebhookConfigurationList {
+    export class MutatingWebhookConfigurationList extends Resource implements IMutatingWebhookConfigurationList {
       items: admissionregistration.v1beta1.MutatingWebhookConfiguration[]
       metadata: apimachinery.v1.ListMeta
       /**
        * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
        */
       constructor (properties: IMutatingWebhookConfigurationList) {
-        super('admissionregistration.k8s.io/v1beta1', 'MutatingWebhookConfigurationList')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'MutatingWebhookConfigurationList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -504,14 +504,14 @@ Default to the empty LabelSelector, which matches everything. */
     /**
      * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
      */
-    export class ValidatingWebhookConfiguration extends Core implements IValidatingWebhookConfiguration {
+    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
       metadata: apimachinery.v1.ObjectMeta
       webhooks?: admissionregistration.v1beta1.ValidatingWebhook[]
       /**
        * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
        */
       constructor (properties: IValidatingWebhookConfiguration) {
-        super('admissionregistration.k8s.io/v1beta1', 'ValidatingWebhookConfiguration')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfiguration' })
         this.metadata = properties.metadata
         this.webhooks = properties.webhooks
       }
@@ -525,14 +525,14 @@ Default to the empty LabelSelector, which matches everything. */
     /**
      * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
      */
-    export class ValidatingWebhookConfigurationList extends Core implements IValidatingWebhookConfigurationList {
+    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
       items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
        */
       constructor (properties: IValidatingWebhookConfigurationList) {
-        super('admissionregistration.k8s.io/v1beta1', 'ValidatingWebhookConfigurationList')
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfigurationList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -573,7 +573,7 @@ export namespace apps {
     /**
      * ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Core implements IControllerRevision {
+    export class ControllerRevision extends Resource implements IControllerRevision {
       data?: apimachinery.misc.RawExtension
       metadata: apimachinery.v1.ObjectMeta
       revision: integer
@@ -581,7 +581,7 @@ export namespace apps {
        * ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
       constructor (properties: IControllerRevision) {
-        super('apps/v1', 'ControllerRevision')
+        super({ apiVersion: 'apps/v1', kind: 'ControllerRevision' })
         this.data = properties.data
         this.metadata = properties.metadata
         this.revision = properties.revision
@@ -598,14 +598,14 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Core implements IControllerRevisionList {
+    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1.ControllerRevision[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
       constructor (properties: IControllerRevisionList) {
-        super('apps/v1', 'ControllerRevisionList')
+        super({ apiVersion: 'apps/v1', kind: 'ControllerRevisionList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -619,14 +619,14 @@ export namespace apps {
     /**
      * DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Core implements IDaemonSet {
+    export class DaemonSet extends Resource implements IDaemonSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1.DaemonSetSpec
       /**
        * DaemonSet represents the configuration of a daemon set.
        */
       constructor (properties: IDaemonSet) {
-        super('apps/v1', 'DaemonSet')
+        super({ apiVersion: 'apps/v1', kind: 'DaemonSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -655,14 +655,14 @@ export namespace apps {
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Core implements IDaemonSetList {
+    export class DaemonSetList extends Resource implements IDaemonSetList {
       items: apps.v1.DaemonSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
       constructor (properties: IDaemonSetList) {
-        super('apps/v1', 'DaemonSetList')
+        super({ apiVersion: 'apps/v1', kind: 'DaemonSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -725,14 +725,14 @@ export namespace apps {
     /**
      * Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Core implements IDeployment {
+    export class Deployment extends Resource implements IDeployment {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1.DeploymentSpec
       /**
        * Deployment enables declarative updates for Pods and ReplicaSets.
        */
       constructor (properties: IDeployment) {
-        super('apps/v1', 'Deployment')
+        super({ apiVersion: 'apps/v1', kind: 'Deployment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -763,14 +763,14 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Core implements IDeploymentList {
+    export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1.Deployment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
       constructor (properties: IDeploymentList) {
-        super('apps/v1', 'DeploymentList')
+        super({ apiVersion: 'apps/v1', kind: 'DeploymentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -835,14 +835,14 @@ export namespace apps {
     /**
      * ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Core implements IReplicaSet {
+    export class ReplicaSet extends Resource implements IReplicaSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1.ReplicaSetSpec
       /**
        * ReplicaSet ensures that a specified number of pod replicas are running at any given time.
        */
       constructor (properties: IReplicaSet) {
-        super('apps/v1', 'ReplicaSet')
+        super({ apiVersion: 'apps/v1', kind: 'ReplicaSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -871,14 +871,14 @@ export namespace apps {
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Core implements IReplicaSetList {
+    export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: apps.v1.ReplicaSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
       constructor (properties: IReplicaSetList) {
-        super('apps/v1', 'ReplicaSetList')
+        super({ apiVersion: 'apps/v1', kind: 'ReplicaSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -948,7 +948,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Core implements IStatefulSet {
+    export class StatefulSet extends Resource implements IStatefulSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1.StatefulSetSpec
       /**
@@ -958,7 +958,7 @@ export namespace apps {
        * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
        */
       constructor (properties: IStatefulSet) {
-        super('apps/v1', 'StatefulSet')
+        super({ apiVersion: 'apps/v1', kind: 'StatefulSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -986,14 +986,14 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Core implements IStatefulSetList {
+    export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1.StatefulSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
       constructor (properties: IStatefulSetList) {
-        super('apps/v1', 'StatefulSetList')
+        super({ apiVersion: 'apps/v1', kind: 'StatefulSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1060,7 +1060,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1beta2/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Core implements IControllerRevision {
+    export class ControllerRevision extends Resource implements IControllerRevision {
       data?: apimachinery.misc.RawExtension
       metadata: apimachinery.v1.ObjectMeta
       revision: integer
@@ -1068,7 +1068,7 @@ export namespace apps {
        * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1beta2/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
       constructor (properties: IControllerRevision) {
-        super('apps/v1beta1', 'ControllerRevision')
+        super({ apiVersion: 'apps/v1beta1', kind: 'ControllerRevision' })
         this.data = properties.data
         this.metadata = properties.metadata
         this.revision = properties.revision
@@ -1085,14 +1085,14 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Core implements IControllerRevisionList {
+    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1beta1.ControllerRevision[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
       constructor (properties: IControllerRevisionList) {
-        super('apps/v1beta1', 'ControllerRevisionList')
+        super({ apiVersion: 'apps/v1beta1', kind: 'ControllerRevisionList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1106,14 +1106,14 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Core implements IDeployment {
+    export class Deployment extends Resource implements IDeployment {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta1.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
        */
       constructor (properties: IDeployment) {
-        super('apps/v1beta1', 'Deployment')
+        super({ apiVersion: 'apps/v1beta1', kind: 'Deployment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1144,14 +1144,14 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Core implements IDeploymentList {
+    export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1beta1.Deployment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
       constructor (properties: IDeploymentList) {
-        super('apps/v1beta1', 'DeploymentList')
+        super({ apiVersion: 'apps/v1beta1', kind: 'DeploymentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1165,7 +1165,7 @@ export namespace apps {
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
      */
-    export class DeploymentRollback extends Core implements IDeploymentRollback {
+    export class DeploymentRollback extends Resource implements IDeploymentRollback {
       name: string
       rollbackTo: apps.v1beta1.RollbackConfig
       updatedAnnotations?: { [k: string]: string }
@@ -1173,7 +1173,7 @@ export namespace apps {
        * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
        */
       constructor (properties: IDeploymentRollback) {
-        super('apps/v1beta1', 'DeploymentRollback')
+        super({ apiVersion: 'apps/v1beta1', kind: 'DeploymentRollback' })
         this.name = properties.name
         this.rollbackTo = properties.rollbackTo
         this.updatedAnnotations = properties.updatedAnnotations
@@ -1266,14 +1266,14 @@ export namespace apps {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Core implements IScale {
+    export class Scale extends Resource implements IScale {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta1.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
        */
       constructor (properties: IScale) {
-        super('apps/v1beta1', 'Scale')
+        super({ apiVersion: 'apps/v1beta1', kind: 'Scale' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1308,7 +1308,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Core implements IStatefulSet {
+    export class StatefulSet extends Resource implements IStatefulSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta1.StatefulSetSpec
       /**
@@ -1318,7 +1318,7 @@ export namespace apps {
        * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
        */
       constructor (properties: IStatefulSet) {
-        super('apps/v1beta1', 'StatefulSet')
+        super({ apiVersion: 'apps/v1beta1', kind: 'StatefulSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1346,14 +1346,14 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Core implements IStatefulSetList {
+    export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1beta1.StatefulSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
       constructor (properties: IStatefulSetList) {
-        super('apps/v1beta1', 'StatefulSetList')
+        super({ apiVersion: 'apps/v1beta1', kind: 'StatefulSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1420,7 +1420,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Core implements IControllerRevision {
+    export class ControllerRevision extends Resource implements IControllerRevision {
       data?: apimachinery.misc.RawExtension
       metadata: apimachinery.v1.ObjectMeta
       revision: integer
@@ -1428,7 +1428,7 @@ export namespace apps {
        * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
       constructor (properties: IControllerRevision) {
-        super('apps/v1beta2', 'ControllerRevision')
+        super({ apiVersion: 'apps/v1beta2', kind: 'ControllerRevision' })
         this.data = properties.data
         this.metadata = properties.metadata
         this.revision = properties.revision
@@ -1445,14 +1445,14 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Core implements IControllerRevisionList {
+    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1beta2.ControllerRevision[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
       constructor (properties: IControllerRevisionList) {
-        super('apps/v1beta2', 'ControllerRevisionList')
+        super({ apiVersion: 'apps/v1beta2', kind: 'ControllerRevisionList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1466,14 +1466,14 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Core implements IDaemonSet {
+    export class DaemonSet extends Resource implements IDaemonSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta2.DaemonSetSpec
       /**
        * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
        */
       constructor (properties: IDaemonSet) {
-        super('apps/v1beta2', 'DaemonSet')
+        super({ apiVersion: 'apps/v1beta2', kind: 'DaemonSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1502,14 +1502,14 @@ export namespace apps {
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Core implements IDaemonSetList {
+    export class DaemonSetList extends Resource implements IDaemonSetList {
       items: apps.v1beta2.DaemonSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
       constructor (properties: IDaemonSetList) {
-        super('apps/v1beta2', 'DaemonSetList')
+        super({ apiVersion: 'apps/v1beta2', kind: 'DaemonSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1572,14 +1572,14 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Core implements IDeployment {
+    export class Deployment extends Resource implements IDeployment {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta2.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
        */
       constructor (properties: IDeployment) {
-        super('apps/v1beta2', 'Deployment')
+        super({ apiVersion: 'apps/v1beta2', kind: 'Deployment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1610,14 +1610,14 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Core implements IDeploymentList {
+    export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1beta2.Deployment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
       constructor (properties: IDeploymentList) {
-        super('apps/v1beta2', 'DeploymentList')
+        super({ apiVersion: 'apps/v1beta2', kind: 'DeploymentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1682,14 +1682,14 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Core implements IReplicaSet {
+    export class ReplicaSet extends Resource implements IReplicaSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta2.ReplicaSetSpec
       /**
        * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
        */
       constructor (properties: IReplicaSet) {
-        super('apps/v1beta2', 'ReplicaSet')
+        super({ apiVersion: 'apps/v1beta2', kind: 'ReplicaSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1718,14 +1718,14 @@ export namespace apps {
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Core implements IReplicaSetList {
+    export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: apps.v1beta2.ReplicaSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
       constructor (properties: IReplicaSetList) {
-        super('apps/v1beta2', 'ReplicaSetList')
+        super({ apiVersion: 'apps/v1beta2', kind: 'ReplicaSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1792,14 +1792,14 @@ export namespace apps {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Core implements IScale {
+    export class Scale extends Resource implements IScale {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta2.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
        */
       constructor (properties: IScale) {
-        super('apps/v1beta2', 'Scale')
+        super({ apiVersion: 'apps/v1beta2', kind: 'Scale' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1834,7 +1834,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Core implements IStatefulSet {
+    export class StatefulSet extends Resource implements IStatefulSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: apps.v1beta2.StatefulSetSpec
       /**
@@ -1844,7 +1844,7 @@ export namespace apps {
        * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
        */
       constructor (properties: IStatefulSet) {
-        super('apps/v1beta2', 'StatefulSet')
+        super({ apiVersion: 'apps/v1beta2', kind: 'StatefulSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1872,14 +1872,14 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Core implements IStatefulSetList {
+    export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1beta2.StatefulSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
       constructor (properties: IStatefulSetList) {
-        super('apps/v1beta2', 'StatefulSetList')
+        super({ apiVersion: 'apps/v1beta2', kind: 'StatefulSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -1948,14 +1948,14 @@ export namespace auditregistration {
     /**
      * AuditSink represents a cluster level audit sink
      */
-    export class AuditSink extends Core implements IAuditSink {
+    export class AuditSink extends Resource implements IAuditSink {
       metadata: apimachinery.v1.ObjectMeta
       spec: auditregistration.v1alpha1.AuditSinkSpec
       /**
        * AuditSink represents a cluster level audit sink
        */
       constructor (properties: IAuditSink) {
-        super('auditregistration.k8s.io/v1alpha1', 'AuditSink')
+        super({ apiVersion: 'auditregistration.k8s.io/v1alpha1', kind: 'AuditSink' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -1968,14 +1968,14 @@ export namespace auditregistration {
     /**
      * AuditSinkList is a list of AuditSink items.
      */
-    export class AuditSinkList extends Core implements IAuditSinkList {
+    export class AuditSinkList extends Resource implements IAuditSinkList {
       items: auditregistration.v1alpha1.AuditSink[]
       metadata: apimachinery.v1.ListMeta
       /**
        * AuditSinkList is a list of AuditSink items.
        */
       constructor (properties: IAuditSinkList) {
-        super('auditregistration.k8s.io/v1alpha1', 'AuditSinkList')
+        super({ apiVersion: 'auditregistration.k8s.io/v1alpha1', kind: 'AuditSinkList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -2077,14 +2077,14 @@ export namespace authentication {
     /**
      * TokenRequest requests a token for a given service account.
      */
-    export class TokenRequest extends Core implements ITokenRequest {
+    export class TokenRequest extends Resource implements ITokenRequest {
       metadata: apimachinery.v1.ObjectMeta
       spec: authentication.v1.TokenRequestSpec
       /**
        * TokenRequest requests a token for a given service account.
        */
       constructor (properties: ITokenRequest) {
-        super('authentication.k8s.io/v1', 'TokenRequest')
+        super({ apiVersion: 'authentication.k8s.io/v1', kind: 'TokenRequest' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2116,14 +2116,14 @@ export namespace authentication {
     /**
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
-    export class TokenReview extends Core implements ITokenReview {
+    export class TokenReview extends Resource implements ITokenReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authentication.v1.TokenReviewSpec
       /**
        * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
        */
       constructor (properties: ITokenReview) {
-        super('authentication.k8s.io/v1', 'TokenReview')
+        super({ apiVersion: 'authentication.k8s.io/v1', kind: 'TokenReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2173,14 +2173,14 @@ export namespace authentication {
     /**
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
-    export class TokenReview extends Core implements ITokenReview {
+    export class TokenReview extends Resource implements ITokenReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authentication.v1beta1.TokenReviewSpec
       /**
        * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
        */
       constructor (properties: ITokenReview) {
-        super('authentication.k8s.io/v1beta1', 'TokenReview')
+        super({ apiVersion: 'authentication.k8s.io/v1beta1', kind: 'TokenReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2232,14 +2232,14 @@ export namespace authorization {
     /**
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
-    export class LocalSubjectAccessReview extends Core implements ILocalSubjectAccessReview {
+    export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
        * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
        */
       constructor (properties: ILocalSubjectAccessReview) {
-        super('authorization.k8s.io/v1', 'LocalSubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1', kind: 'LocalSubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2303,14 +2303,14 @@ export namespace authorization {
     /**
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
-    export class SelfSubjectAccessReview extends Core implements ISelfSubjectAccessReview {
+    export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectAccessReviewSpec
       /**
        * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
        */
       constructor (properties: ISelfSubjectAccessReview) {
-        super('authorization.k8s.io/v1', 'SelfSubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1', kind: 'SelfSubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2332,14 +2332,14 @@ export namespace authorization {
     /**
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
-    export class SelfSubjectRulesReview extends Core implements ISelfSubjectRulesReview {
+    export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectRulesReviewSpec
       /**
        * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
        */
       constructor (properties: ISelfSubjectRulesReview) {
-        super('authorization.k8s.io/v1', 'SelfSubjectRulesReview')
+        super({ apiVersion: 'authorization.k8s.io/v1', kind: 'SelfSubjectRulesReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2356,14 +2356,14 @@ export namespace authorization {
     /**
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
-    export class SubjectAccessReview extends Core implements ISubjectAccessReview {
+    export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
        * SubjectAccessReview checks whether or not a user or group can perform an action.
        */
       constructor (properties: ISubjectAccessReview) {
-        super('authorization.k8s.io/v1', 'SubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1', kind: 'SubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2421,14 +2421,14 @@ export namespace authorization {
     /**
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
-    export class LocalSubjectAccessReview extends Core implements ILocalSubjectAccessReview {
+    export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
        * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
        */
       constructor (properties: ILocalSubjectAccessReview) {
-        super('authorization.k8s.io/v1beta1', 'LocalSubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1beta1', kind: 'LocalSubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2492,14 +2492,14 @@ export namespace authorization {
     /**
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
-    export class SelfSubjectAccessReview extends Core implements ISelfSubjectAccessReview {
+    export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectAccessReviewSpec
       /**
        * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
        */
       constructor (properties: ISelfSubjectAccessReview) {
-        super('authorization.k8s.io/v1beta1', 'SelfSubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1beta1', kind: 'SelfSubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2521,14 +2521,14 @@ export namespace authorization {
     /**
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
-    export class SelfSubjectRulesReview extends Core implements ISelfSubjectRulesReview {
+    export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectRulesReviewSpec
       /**
        * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
        */
       constructor (properties: ISelfSubjectRulesReview) {
-        super('authorization.k8s.io/v1beta1', 'SelfSubjectRulesReview')
+        super({ apiVersion: 'authorization.k8s.io/v1beta1', kind: 'SelfSubjectRulesReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2545,14 +2545,14 @@ export namespace authorization {
     /**
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
-    export class SubjectAccessReview extends Core implements ISubjectAccessReview {
+    export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
       metadata: apimachinery.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
        * SubjectAccessReview checks whether or not a user or group can perform an action.
        */
       constructor (properties: ISubjectAccessReview) {
-        super('authorization.k8s.io/v1beta1', 'SubjectAccessReview')
+        super({ apiVersion: 'authorization.k8s.io/v1beta1', kind: 'SubjectAccessReview' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2623,14 +2623,14 @@ export namespace autoscaling {
     /**
      * configuration of a horizontal pod autoscaler.
      */
-    export class HorizontalPodAutoscaler extends Core implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
       metadata: apimachinery.v1.ObjectMeta
       spec: autoscaling.v1.HorizontalPodAutoscalerSpec
       /**
        * configuration of a horizontal pod autoscaler.
        */
       constructor (properties: IHorizontalPodAutoscaler) {
-        super('autoscaling/v1', 'HorizontalPodAutoscaler')
+        super({ apiVersion: 'autoscaling/v1', kind: 'HorizontalPodAutoscaler' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2644,14 +2644,14 @@ export namespace autoscaling {
     /**
      * list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Core implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v1.HorizontalPodAutoscaler[]
       metadata: apimachinery.v1.ListMeta
       /**
        * list of horizontal pod autoscaler objects.
        */
       constructor (properties: IHorizontalPodAutoscalerList) {
-        super('autoscaling/v1', 'HorizontalPodAutoscalerList')
+        super({ apiVersion: 'autoscaling/v1', kind: 'HorizontalPodAutoscalerList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -2693,14 +2693,14 @@ export namespace autoscaling {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Core implements IScale {
+    export class Scale extends Resource implements IScale {
       metadata: apimachinery.v1.ObjectMeta
       spec: autoscaling.v1.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
        */
       constructor (properties: IScale) {
-        super('autoscaling/v1', 'Scale')
+        super({ apiVersion: 'autoscaling/v1', kind: 'Scale' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2769,14 +2769,14 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
-    export class HorizontalPodAutoscaler extends Core implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
       metadata: apimachinery.v1.ObjectMeta
       spec: autoscaling.v2beta1.HorizontalPodAutoscalerSpec
       /**
        * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
        */
       constructor (properties: IHorizontalPodAutoscaler) {
-        super('autoscaling/v2beta1', 'HorizontalPodAutoscaler')
+        super({ apiVersion: 'autoscaling/v2beta1', kind: 'HorizontalPodAutoscaler' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -2805,14 +2805,14 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is a list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Core implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta1.HorizontalPodAutoscaler[]
       metadata: apimachinery.v1.ListMeta
       /**
        * HorizontalPodAutoscaler is a list of horizontal pod autoscaler objects.
        */
       constructor (properties: IHorizontalPodAutoscalerList) {
-        super('autoscaling/v2beta1', 'HorizontalPodAutoscalerList')
+        super({ apiVersion: 'autoscaling/v2beta1', kind: 'HorizontalPodAutoscalerList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -2991,14 +2991,14 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
-    export class HorizontalPodAutoscaler extends Core implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
       metadata: apimachinery.v1.ObjectMeta
       spec: autoscaling.v2beta2.HorizontalPodAutoscalerSpec
       /**
        * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
        */
       constructor (properties: IHorizontalPodAutoscaler) {
-        super('autoscaling/v2beta2', 'HorizontalPodAutoscaler')
+        super({ apiVersion: 'autoscaling/v2beta2', kind: 'HorizontalPodAutoscaler' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3027,14 +3027,14 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscalerList is a list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Core implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta2.HorizontalPodAutoscaler[]
       metadata: apimachinery.v1.ListMeta
       /**
        * HorizontalPodAutoscalerList is a list of horizontal pod autoscaler objects.
        */
       constructor (properties: IHorizontalPodAutoscalerList) {
-        super('autoscaling/v2beta2', 'HorizontalPodAutoscalerList')
+        super({ apiVersion: 'autoscaling/v2beta2', kind: 'HorizontalPodAutoscalerList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3201,14 +3201,14 @@ export namespace batch {
     /**
      * Job represents the configuration of a single job.
      */
-    export class Job extends Core implements IJob {
+    export class Job extends Resource implements IJob {
       metadata: apimachinery.v1.ObjectMeta
       spec: batch.v1.JobSpec
       /**
        * Job represents the configuration of a single job.
        */
       constructor (properties: IJob) {
-        super('batch/v1', 'Job')
+        super({ apiVersion: 'batch/v1', kind: 'Job' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3239,14 +3239,14 @@ export namespace batch {
     /**
      * JobList is a collection of jobs.
      */
-    export class JobList extends Core implements IJobList {
+    export class JobList extends Resource implements IJobList {
       items: batch.v1.Job[]
       metadata: apimachinery.v1.ListMeta
       /**
        * JobList is a collection of jobs.
        */
       constructor (properties: IJobList) {
-        super('batch/v1', 'JobList')
+        super({ apiVersion: 'batch/v1', kind: 'JobList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3300,14 +3300,14 @@ export namespace batch {
     /**
      * CronJob represents the configuration of a single cron job.
      */
-    export class CronJob extends Core implements ICronJob {
+    export class CronJob extends Resource implements ICronJob {
       metadata: apimachinery.v1.ObjectMeta
       spec: batch.v1beta1.CronJobSpec
       /**
        * CronJob represents the configuration of a single cron job.
        */
       constructor (properties: ICronJob) {
-        super('batch/v1beta1', 'CronJob')
+        super({ apiVersion: 'batch/v1beta1', kind: 'CronJob' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3321,14 +3321,14 @@ export namespace batch {
     /**
      * CronJobList is a collection of cron jobs.
      */
-    export class CronJobList extends Core implements ICronJobList {
+    export class CronJobList extends Resource implements ICronJobList {
       items: batch.v1beta1.CronJob[]
       metadata: apimachinery.v1.ListMeta
       /**
        * CronJobList is a collection of cron jobs.
        */
       constructor (properties: ICronJobList) {
-        super('batch/v1beta1', 'CronJobList')
+        super({ apiVersion: 'batch/v1beta1', kind: 'CronJobList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3381,14 +3381,14 @@ export namespace batch {
     /**
      * CronJob represents the configuration of a single cron job.
      */
-    export class CronJob extends Core implements ICronJob {
+    export class CronJob extends Resource implements ICronJob {
       metadata: apimachinery.v1.ObjectMeta
       spec: batch.v2alpha1.CronJobSpec
       /**
        * CronJob represents the configuration of a single cron job.
        */
       constructor (properties: ICronJob) {
-        super('batch/v2alpha1', 'CronJob')
+        super({ apiVersion: 'batch/v2alpha1', kind: 'CronJob' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3402,14 +3402,14 @@ export namespace batch {
     /**
      * CronJobList is a collection of cron jobs.
      */
-    export class CronJobList extends Core implements ICronJobList {
+    export class CronJobList extends Resource implements ICronJobList {
       items: batch.v2alpha1.CronJob[]
       metadata: apimachinery.v1.ListMeta
       /**
        * CronJobList is a collection of cron jobs.
        */
       constructor (properties: ICronJobList) {
-        super('batch/v2alpha1', 'CronJobList')
+        super({ apiVersion: 'batch/v2alpha1', kind: 'CronJobList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3464,14 +3464,14 @@ export namespace certificates {
     /**
      * Describes a certificate signing request
      */
-    export class CertificateSigningRequest extends Core implements ICertificateSigningRequest {
+    export class CertificateSigningRequest extends Resource implements ICertificateSigningRequest {
       metadata: apimachinery.v1.ObjectMeta
       spec: certificates.v1beta1.CertificateSigningRequestSpec
       /**
        * Describes a certificate signing request
        */
       constructor (properties: ICertificateSigningRequest) {
-        super('certificates.k8s.io/v1beta1', 'CertificateSigningRequest')
+        super({ apiVersion: 'certificates.k8s.io/v1beta1', kind: 'CertificateSigningRequest' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3491,11 +3491,11 @@ export namespace certificates {
       /** request approval state, currently Approved or Denied. */
       type: string
     }
-    export class CertificateSigningRequestList extends Core implements ICertificateSigningRequestList {
+    export class CertificateSigningRequestList extends Resource implements ICertificateSigningRequestList {
       items: certificates.v1beta1.CertificateSigningRequest[]
       metadata: apimachinery.v1.ListMeta
       constructor (properties: ICertificateSigningRequestList) {
-        super('certificates.k8s.io/v1beta1', 'CertificateSigningRequestList')
+        super({ apiVersion: 'certificates.k8s.io/v1beta1', kind: 'CertificateSigningRequestList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3535,14 +3535,14 @@ export namespace coordination {
     /**
      * Lease defines a lease concept.
      */
-    export class Lease extends Core implements ILease {
+    export class Lease extends Resource implements ILease {
       metadata: apimachinery.v1.ObjectMeta
       spec: coordination.v1.LeaseSpec
       /**
        * Lease defines a lease concept.
        */
       constructor (properties: ILease) {
-        super('coordination.k8s.io/v1', 'Lease')
+        super({ apiVersion: 'coordination.k8s.io/v1', kind: 'Lease' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3556,14 +3556,14 @@ export namespace coordination {
     /**
      * LeaseList is a list of Lease objects.
      */
-    export class LeaseList extends Core implements ILeaseList {
+    export class LeaseList extends Resource implements ILeaseList {
       items: coordination.v1.Lease[]
       metadata: apimachinery.v1.ListMeta
       /**
        * LeaseList is a list of Lease objects.
        */
       constructor (properties: ILeaseList) {
-        super('coordination.k8s.io/v1', 'LeaseList')
+        super({ apiVersion: 'coordination.k8s.io/v1', kind: 'LeaseList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3594,14 +3594,14 @@ export namespace coordination {
     /**
      * Lease defines a lease concept.
      */
-    export class Lease extends Core implements ILease {
+    export class Lease extends Resource implements ILease {
       metadata: apimachinery.v1.ObjectMeta
       spec: coordination.v1beta1.LeaseSpec
       /**
        * Lease defines a lease concept.
        */
       constructor (properties: ILease) {
-        super('coordination.k8s.io/v1beta1', 'Lease')
+        super({ apiVersion: 'coordination.k8s.io/v1beta1', kind: 'Lease' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -3615,14 +3615,14 @@ export namespace coordination {
     /**
      * LeaseList is a list of Lease objects.
      */
-    export class LeaseList extends Core implements ILeaseList {
+    export class LeaseList extends Resource implements ILeaseList {
       items: coordination.v1beta1.Lease[]
       metadata: apimachinery.v1.ListMeta
       /**
        * LeaseList is a list of Lease objects.
        */
       constructor (properties: ILeaseList) {
-        super('coordination.k8s.io/v1beta1', 'LeaseList')
+        super({ apiVersion: 'coordination.k8s.io/v1beta1', kind: 'LeaseList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3731,14 +3731,14 @@ export namespace core {
     /**
      * Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
      */
-    export class Binding extends Core implements IBinding {
+    export class Binding extends Resource implements IBinding {
       metadata: apimachinery.v1.ObjectMeta
       target: core.v1.ObjectReference
       /**
        * Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
        */
       constructor (properties: IBinding) {
-        super('v1', 'Binding')
+        super({ apiVersion: 'v1', kind: 'Binding' })
         this.metadata = properties.metadata
         this.target = properties.target
       }
@@ -3879,14 +3879,14 @@ export namespace core {
     /**
      * ComponentStatus (and ComponentStatusList) holds the cluster validation info.
      */
-    export class ComponentStatus extends Core implements IComponentStatus {
+    export class ComponentStatus extends Resource implements IComponentStatus {
       conditions?: core.v1.ComponentCondition[]
       metadata: apimachinery.v1.ObjectMeta
       /**
        * ComponentStatus (and ComponentStatusList) holds the cluster validation info.
        */
       constructor (properties: IComponentStatus) {
-        super('v1', 'ComponentStatus')
+        super({ apiVersion: 'v1', kind: 'ComponentStatus' })
         this.conditions = properties.conditions
         this.metadata = properties.metadata
       }
@@ -3900,14 +3900,14 @@ export namespace core {
     /**
      * Status of all the conditions for the component as a list of ComponentStatus objects.
      */
-    export class ComponentStatusList extends Core implements IComponentStatusList {
+    export class ComponentStatusList extends Resource implements IComponentStatusList {
       items: core.v1.ComponentStatus[]
       metadata: apimachinery.v1.ListMeta
       /**
        * Status of all the conditions for the component as a list of ComponentStatus objects.
        */
       constructor (properties: IComponentStatusList) {
-        super('v1', 'ComponentStatusList')
+        super({ apiVersion: 'v1', kind: 'ComponentStatusList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -3921,7 +3921,7 @@ export namespace core {
     /**
      * ConfigMap holds configuration data for pods to consume.
      */
-    export class ConfigMap extends Core implements IConfigMap {
+    export class ConfigMap extends Resource implements IConfigMap {
       binaryData?: { [k: string]: string }
       data?: { [k: string]: string }
       metadata: apimachinery.v1.ObjectMeta
@@ -3929,7 +3929,7 @@ export namespace core {
        * ConfigMap holds configuration data for pods to consume.
        */
       constructor (properties: IConfigMap) {
-        super('v1', 'ConfigMap')
+        super({ apiVersion: 'v1', kind: 'ConfigMap' })
         this.binaryData = properties.binaryData
         this.data = properties.data
         this.metadata = properties.metadata
@@ -3968,14 +3968,14 @@ export namespace core {
     /**
      * ConfigMapList is a resource containing a list of ConfigMap objects.
      */
-    export class ConfigMapList extends Core implements IConfigMapList {
+    export class ConfigMapList extends Resource implements IConfigMapList {
       items: core.v1.ConfigMap[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ConfigMapList is a resource containing a list of ConfigMap objects.
        */
       constructor (properties: IConfigMapList) {
-        super('v1', 'ConfigMapList')
+        super({ apiVersion: 'v1', kind: 'ConfigMapList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -4268,7 +4268,7 @@ export namespace core {
      *     },
      *  ]
      */
-    export class Endpoints extends Core implements IEndpoints {
+    export class Endpoints extends Resource implements IEndpoints {
       metadata: apimachinery.v1.ObjectMeta
       subsets?: core.v1.EndpointSubset[]
       /**
@@ -4286,7 +4286,7 @@ export namespace core {
        *  ]
        */
       constructor (properties: IEndpoints) {
-        super('v1', 'Endpoints')
+        super({ apiVersion: 'v1', kind: 'Endpoints' })
         this.metadata = properties.metadata
         this.subsets = properties.subsets
       }
@@ -4300,14 +4300,14 @@ export namespace core {
     /**
      * EndpointsList is a list of endpoints.
      */
-    export class EndpointsList extends Core implements IEndpointsList {
+    export class EndpointsList extends Resource implements IEndpointsList {
       items: core.v1.Endpoints[]
       metadata: apimachinery.v1.ListMeta
       /**
        * EndpointsList is a list of endpoints.
        */
       constructor (properties: IEndpointsList) {
-        super('v1', 'EndpointsList')
+        super({ apiVersion: 'v1', kind: 'EndpointsList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -4405,7 +4405,7 @@ export namespace core {
     /**
      * Event is a report of an event somewhere in the cluster.
      */
-    export class Event extends Core implements IEvent {
+    export class Event extends Resource implements IEvent {
       action?: string
       count?: integer
       eventTime?: apimachinery.v1.MicroTime
@@ -4425,7 +4425,7 @@ export namespace core {
        * Event is a report of an event somewhere in the cluster.
        */
       constructor (properties: IEvent) {
-        super('v1', 'Event')
+        super({ apiVersion: 'v1', kind: 'Event' })
         this.action = properties.action
         this.count = properties.count
         this.eventTime = properties.eventTime
@@ -4478,14 +4478,14 @@ export namespace core {
     /**
      * EventList is a list of events.
      */
-    export class EventList extends Core implements IEventList {
+    export class EventList extends Resource implements IEventList {
       items: core.v1.Event[]
       metadata: apimachinery.v1.ListMeta
       /**
        * EventList is a list of events.
        */
       constructor (properties: IEventList) {
-        super('v1', 'EventList')
+        super({ apiVersion: 'v1', kind: 'EventList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -4759,14 +4759,14 @@ export namespace core {
     /**
      * LimitRange sets resource usage limits for each kind of resource in a Namespace.
      */
-    export class LimitRange extends Core implements ILimitRange {
+    export class LimitRange extends Resource implements ILimitRange {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.LimitRangeSpec
       /**
        * LimitRange sets resource usage limits for each kind of resource in a Namespace.
        */
       constructor (properties: ILimitRange) {
-        super('v1', 'LimitRange')
+        super({ apiVersion: 'v1', kind: 'LimitRange' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -4797,14 +4797,14 @@ export namespace core {
     /**
      * LimitRangeList is a list of LimitRange items.
      */
-    export class LimitRangeList extends Core implements ILimitRangeList {
+    export class LimitRangeList extends Resource implements ILimitRangeList {
       items: core.v1.LimitRange[]
       metadata: apimachinery.v1.ListMeta
       /**
        * LimitRangeList is a list of LimitRange items.
        */
       constructor (properties: ILimitRangeList) {
-        super('v1', 'LimitRangeList')
+        super({ apiVersion: 'v1', kind: 'LimitRangeList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -4868,14 +4868,14 @@ export namespace core {
     /**
      * Namespace provides a scope for Names. Use of multiple namespaces is optional.
      */
-    export class Namespace extends Core implements INamespace {
+    export class Namespace extends Resource implements INamespace {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.NamespaceSpec
       /**
        * Namespace provides a scope for Names. Use of multiple namespaces is optional.
        */
       constructor (properties: INamespace) {
-        super('v1', 'Namespace')
+        super({ apiVersion: 'v1', kind: 'Namespace' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -4889,14 +4889,14 @@ export namespace core {
     /**
      * NamespaceList is a list of Namespaces.
      */
-    export class NamespaceList extends Core implements INamespaceList {
+    export class NamespaceList extends Resource implements INamespaceList {
       items: core.v1.Namespace[]
       metadata: apimachinery.v1.ListMeta
       /**
        * NamespaceList is a list of Namespaces.
        */
       constructor (properties: INamespaceList) {
-        super('v1', 'NamespaceList')
+        super({ apiVersion: 'v1', kind: 'NamespaceList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -4924,14 +4924,14 @@ export namespace core {
     /**
      * Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
      */
-    export class Node extends Core implements INode {
+    export class Node extends Resource implements INode {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.NodeSpec
       /**
        * Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
        */
       constructor (properties: INode) {
-        super('v1', 'Node')
+        super({ apiVersion: 'v1', kind: 'Node' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5007,14 +5007,14 @@ export namespace core {
     /**
      * NodeList is the whole list of all Nodes which have been registered with master.
      */
-    export class NodeList extends Core implements INodeList {
+    export class NodeList extends Resource implements INodeList {
       items: core.v1.Node[]
       metadata: apimachinery.v1.ListMeta
       /**
        * NodeList is the whole list of all Nodes which have been registered with master.
        */
       constructor (properties: INodeList) {
-        super('v1', 'NodeList')
+        super({ apiVersion: 'v1', kind: 'NodeList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5154,14 +5154,14 @@ export namespace core {
     /**
      * PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
      */
-    export class PersistentVolume extends Core implements IPersistentVolume {
+    export class PersistentVolume extends Resource implements IPersistentVolume {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.PersistentVolumeSpec
       /**
        * PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
        */
       constructor (properties: IPersistentVolume) {
-        super('v1', 'PersistentVolume')
+        super({ apiVersion: 'v1', kind: 'PersistentVolume' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5175,14 +5175,14 @@ export namespace core {
     /**
      * PersistentVolumeClaim is a user's request for and claim to a persistent volume
      */
-    export class PersistentVolumeClaim extends Core implements IPersistentVolumeClaim {
+    export class PersistentVolumeClaim extends Resource implements IPersistentVolumeClaim {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.PersistentVolumeClaimSpec
       /**
        * PersistentVolumeClaim is a user's request for and claim to a persistent volume
        */
       constructor (properties: IPersistentVolumeClaim) {
-        super('v1', 'PersistentVolumeClaim')
+        super({ apiVersion: 'v1', kind: 'PersistentVolumeClaim' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5211,14 +5211,14 @@ export namespace core {
     /**
      * PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
      */
-    export class PersistentVolumeClaimList extends Core implements IPersistentVolumeClaimList {
+    export class PersistentVolumeClaimList extends Resource implements IPersistentVolumeClaimList {
       items: core.v1.PersistentVolumeClaim[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
        */
       constructor (properties: IPersistentVolumeClaimList) {
-        super('v1', 'PersistentVolumeClaimList')
+        super({ apiVersion: 'v1', kind: 'PersistentVolumeClaimList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5273,14 +5273,14 @@ export namespace core {
     /**
      * PersistentVolumeList is a list of PersistentVolume items.
      */
-    export class PersistentVolumeList extends Core implements IPersistentVolumeList {
+    export class PersistentVolumeList extends Resource implements IPersistentVolumeList {
       items: core.v1.PersistentVolume[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PersistentVolumeList is a list of PersistentVolume items.
        */
       constructor (properties: IPersistentVolumeList) {
-        super('v1', 'PersistentVolumeList')
+        super({ apiVersion: 'v1', kind: 'PersistentVolumeList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5379,14 +5379,14 @@ export namespace core {
     /**
      * Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
      */
-    export class Pod extends Core implements IPod {
+    export class Pod extends Resource implements IPod {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.PodSpec
       /**
        * Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
        */
       constructor (properties: IPod) {
-        super('v1', 'Pod')
+        super({ apiVersion: 'v1', kind: 'Pod' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5473,14 +5473,14 @@ export namespace core {
     /**
      * PodList is a list of Pods.
      */
-    export class PodList extends Core implements IPodList {
+    export class PodList extends Resource implements IPodList {
       items: core.v1.Pod[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodList is a list of Pods.
        */
       constructor (properties: IPodList) {
-        super('v1', 'PodList')
+        super({ apiVersion: 'v1', kind: 'PodList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5634,14 +5634,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * PodTemplate describes a template for creating copies of a predefined pod.
      */
-    export class PodTemplate extends Core implements IPodTemplate {
+    export class PodTemplate extends Resource implements IPodTemplate {
       metadata: apimachinery.v1.ObjectMeta
       template?: core.v1.PodTemplateSpec
       /**
        * PodTemplate describes a template for creating copies of a predefined pod.
        */
       constructor (properties: IPodTemplate) {
-        super('v1', 'PodTemplate')
+        super({ apiVersion: 'v1', kind: 'PodTemplate' })
         this.metadata = properties.metadata
         this.template = properties.template
       }
@@ -5655,14 +5655,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * PodTemplateList is a list of PodTemplates.
      */
-    export class PodTemplateList extends Core implements IPodTemplateList {
+    export class PodTemplateList extends Resource implements IPodTemplateList {
       items: core.v1.PodTemplate[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodTemplateList is a list of PodTemplates.
        */
       constructor (properties: IPodTemplateList) {
-        super('v1', 'PodTemplateList')
+        super({ apiVersion: 'v1', kind: 'PodTemplateList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5794,14 +5794,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ReplicationController represents the configuration of a replication controller.
      */
-    export class ReplicationController extends Core implements IReplicationController {
+    export class ReplicationController extends Resource implements IReplicationController {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.ReplicationControllerSpec
       /**
        * ReplicationController represents the configuration of a replication controller.
        */
       constructor (properties: IReplicationController) {
-        super('v1', 'ReplicationController')
+        super({ apiVersion: 'v1', kind: 'ReplicationController' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5830,14 +5830,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ReplicationControllerList is a collection of replication controllers.
      */
-    export class ReplicationControllerList extends Core implements IReplicationControllerList {
+    export class ReplicationControllerList extends Resource implements IReplicationControllerList {
       items: core.v1.ReplicationController[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ReplicationControllerList is a collection of replication controllers.
        */
       constructor (properties: IReplicationControllerList) {
-        super('v1', 'ReplicationControllerList')
+        super({ apiVersion: 'v1', kind: 'ReplicationControllerList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -5892,14 +5892,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ResourceQuota sets aggregate quota restrictions enforced per namespace
      */
-    export class ResourceQuota extends Core implements IResourceQuota {
+    export class ResourceQuota extends Resource implements IResourceQuota {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.ResourceQuotaSpec
       /**
        * ResourceQuota sets aggregate quota restrictions enforced per namespace
        */
       constructor (properties: IResourceQuota) {
-        super('v1', 'ResourceQuota')
+        super({ apiVersion: 'v1', kind: 'ResourceQuota' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -5913,14 +5913,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ResourceQuotaList is a list of ResourceQuota items.
      */
-    export class ResourceQuotaList extends Core implements IResourceQuotaList {
+    export class ResourceQuotaList extends Resource implements IResourceQuotaList {
       items: core.v1.ResourceQuota[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ResourceQuotaList is a list of ResourceQuota items.
        */
       constructor (properties: IResourceQuotaList) {
-        super('v1', 'ResourceQuotaList')
+        super({ apiVersion: 'v1', kind: 'ResourceQuotaList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6044,7 +6044,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
      */
-    export class Secret extends Core implements ISecret {
+    export class Secret extends Resource implements ISecret {
       data?: { [k: string]: string }
       metadata: apimachinery.v1.ObjectMeta
       stringData?: { [k: string]: string }
@@ -6053,7 +6053,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
        * Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
        */
       constructor (properties: ISecret) {
-        super('v1', 'Secret')
+        super({ apiVersion: 'v1', kind: 'Secret' })
         this.data = properties.data
         this.metadata = properties.metadata
         this.stringData = properties.stringData
@@ -6095,14 +6095,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * SecretList is a list of Secret.
      */
-    export class SecretList extends Core implements ISecretList {
+    export class SecretList extends Resource implements ISecretList {
       items: core.v1.Secret[]
       metadata: apimachinery.v1.ListMeta
       /**
        * SecretList is a list of Secret.
        */
       constructor (properties: ISecretList) {
-        super('v1', 'SecretList')
+        super({ apiVersion: 'v1', kind: 'SecretList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6178,14 +6178,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
      */
-    export class Service extends Core implements IService {
+    export class Service extends Resource implements IService {
       metadata: apimachinery.v1.ObjectMeta
       spec: core.v1.ServiceSpec
       /**
        * Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
        */
       constructor (properties: IService) {
-        super('v1', 'Service')
+        super({ apiVersion: 'v1', kind: 'Service' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -6199,7 +6199,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
      */
-    export class ServiceAccount extends Core implements IServiceAccount {
+    export class ServiceAccount extends Resource implements IServiceAccount {
       automountServiceAccountToken?: boolean
       imagePullSecrets?: core.v1.LocalObjectReference[]
       metadata: apimachinery.v1.ObjectMeta
@@ -6208,7 +6208,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
        * ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
        */
       constructor (properties: IServiceAccount) {
-        super('v1', 'ServiceAccount')
+        super({ apiVersion: 'v1', kind: 'ServiceAccount' })
         this.automountServiceAccountToken = properties.automountServiceAccountToken
         this.imagePullSecrets = properties.imagePullSecrets
         this.metadata = properties.metadata
@@ -6228,14 +6228,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceAccountList is a list of ServiceAccount objects
      */
-    export class ServiceAccountList extends Core implements IServiceAccountList {
+    export class ServiceAccountList extends Resource implements IServiceAccountList {
       items: core.v1.ServiceAccount[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ServiceAccountList is a list of ServiceAccount objects
        */
       constructor (properties: IServiceAccountList) {
-        super('v1', 'ServiceAccountList')
+        super({ apiVersion: 'v1', kind: 'ServiceAccountList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6260,14 +6260,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceList holds a list of services.
      */
-    export class ServiceList extends Core implements IServiceList {
+    export class ServiceList extends Resource implements IServiceList {
       items: core.v1.Service[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ServiceList holds a list of services.
        */
       constructor (properties: IServiceList) {
-        super('v1', 'ServiceList')
+        super({ apiVersion: 'v1', kind: 'ServiceList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6603,7 +6603,7 @@ export namespace events {
     /**
      * Event is a report of an event somewhere in the cluster. It generally denotes some state change in the system.
      */
-    export class Event extends Core implements IEvent {
+    export class Event extends Resource implements IEvent {
       action?: string
       deprecatedCount?: integer
       deprecatedFirstTimestamp?: apimachinery.v1.Time
@@ -6623,7 +6623,7 @@ export namespace events {
        * Event is a report of an event somewhere in the cluster. It generally denotes some state change in the system.
        */
       constructor (properties: IEvent) {
-        super('events.k8s.io/v1beta1', 'Event')
+        super({ apiVersion: 'events.k8s.io/v1beta1', kind: 'Event' })
         this.action = properties.action
         this.deprecatedCount = properties.deprecatedCount
         this.deprecatedFirstTimestamp = properties.deprecatedFirstTimestamp
@@ -6675,14 +6675,14 @@ export namespace events {
     /**
      * EventList is a list of Event objects.
      */
-    export class EventList extends Core implements IEventList {
+    export class EventList extends Resource implements IEventList {
       items: events.v1beta1.Event[]
       metadata: apimachinery.v1.ListMeta
       /**
        * EventList is a list of Event objects.
        */
       constructor (properties: IEventList) {
-        super('events.k8s.io/v1beta1', 'EventList')
+        super({ apiVersion: 'events.k8s.io/v1beta1', kind: 'EventList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6736,14 +6736,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Core implements IDaemonSet {
+    export class DaemonSet extends Resource implements IDaemonSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.DaemonSetSpec
       /**
        * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
        */
       constructor (properties: IDaemonSet) {
-        super('extensions/v1beta1', 'DaemonSet')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'DaemonSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -6772,14 +6772,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Core implements IDaemonSetList {
+    export class DaemonSetList extends Resource implements IDaemonSetList {
       items: extensions.v1beta1.DaemonSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
       constructor (properties: IDaemonSetList) {
-        super('extensions/v1beta1', 'DaemonSetList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'DaemonSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6841,14 +6841,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Core implements IDeployment {
+    export class Deployment extends Resource implements IDeployment {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
        */
       constructor (properties: IDeployment) {
-        super('extensions/v1beta1', 'Deployment')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'Deployment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -6879,14 +6879,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Core implements IDeploymentList {
+    export class DeploymentList extends Resource implements IDeploymentList {
       items: extensions.v1beta1.Deployment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
       constructor (properties: IDeploymentList) {
-        super('extensions/v1beta1', 'DeploymentList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'DeploymentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -6900,7 +6900,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
      */
-    export class DeploymentRollback extends Core implements IDeploymentRollback {
+    export class DeploymentRollback extends Resource implements IDeploymentRollback {
       name: string
       rollbackTo: extensions.v1beta1.RollbackConfig
       updatedAnnotations?: { [k: string]: string }
@@ -6908,7 +6908,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
        * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
        */
       constructor (properties: IDeploymentRollback) {
-        super('extensions/v1beta1', 'DeploymentRollback')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'DeploymentRollback' })
         this.name = properties.name
         this.rollbackTo = properties.rollbackTo
         this.updatedAnnotations = properties.updatedAnnotations
@@ -7030,14 +7030,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc. DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
      */
-    export class Ingress extends Core implements IIngress {
+    export class Ingress extends Resource implements IIngress {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.IngressSpec
       /**
        * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc. DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
        */
       constructor (properties: IIngress) {
-        super('extensions/v1beta1', 'Ingress')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'Ingress' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7060,14 +7060,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * IngressList is a collection of Ingress.
      */
-    export class IngressList extends Core implements IIngressList {
+    export class IngressList extends Resource implements IIngressList {
       items: extensions.v1beta1.Ingress[]
       metadata: apimachinery.v1.ListMeta
       /**
        * IngressList is a collection of Ingress.
        */
       constructor (properties: IIngressList) {
-        super('extensions/v1beta1', 'IngressList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'IngressList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7121,14 +7121,14 @@ Both these may change in the future. Incoming requests are matched against the h
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
-    export class NetworkPolicy extends Core implements INetworkPolicy {
+    export class NetworkPolicy extends Resource implements INetworkPolicy {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.NetworkPolicySpec
       /**
        * DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods
        */
       constructor (properties: INetworkPolicy) {
-        super('extensions/v1beta1', 'NetworkPolicy')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'NetworkPolicy' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7160,14 +7160,14 @@ Both these may change in the future. Incoming requests are matched against the h
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicyList is deprecated by networking/v1/NetworkPolicyList. Network Policy List is a list of NetworkPolicy objects.
      */
-    export class NetworkPolicyList extends Core implements INetworkPolicyList {
+    export class NetworkPolicyList extends Resource implements INetworkPolicyList {
       items: extensions.v1beta1.NetworkPolicy[]
       metadata: apimachinery.v1.ListMeta
       /**
        * DEPRECATED 1.9 - This group version of NetworkPolicyList is deprecated by networking/v1/NetworkPolicyList. Network Policy List is a list of NetworkPolicy objects.
        */
       constructor (properties: INetworkPolicyList) {
-        super('extensions/v1beta1', 'NetworkPolicyList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'NetworkPolicyList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7218,14 +7218,14 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.
      */
-    export class PodSecurityPolicy extends Core implements IPodSecurityPolicy {
+    export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.PodSecurityPolicySpec
       /**
        * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.
        */
       constructor (properties: IPodSecurityPolicy) {
-        super('extensions/v1beta1', 'PodSecurityPolicy')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'PodSecurityPolicy' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7239,14 +7239,14 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * PodSecurityPolicyList is a list of PodSecurityPolicy objects. Deprecated: use PodSecurityPolicyList from policy API Group instead.
      */
-    export class PodSecurityPolicyList extends Core implements IPodSecurityPolicyList {
+    export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
       items: extensions.v1beta1.PodSecurityPolicy[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodSecurityPolicyList is a list of PodSecurityPolicy objects. Deprecated: use PodSecurityPolicyList from policy API Group instead.
        */
       constructor (properties: IPodSecurityPolicyList) {
-        super('extensions/v1beta1', 'PodSecurityPolicyList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'PodSecurityPolicyList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7317,14 +7317,14 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Core implements IReplicaSet {
+    export class ReplicaSet extends Resource implements IReplicaSet {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.ReplicaSetSpec
       /**
        * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
        */
       constructor (properties: IReplicaSet) {
-        super('extensions/v1beta1', 'ReplicaSet')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'ReplicaSet' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7353,14 +7353,14 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Core implements IReplicaSetList {
+    export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: extensions.v1beta1.ReplicaSet[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
       constructor (properties: IReplicaSetList) {
-        super('extensions/v1beta1', 'ReplicaSetList')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'ReplicaSetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7463,14 +7463,14 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * represents a scaling request for a resource.
      */
-    export class Scale extends Core implements IScale {
+    export class Scale extends Resource implements IScale {
       metadata: apimachinery.v1.ObjectMeta
       spec: extensions.v1beta1.ScaleSpec
       /**
        * represents a scaling request for a resource.
        */
       constructor (properties: IScale) {
-        super('extensions/v1beta1', 'Scale')
+        super({ apiVersion: 'extensions/v1beta1', kind: 'Scale' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7524,14 +7524,14 @@ export namespace networking {
     /**
      * NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
-    export class NetworkPolicy extends Core implements INetworkPolicy {
+    export class NetworkPolicy extends Resource implements INetworkPolicy {
       metadata: apimachinery.v1.ObjectMeta
       spec: networking.v1.NetworkPolicySpec
       /**
        * NetworkPolicy describes what network traffic is allowed for a set of Pods
        */
       constructor (properties: INetworkPolicy) {
-        super('networking.k8s.io/v1', 'NetworkPolicy')
+        super({ apiVersion: 'networking.k8s.io/v1', kind: 'NetworkPolicy' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7563,14 +7563,14 @@ export namespace networking {
     /**
      * NetworkPolicyList is a list of NetworkPolicy objects.
      */
-    export class NetworkPolicyList extends Core implements INetworkPolicyList {
+    export class NetworkPolicyList extends Resource implements INetworkPolicyList {
       items: networking.v1.NetworkPolicy[]
       metadata: apimachinery.v1.ListMeta
       /**
        * NetworkPolicyList is a list of NetworkPolicy objects.
        */
       constructor (properties: INetworkPolicyList) {
-        super('networking.k8s.io/v1', 'NetworkPolicyList')
+        super({ apiVersion: 'networking.k8s.io/v1', kind: 'NetworkPolicyList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7639,14 +7639,14 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
      */
-    export class Ingress extends Core implements IIngress {
+    export class Ingress extends Resource implements IIngress {
       metadata: apimachinery.v1.ObjectMeta
       spec: networking.v1beta1.IngressSpec
       /**
        * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
        */
       constructor (properties: IIngress) {
-        super('networking.k8s.io/v1beta1', 'Ingress')
+        super({ apiVersion: 'networking.k8s.io/v1beta1', kind: 'Ingress' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7669,14 +7669,14 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * IngressList is a collection of Ingress.
      */
-    export class IngressList extends Core implements IIngressList {
+    export class IngressList extends Resource implements IIngressList {
       items: networking.v1beta1.Ingress[]
       metadata: apimachinery.v1.ListMeta
       /**
        * IngressList is a collection of Ingress.
        */
       constructor (properties: IIngressList) {
-        super('networking.k8s.io/v1beta1', 'IngressList')
+        super({ apiVersion: 'networking.k8s.io/v1beta1', kind: 'IngressList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7741,14 +7741,14 @@ export namespace node {
     /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
-    export class RuntimeClass extends Core implements IRuntimeClass {
+    export class RuntimeClass extends Resource implements IRuntimeClass {
       metadata: apimachinery.v1.ObjectMeta
       spec: node.v1alpha1.RuntimeClassSpec
       /**
        * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
        */
       constructor (properties: IRuntimeClass) {
-        super('node.k8s.io/v1alpha1', 'RuntimeClass')
+        super({ apiVersion: 'node.k8s.io/v1alpha1', kind: 'RuntimeClass' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7762,14 +7762,14 @@ export namespace node {
     /**
      * RuntimeClassList is a list of RuntimeClass objects.
      */
-    export class RuntimeClassList extends Core implements IRuntimeClassList {
+    export class RuntimeClassList extends Resource implements IRuntimeClassList {
       items: node.v1alpha1.RuntimeClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RuntimeClassList is a list of RuntimeClass objects.
        */
       constructor (properties: IRuntimeClassList) {
-        super('node.k8s.io/v1alpha1', 'RuntimeClassList')
+        super({ apiVersion: 'node.k8s.io/v1alpha1', kind: 'RuntimeClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7801,7 +7801,7 @@ export namespace node {
     /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
-    export class RuntimeClass extends Core implements IRuntimeClass {
+    export class RuntimeClass extends Resource implements IRuntimeClass {
       handler: string
       metadata: apimachinery.v1.ObjectMeta
       overhead?: node.v1beta1.Overhead
@@ -7809,7 +7809,7 @@ export namespace node {
        * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
        */
       constructor (properties: IRuntimeClass) {
-        super('node.k8s.io/v1beta1', 'RuntimeClass')
+        super({ apiVersion: 'node.k8s.io/v1beta1', kind: 'RuntimeClass' })
         this.handler = properties.handler
         this.metadata = properties.metadata
         this.overhead = properties.overhead
@@ -7826,14 +7826,14 @@ export namespace node {
     /**
      * RuntimeClassList is a list of RuntimeClass objects.
      */
-    export class RuntimeClassList extends Core implements IRuntimeClassList {
+    export class RuntimeClassList extends Resource implements IRuntimeClassList {
       items: node.v1beta1.RuntimeClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RuntimeClassList is a list of RuntimeClass objects.
        */
       constructor (properties: IRuntimeClassList) {
-        super('node.k8s.io/v1beta1', 'RuntimeClassList')
+        super({ apiVersion: 'node.k8s.io/v1beta1', kind: 'RuntimeClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7876,14 +7876,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
      */
-    export class Eviction extends Core implements IEviction {
+    export class Eviction extends Resource implements IEviction {
       deleteOptions?: apimachinery.v1.DeleteOptions
       metadata: apimachinery.v1.ObjectMeta
       /**
        * Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
        */
       constructor (properties: IEviction) {
-        super('policy/v1beta1', 'Eviction')
+        super({ apiVersion: 'policy/v1beta1', kind: 'Eviction' })
         this.deleteOptions = properties.deleteOptions
         this.metadata = properties.metadata
       }
@@ -7924,14 +7924,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
      */
-    export class PodDisruptionBudget extends Core implements IPodDisruptionBudget {
+    export class PodDisruptionBudget extends Resource implements IPodDisruptionBudget {
       metadata: apimachinery.v1.ObjectMeta
       spec: policy.v1beta1.PodDisruptionBudgetSpec
       /**
        * PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
        */
       constructor (properties: IPodDisruptionBudget) {
-        super('policy/v1beta1', 'PodDisruptionBudget')
+        super({ apiVersion: 'policy/v1beta1', kind: 'PodDisruptionBudget' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -7944,14 +7944,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodDisruptionBudgetList is a collection of PodDisruptionBudgets.
      */
-    export class PodDisruptionBudgetList extends Core implements IPodDisruptionBudgetList {
+    export class PodDisruptionBudgetList extends Resource implements IPodDisruptionBudgetList {
       items: policy.v1beta1.PodDisruptionBudget[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodDisruptionBudgetList is a collection of PodDisruptionBudgets.
        */
       constructor (properties: IPodDisruptionBudgetList) {
-        super('policy/v1beta1', 'PodDisruptionBudgetList')
+        super({ apiVersion: 'policy/v1beta1', kind: 'PodDisruptionBudgetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -7991,14 +7991,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.
      */
-    export class PodSecurityPolicy extends Core implements IPodSecurityPolicy {
+    export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
       metadata: apimachinery.v1.ObjectMeta
       spec: policy.v1beta1.PodSecurityPolicySpec
       /**
        * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.
        */
       constructor (properties: IPodSecurityPolicy) {
-        super('policy/v1beta1', 'PodSecurityPolicy')
+        super({ apiVersion: 'policy/v1beta1', kind: 'PodSecurityPolicy' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -8012,14 +8012,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodSecurityPolicyList is a list of PodSecurityPolicy objects.
      */
-    export class PodSecurityPolicyList extends Core implements IPodSecurityPolicyList {
+    export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
       items: policy.v1beta1.PodSecurityPolicy[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodSecurityPolicyList is a list of PodSecurityPolicy objects.
        */
       constructor (properties: IPodSecurityPolicyList) {
-        super('policy/v1beta1', 'PodSecurityPolicyList')
+        super({ apiVersion: 'policy/v1beta1', kind: 'PodSecurityPolicyList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8146,7 +8146,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Core implements IClusterRole {
+    export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1.AggregationRule
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
@@ -8154,7 +8154,7 @@ export namespace rbac {
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
        */
       constructor (properties: IClusterRole) {
-        super('rbac.authorization.k8s.io/v1', 'ClusterRole')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'ClusterRole' })
         this.aggregationRule = properties.aggregationRule
         this.metadata = properties.metadata
         this.rules = properties.rules
@@ -8171,7 +8171,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Core implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
@@ -8179,7 +8179,7 @@ export namespace rbac {
        * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
        */
       constructor (properties: IClusterRoleBinding) {
-        super('rbac.authorization.k8s.io/v1', 'ClusterRoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'ClusterRoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8196,14 +8196,14 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Core implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1.ClusterRoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
       constructor (properties: IClusterRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1', 'ClusterRoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'ClusterRoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8217,14 +8217,14 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Core implements IClusterRoleList {
+    export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1.ClusterRole[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
       constructor (properties: IClusterRoleList) {
-        super('rbac.authorization.k8s.io/v1', 'ClusterRoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'ClusterRoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8253,14 +8253,14 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Core implements IRole {
+    export class Role extends Resource implements IRole {
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
        */
       constructor (properties: IRole) {
-        super('rbac.authorization.k8s.io/v1', 'Role')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'Role' })
         this.metadata = properties.metadata
         this.rules = properties.rules
       }
@@ -8274,7 +8274,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Core implements IRoleBinding {
+    export class RoleBinding extends Resource implements IRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
@@ -8282,7 +8282,7 @@ export namespace rbac {
        * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
        */
       constructor (properties: IRoleBinding) {
-        super('rbac.authorization.k8s.io/v1', 'RoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'RoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8299,14 +8299,14 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Core implements IRoleBindingList {
+    export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1.RoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
       constructor (properties: IRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1', 'RoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'RoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8320,14 +8320,14 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Core implements IRoleList {
+    export class RoleList extends Resource implements IRoleList {
       items: rbac.v1.Role[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
       constructor (properties: IRoleList) {
-        super('rbac.authorization.k8s.io/v1', 'RoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1', kind: 'RoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8374,7 +8374,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Core implements IClusterRole {
+    export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1alpha1.AggregationRule
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
@@ -8382,7 +8382,7 @@ export namespace rbac {
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
        */
       constructor (properties: IClusterRole) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'ClusterRole')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'ClusterRole' })
         this.aggregationRule = properties.aggregationRule
         this.metadata = properties.metadata
         this.rules = properties.rules
@@ -8399,7 +8399,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Core implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
@@ -8407,7 +8407,7 @@ export namespace rbac {
        * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
        */
       constructor (properties: IClusterRoleBinding) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'ClusterRoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'ClusterRoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8424,14 +8424,14 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Core implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1alpha1.ClusterRoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
       constructor (properties: IClusterRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'ClusterRoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'ClusterRoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8445,14 +8445,14 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Core implements IClusterRoleList {
+    export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1alpha1.ClusterRole[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
       constructor (properties: IClusterRoleList) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'ClusterRoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'ClusterRoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8481,14 +8481,14 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Core implements IRole {
+    export class Role extends Resource implements IRole {
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
        */
       constructor (properties: IRole) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'Role')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'Role' })
         this.metadata = properties.metadata
         this.rules = properties.rules
       }
@@ -8502,7 +8502,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Core implements IRoleBinding {
+    export class RoleBinding extends Resource implements IRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
@@ -8510,7 +8510,7 @@ export namespace rbac {
        * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
        */
       constructor (properties: IRoleBinding) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'RoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'RoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8527,14 +8527,14 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Core implements IRoleBindingList {
+    export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1alpha1.RoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
       constructor (properties: IRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'RoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'RoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8548,14 +8548,14 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Core implements IRoleList {
+    export class RoleList extends Resource implements IRoleList {
       items: rbac.v1alpha1.Role[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
       constructor (properties: IRoleList) {
-        super('rbac.authorization.k8s.io/v1alpha1', 'RoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1alpha1', kind: 'RoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8602,7 +8602,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Core implements IClusterRole {
+    export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1beta1.AggregationRule
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
@@ -8610,7 +8610,7 @@ export namespace rbac {
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
        */
       constructor (properties: IClusterRole) {
-        super('rbac.authorization.k8s.io/v1beta1', 'ClusterRole')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'ClusterRole' })
         this.aggregationRule = properties.aggregationRule
         this.metadata = properties.metadata
         this.rules = properties.rules
@@ -8627,7 +8627,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Core implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
@@ -8635,7 +8635,7 @@ export namespace rbac {
        * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
        */
       constructor (properties: IClusterRoleBinding) {
-        super('rbac.authorization.k8s.io/v1beta1', 'ClusterRoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'ClusterRoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8652,14 +8652,14 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Core implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1beta1.ClusterRoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
       constructor (properties: IClusterRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1beta1', 'ClusterRoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'ClusterRoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8673,14 +8673,14 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Core implements IClusterRoleList {
+    export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1beta1.ClusterRole[]
       metadata: apimachinery.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
       constructor (properties: IClusterRoleList) {
-        super('rbac.authorization.k8s.io/v1beta1', 'ClusterRoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'ClusterRoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8709,14 +8709,14 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Core implements IRole {
+    export class Role extends Resource implements IRole {
       metadata: apimachinery.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
        */
       constructor (properties: IRole) {
-        super('rbac.authorization.k8s.io/v1beta1', 'Role')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'Role' })
         this.metadata = properties.metadata
         this.rules = properties.rules
       }
@@ -8730,7 +8730,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Core implements IRoleBinding {
+    export class RoleBinding extends Resource implements IRoleBinding {
       metadata: apimachinery.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
@@ -8738,7 +8738,7 @@ export namespace rbac {
        * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
        */
       constructor (properties: IRoleBinding) {
-        super('rbac.authorization.k8s.io/v1beta1', 'RoleBinding')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'RoleBinding' })
         this.metadata = properties.metadata
         this.roleRef = properties.roleRef
         this.subjects = properties.subjects
@@ -8755,14 +8755,14 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Core implements IRoleBindingList {
+    export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1beta1.RoleBinding[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
       constructor (properties: IRoleBindingList) {
-        super('rbac.authorization.k8s.io/v1beta1', 'RoleBindingList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'RoleBindingList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8776,14 +8776,14 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Core implements IRoleList {
+    export class RoleList extends Resource implements IRoleList {
       items: rbac.v1beta1.Role[]
       metadata: apimachinery.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
       constructor (properties: IRoleList) {
-        super('rbac.authorization.k8s.io/v1beta1', 'RoleList')
+        super({ apiVersion: 'rbac.authorization.k8s.io/v1beta1', kind: 'RoleList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8825,7 +8825,7 @@ export namespace scheduling {
     /**
      * PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Core implements IPriorityClass {
+    export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: apimachinery.v1.ObjectMeta
@@ -8835,7 +8835,7 @@ export namespace scheduling {
        * PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
       constructor (properties: IPriorityClass) {
-        super('scheduling.k8s.io/v1', 'PriorityClass')
+        super({ apiVersion: 'scheduling.k8s.io/v1', kind: 'PriorityClass' })
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
@@ -8858,14 +8858,14 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Core implements IPriorityClassList {
+    export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1.PriorityClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
       constructor (properties: IPriorityClassList) {
-        super('scheduling.k8s.io/v1', 'PriorityClassList')
+        super({ apiVersion: 'scheduling.k8s.io/v1', kind: 'PriorityClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8881,7 +8881,7 @@ export namespace scheduling {
     /**
      * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Core implements IPriorityClass {
+    export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: apimachinery.v1.ObjectMeta
@@ -8891,7 +8891,7 @@ export namespace scheduling {
        * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
       constructor (properties: IPriorityClass) {
-        super('scheduling.k8s.io/v1alpha1', 'PriorityClass')
+        super({ apiVersion: 'scheduling.k8s.io/v1alpha1', kind: 'PriorityClass' })
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
@@ -8914,14 +8914,14 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Core implements IPriorityClassList {
+    export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1alpha1.PriorityClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
       constructor (properties: IPriorityClassList) {
-        super('scheduling.k8s.io/v1alpha1', 'PriorityClassList')
+        super({ apiVersion: 'scheduling.k8s.io/v1alpha1', kind: 'PriorityClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8937,7 +8937,7 @@ export namespace scheduling {
     /**
      * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Core implements IPriorityClass {
+    export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: apimachinery.v1.ObjectMeta
@@ -8947,7 +8947,7 @@ export namespace scheduling {
        * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
       constructor (properties: IPriorityClass) {
-        super('scheduling.k8s.io/v1beta1', 'PriorityClass')
+        super({ apiVersion: 'scheduling.k8s.io/v1beta1', kind: 'PriorityClass' })
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
@@ -8970,14 +8970,14 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Core implements IPriorityClassList {
+    export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1beta1.PriorityClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
       constructor (properties: IPriorityClassList) {
-        super('scheduling.k8s.io/v1beta1', 'PriorityClassList')
+        super({ apiVersion: 'scheduling.k8s.io/v1beta1', kind: 'PriorityClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -8995,14 +8995,14 @@ export namespace settings {
     /**
      * PodPreset is a policy resource that defines additional runtime requirements for a Pod.
      */
-    export class PodPreset extends Core implements IPodPreset {
+    export class PodPreset extends Resource implements IPodPreset {
       metadata: apimachinery.v1.ObjectMeta
       spec: settings.v1alpha1.PodPresetSpec
       /**
        * PodPreset is a policy resource that defines additional runtime requirements for a Pod.
        */
       constructor (properties: IPodPreset) {
-        super('settings.k8s.io/v1alpha1', 'PodPreset')
+        super({ apiVersion: 'settings.k8s.io/v1alpha1', kind: 'PodPreset' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9014,14 +9014,14 @@ export namespace settings {
     /**
      * PodPresetList is a list of PodPreset objects.
      */
-    export class PodPresetList extends Core implements IPodPresetList {
+    export class PodPresetList extends Resource implements IPodPresetList {
       items: settings.v1alpha1.PodPreset[]
       metadata: apimachinery.v1.ListMeta
       /**
        * PodPresetList is a list of PodPreset objects.
        */
       constructor (properties: IPodPresetList) {
-        super('settings.k8s.io/v1alpha1', 'PodPresetList')
+        super({ apiVersion: 'settings.k8s.io/v1alpha1', kind: 'PodPresetList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9056,7 +9056,7 @@ export namespace storage {
      *
      * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
      */
-    export class StorageClass extends Core implements IStorageClass {
+    export class StorageClass extends Resource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       metadata: apimachinery.v1.ObjectMeta
@@ -9071,7 +9071,7 @@ export namespace storage {
        * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
        */
       constructor (properties: IStorageClass) {
-        super('storage.k8s.io/v1', 'StorageClass')
+        super({ apiVersion: 'storage.k8s.io/v1', kind: 'StorageClass' })
         this.allowVolumeExpansion = properties.allowVolumeExpansion
         this.allowedTopologies = properties.allowedTopologies
         this.metadata = properties.metadata
@@ -9103,14 +9103,14 @@ export namespace storage {
     /**
      * StorageClassList is a collection of storage classes.
      */
-    export class StorageClassList extends Core implements IStorageClassList {
+    export class StorageClassList extends Resource implements IStorageClassList {
       items: storage.v1.StorageClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * StorageClassList is a collection of storage classes.
        */
       constructor (properties: IStorageClassList) {
-        super('storage.k8s.io/v1', 'StorageClassList')
+        super({ apiVersion: 'storage.k8s.io/v1', kind: 'StorageClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9126,7 +9126,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Core implements IVolumeAttachment {
+    export class VolumeAttachment extends Resource implements IVolumeAttachment {
       metadata: apimachinery.v1.ObjectMeta
       spec: storage.v1.VolumeAttachmentSpec
       /**
@@ -9135,7 +9135,7 @@ export namespace storage {
        * VolumeAttachment objects are non-namespaced.
        */
       constructor (properties: IVolumeAttachment) {
-        super('storage.k8s.io/v1', 'VolumeAttachment')
+        super({ apiVersion: 'storage.k8s.io/v1', kind: 'VolumeAttachment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9149,14 +9149,14 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Core implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1.VolumeAttachment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
       constructor (properties: IVolumeAttachmentList) {
-        super('storage.k8s.io/v1', 'VolumeAttachmentList')
+        super({ apiVersion: 'storage.k8s.io/v1', kind: 'VolumeAttachmentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9216,7 +9216,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Core implements IVolumeAttachment {
+    export class VolumeAttachment extends Resource implements IVolumeAttachment {
       metadata: apimachinery.v1.ObjectMeta
       spec: storage.v1alpha1.VolumeAttachmentSpec
       /**
@@ -9225,7 +9225,7 @@ export namespace storage {
        * VolumeAttachment objects are non-namespaced.
        */
       constructor (properties: IVolumeAttachment) {
-        super('storage.k8s.io/v1alpha1', 'VolumeAttachment')
+        super({ apiVersion: 'storage.k8s.io/v1alpha1', kind: 'VolumeAttachment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9239,14 +9239,14 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Core implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1alpha1.VolumeAttachment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
       constructor (properties: IVolumeAttachmentList) {
-        super('storage.k8s.io/v1alpha1', 'VolumeAttachmentList')
+        super({ apiVersion: 'storage.k8s.io/v1alpha1', kind: 'VolumeAttachmentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9304,14 +9304,14 @@ export namespace storage {
     /**
      * CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
      */
-    export class CSIDriver extends Core implements ICSIDriver {
+    export class CSIDriver extends Resource implements ICSIDriver {
       metadata: apimachinery.v1.ObjectMeta
       spec: storage.v1beta1.CSIDriverSpec
       /**
        * CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
        */
       constructor (properties: ICSIDriver) {
-        super('storage.k8s.io/v1beta1', 'CSIDriver')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'CSIDriver' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9325,14 +9325,14 @@ export namespace storage {
     /**
      * CSIDriverList is a collection of CSIDriver objects.
      */
-    export class CSIDriverList extends Core implements ICSIDriverList {
+    export class CSIDriverList extends Resource implements ICSIDriverList {
       items: storage.v1beta1.CSIDriver[]
       metadata: apimachinery.v1.ListMeta
       /**
        * CSIDriverList is a collection of CSIDriver objects.
        */
       constructor (properties: ICSIDriverList) {
-        super('storage.k8s.io/v1beta1', 'CSIDriverList')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'CSIDriverList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9355,14 +9355,14 @@ export namespace storage {
     /**
      * CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
      */
-    export class CSINode extends Core implements ICSINode {
+    export class CSINode extends Resource implements ICSINode {
       metadata: apimachinery.v1.ObjectMeta
       spec: storage.v1beta1.CSINodeSpec
       /**
        * CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
        */
       constructor (properties: ICSINode) {
-        super('storage.k8s.io/v1beta1', 'CSINode')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'CSINode' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9389,14 +9389,14 @@ export namespace storage {
     /**
      * CSINodeList is a collection of CSINode objects.
      */
-    export class CSINodeList extends Core implements ICSINodeList {
+    export class CSINodeList extends Resource implements ICSINodeList {
       items: storage.v1beta1.CSINode[]
       metadata: apimachinery.v1.ListMeta
       /**
        * CSINodeList is a collection of CSINode objects.
        */
       constructor (properties: ICSINodeList) {
-        super('storage.k8s.io/v1beta1', 'CSINodeList')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'CSINodeList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9419,7 +9419,7 @@ export namespace storage {
      *
      * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
      */
-    export class StorageClass extends Core implements IStorageClass {
+    export class StorageClass extends Resource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       metadata: apimachinery.v1.ObjectMeta
@@ -9434,7 +9434,7 @@ export namespace storage {
        * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
        */
       constructor (properties: IStorageClass) {
-        super('storage.k8s.io/v1beta1', 'StorageClass')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'StorageClass' })
         this.allowVolumeExpansion = properties.allowVolumeExpansion
         this.allowedTopologies = properties.allowedTopologies
         this.metadata = properties.metadata
@@ -9466,14 +9466,14 @@ export namespace storage {
     /**
      * StorageClassList is a collection of storage classes.
      */
-    export class StorageClassList extends Core implements IStorageClassList {
+    export class StorageClassList extends Resource implements IStorageClassList {
       items: storage.v1beta1.StorageClass[]
       metadata: apimachinery.v1.ListMeta
       /**
        * StorageClassList is a collection of storage classes.
        */
       constructor (properties: IStorageClassList) {
-        super('storage.k8s.io/v1beta1', 'StorageClassList')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'StorageClassList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9489,7 +9489,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Core implements IVolumeAttachment {
+    export class VolumeAttachment extends Resource implements IVolumeAttachment {
       metadata: apimachinery.v1.ObjectMeta
       spec: storage.v1beta1.VolumeAttachmentSpec
       /**
@@ -9498,7 +9498,7 @@ export namespace storage {
        * VolumeAttachment objects are non-namespaced.
        */
       constructor (properties: IVolumeAttachment) {
-        super('storage.k8s.io/v1beta1', 'VolumeAttachment')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'VolumeAttachment' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9512,14 +9512,14 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Core implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1beta1.VolumeAttachment[]
       metadata: apimachinery.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
       constructor (properties: IVolumeAttachmentList) {
-        super('storage.k8s.io/v1beta1', 'VolumeAttachmentList')
+        super({ apiVersion: 'storage.k8s.io/v1beta1', kind: 'VolumeAttachmentList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9615,14 +9615,14 @@ export namespace apiextensions {
     /**
      * CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
      */
-    export class CustomResourceDefinition extends Core implements ICustomResourceDefinition {
+    export class CustomResourceDefinition extends Resource implements ICustomResourceDefinition {
       metadata: apimachinery.v1.ObjectMeta
       spec: apiextensions.v1beta1.CustomResourceDefinitionSpec
       /**
        * CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
        */
       constructor (properties: ICustomResourceDefinition) {
-        super('apiextensions.k8s.io/v1beta1', 'CustomResourceDefinition')
+        super({ apiVersion: 'apiextensions.k8s.io/v1beta1', kind: 'CustomResourceDefinition' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -9650,14 +9650,14 @@ export namespace apiextensions {
     /**
      * CustomResourceDefinitionList is a list of CustomResourceDefinition objects.
      */
-    export class CustomResourceDefinitionList extends Core implements ICustomResourceDefinitionList {
+    export class CustomResourceDefinitionList extends Resource implements ICustomResourceDefinitionList {
       items: apiextensions.v1beta1.CustomResourceDefinition[]
       metadata: apimachinery.v1.ListMeta
       /**
        * CustomResourceDefinitionList is a list of CustomResourceDefinition objects.
        */
       constructor (properties: ICustomResourceDefinitionList) {
-        super('apiextensions.k8s.io/v1beta1', 'CustomResourceDefinitionList')
+        super({ apiVersion: 'apiextensions.k8s.io/v1beta1', kind: 'CustomResourceDefinitionList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -9951,7 +9951,7 @@ export namespace apimachinery {
     /**
      * APIGroup contains the name, the supported versions, and the preferred version of a group.
      */
-    export class APIGroup extends Core implements IAPIGroup {
+    export class APIGroup extends Resource implements IAPIGroup {
       name: string
       preferredVersion?: apimachinery.v1.GroupVersionForDiscovery
       serverAddressByClientCIDRs?: apimachinery.v1.ServerAddressByClientCIDR[]
@@ -9960,7 +9960,7 @@ export namespace apimachinery {
        * APIGroup contains the name, the supported versions, and the preferred version of a group.
        */
       constructor (properties: IAPIGroup) {
-        super('v1', 'APIGroup')
+        super({ apiVersion: 'v1', kind: 'APIGroup' })
         this.name = properties.name
         this.preferredVersion = properties.preferredVersion
         this.serverAddressByClientCIDRs = properties.serverAddressByClientCIDRs
@@ -9980,13 +9980,13 @@ export namespace apimachinery {
     /**
      * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
      */
-    export class APIGroupList extends Core implements IAPIGroupList {
+    export class APIGroupList extends Resource implements IAPIGroupList {
       groups: apimachinery.v1.APIGroup[]
       /**
        * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
        */
       constructor (properties: IAPIGroupList) {
-        super('v1', 'APIGroupList')
+        super({ apiVersion: 'v1', kind: 'APIGroupList' })
         this.groups = properties.groups
       }
     }
@@ -10022,14 +10022,14 @@ export namespace apimachinery {
     /**
      * APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.
      */
-    export class APIResourceList extends Core implements IAPIResourceList {
+    export class APIResourceList extends Resource implements IAPIResourceList {
       groupVersion: string
       resources: apimachinery.v1.APIResource[]
       /**
        * APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.
        */
       constructor (properties: IAPIResourceList) {
-        super('v1', 'APIResourceList')
+        super({ apiVersion: 'v1', kind: 'APIResourceList' })
         this.groupVersion = properties.groupVersion
         this.resources = properties.resources
       }
@@ -10043,14 +10043,14 @@ export namespace apimachinery {
     /**
      * APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.
      */
-    export class APIVersions extends Core implements IAPIVersions {
+    export class APIVersions extends Resource implements IAPIVersions {
       serverAddressByClientCIDRs: apimachinery.v1.ServerAddressByClientCIDR[]
       versions: string[]
       /**
        * APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.
        */
       constructor (properties: IAPIVersions) {
-        super('v1', 'APIVersions')
+        super({ apiVersion: 'v1', kind: 'APIVersions' })
         this.serverAddressByClientCIDRs = properties.serverAddressByClientCIDRs
         this.versions = properties.versions
       }
@@ -10064,7 +10064,7 @@ export namespace apimachinery {
     /**
      * DeleteOptions may be provided when deleting an API object.
      */
-    export class DeleteOptions extends Core implements IDeleteOptions {
+    export class DeleteOptions extends Resource implements IDeleteOptions {
       dryRun?: string[]
       gracePeriodSeconds?: integer
       orphanDependents?: boolean
@@ -10074,7 +10074,7 @@ export namespace apimachinery {
        * DeleteOptions may be provided when deleting an API object.
        */
       constructor (properties: IDeleteOptions) {
-        super('v1', 'DeleteOptions')
+        super({ apiVersion: 'v1', kind: 'DeleteOptions' })
         this.dryRun = properties.dryRun
         this.gracePeriodSeconds = properties.gracePeriodSeconds
         this.orphanDependents = properties.orphanDependents
@@ -10256,7 +10256,7 @@ Populated by the system. Read-only. More info: http://kubernetes.io/docs/user-gu
     /**
      * Status is a return value for calls that don't return other objects.
      */
-    export class Status extends Core implements IStatus {
+    export class Status extends Resource implements IStatus {
       code?: integer
       details?: apimachinery.v1.StatusDetails
       message?: string
@@ -10266,7 +10266,7 @@ Populated by the system. Read-only. More info: http://kubernetes.io/docs/user-gu
        * Status is a return value for calls that don't return other objects.
        */
       constructor (properties: IStatus) {
-        super('v1', 'Status')
+        super({ apiVersion: 'v1', kind: 'Status' })
         this.code = properties.code
         this.details = properties.details
         this.message = properties.message
@@ -10325,14 +10325,14 @@ Examples:
     /**
      * Event represents a single event to a watched resource.
      */
-    export class WatchEvent extends Core implements IWatchEvent {
+    export class WatchEvent extends Resource implements IWatchEvent {
       object: apimachinery.misc.RawExtension
       type: string
       /**
        * Event represents a single event to a watched resource.
        */
       constructor (properties: IWatchEvent) {
-        super('v1', 'WatchEvent')
+        super({ apiVersion: 'v1', kind: 'WatchEvent' })
         this.object = properties.object
         this.type = properties.type
       }
@@ -10369,14 +10369,14 @@ export namespace apiregistration {
     /**
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
-    export class APIService extends Core implements IAPIService {
+    export class APIService extends Resource implements IAPIService {
       metadata: apimachinery.v1.ObjectMeta
       spec: apiregistration.v1.APIServiceSpec
       /**
        * APIService represents a server for a particular GroupVersion. Name must be "version.group".
        */
       constructor (properties: IAPIService) {
-        super('apiregistration.k8s.io/v1', 'APIService')
+        super({ apiVersion: 'apiregistration.k8s.io/v1', kind: 'APIService' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -10404,14 +10404,14 @@ export namespace apiregistration {
     /**
      * APIServiceList is a list of APIService objects.
      */
-    export class APIServiceList extends Core implements IAPIServiceList {
+    export class APIServiceList extends Resource implements IAPIServiceList {
       items: apiregistration.v1.APIService[]
       metadata: apimachinery.v1.ListMeta
       /**
        * APIServiceList is a list of APIService objects.
        */
       constructor (properties: IAPIServiceList) {
-        super('apiregistration.k8s.io/v1', 'APIServiceList')
+        super({ apiVersion: 'apiregistration.k8s.io/v1', kind: 'APIServiceList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }
@@ -10462,14 +10462,14 @@ export namespace apiregistration {
     /**
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
-    export class APIService extends Core implements IAPIService {
+    export class APIService extends Resource implements IAPIService {
       metadata: apimachinery.v1.ObjectMeta
       spec: apiregistration.v1beta1.APIServiceSpec
       /**
        * APIService represents a server for a particular GroupVersion. Name must be "version.group".
        */
       constructor (properties: IAPIService) {
-        super('apiregistration.k8s.io/v1beta1', 'APIService')
+        super({ apiVersion: 'apiregistration.k8s.io/v1beta1', kind: 'APIService' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -10497,14 +10497,14 @@ export namespace apiregistration {
     /**
      * APIServiceList is a list of APIService objects.
      */
-    export class APIServiceList extends Core implements IAPIServiceList {
+    export class APIServiceList extends Resource implements IAPIServiceList {
       items: apiregistration.v1beta1.APIService[]
       metadata: apimachinery.v1.ListMeta
       /**
        * APIServiceList is a list of APIService objects.
        */
       constructor (properties: IAPIServiceList) {
-        super('apiregistration.k8s.io/v1beta1', 'APIServiceList')
+        super({ apiVersion: 'apiregistration.k8s.io/v1beta1', kind: 'APIServiceList' })
         this.items = properties.items
         this.metadata = properties.metadata
       }

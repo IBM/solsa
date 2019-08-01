@@ -117,7 +117,7 @@ console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format */`)
 console.log()
 
 // imports
-console.log(`import { Core } from './core'`)
+console.log(`import { Resource } from './bundle'`)
 console.log()
 console.log(`export type integer = number`)
 console.log()
@@ -143,7 +143,7 @@ for (let [group, g] of Object.entries(reverseMap)) {
       } else {
         if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class
           let apiVersion = resource['x-kubernetes-group-version-kind'][0].group ? resource['x-kubernetes-group-version-kind'][0].group + '/' + version : version
-          console.log(`    export class ${kind} extends Core implements I${kind} {`) // declare class
+          console.log(`    export class ${kind} extends Resource implements I${kind} {`) // declare class
           for (let [key, value, required] of properties) { // field declarations
             console.log(`      ${format([key, value, required])}`) // field declaration
           }
@@ -153,7 +153,7 @@ for (let [group, g] of Object.entries(reverseMap)) {
             console.log(`       */`)
           }
           console.log(`      constructor (properties: I${kind}) {`) // constructor
-          console.log(`        super('${apiVersion}', '${kind}')`) // super call
+          console.log(`        super({ apiVersion: '${apiVersion}', kind: '${kind}' })`) // super call
           console.log(`        ${properties.map(([key]) => `this.${key} = properties.${key}`).join('\n        ')}`) // field initializers
           console.log(`      }`)
           console.log(`    }`)

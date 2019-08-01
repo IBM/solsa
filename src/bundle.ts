@@ -98,17 +98,15 @@ export class Bundle {
  * A resource with an arbitrary structure
  */
 export class Resource extends Bundle {
-  properties: dynamic
-
   /**
    * Construct a bundle with the specified properties
    */
-  constructor (properties: dynamic) {
+  constructor (properties: { apiVersion: string, kind: string } & dynamic) {
     super()
-    this.properties = properties
+    Object.assign(this, properties)
   }
 
-  getResources () {
-    return [{ obj: this.properties }]
+  getResources (): dynamic[] {
+    return [{ obj: this }]
   }
 }
