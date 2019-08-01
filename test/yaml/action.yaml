@@ -4,3 +4,4 @@ metadata:
   name: echo
 spec:
   code: function main (obj) { return obj }
+  runtime: nodejs:default

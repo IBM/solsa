@@ -18,4 +18,4 @@ import * as solsa from '..'
 let bundle = new solsa.Bundle()
 export = bundle
 
-bundle.action = new solsa.openwhisk.v1alpha1.Function({ metadata: { name: 'echo' }, spec: { code: 'function main (obj) { return obj }' } })
+bundle.action = new solsa.openwhisk.v1alpha1.Function({ metadata: { name: 'echo' }, spec: { code: 'function main (obj) { return obj }', runtime: 'nodejs:default' } })
