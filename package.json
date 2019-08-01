@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc && chmod a+x dist/bin/solsa.js",
     "clean": "rm -Rf dist || true",
-    "codegen": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json | node dist/codegen.js > src/synthetic.ts",
+    "codegen-core": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.14/api/openapi-spec/swagger.json | node dist/codegen.js > src/core.ts",
+    "codegen-openwhisk": "curl https://raw.githubusercontent.com/IBM/cloud-functions-operator/master/api/swagger/swagger.json | node dist/codegen.js ibmcloud openwhisk > src/openwhisk.ts",
+    "codegen": "npm run codegen-core && npm run codegen-openwhisk",
     "testgen": "node test/test.js",
     "test": "standard && tslint -p . && mocha"
   },

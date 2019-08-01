@@ -16,11 +16,11 @@
 
 export * from './bundle'
 export * from './container'
+export * from './core'
 export * from './ibmcloud'
 export * from './ingress'
 export * from './knative'
 export * from './openwhisk'
-export * from './synthetic'
 export * from './transform'
 
 export { safeLoad as parseYaml } from 'js-yaml'

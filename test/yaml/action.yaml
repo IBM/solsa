@@ -1,15 +1,6 @@
-apiVersion: openwhisk.seed.ibm.com/v1beta1
+apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Function
 metadata:
   name: echo
 spec:
   code: function main (obj) { return obj }
-  runtime: nodejs:default
----
-apiVersion: openwhisk.seed.ibm.com/v1beta1
-kind: Invocation
-metadata:
-  name: echo
-spec:
-  function: echo
-  parameters: {}

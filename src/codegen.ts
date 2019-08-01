@@ -28,35 +28,34 @@ interface Definition {
 const definitions: { [k: string]: Definition } = JSON.parse(fs.readFileSync(0).toString()).definitions
 
 const ignored = ['x-kubernetes-int-or-string', 'x-kubernetes-embedded-resource', 'x-kubernetes-preserve-unknown-fields'] // JSONSchemaProps
-const misc = ['resource', 'intstr', 'runtime'] // regroup as 'misc'
+const misc = ['api', 'pkg', 'util'] // regroup as 'misc'
 
-const forwardMap: { [k: string]: [string, string, string] } = {} // key -> [group, version, kind]
-const reverseMap: { [k: string]: { [k: string]: { [k: string]: string } } } = {} // [group, version, kind] -> key
+const tree: { [k: string]: { [k: string]: { [k: string]: string } } } = {} // [group, version, kind] -> key
 
-// build maps
+// split key into [group, version, kind]
+function split (key: string) {
+  let [group, version, kind] = `pkg.${key}`.split('.').slice(-3) // runtime -> pkg.runtime hack for ibm cloud functions operator
+  if (group === process.argv[2]) group = process.argv[3] // hack to rename group
+  if (misc.includes(group)) group = 'misc'
+  return [group, version, kind]
+}
+
+// build definition tree
 for (let key of Object.keys(definitions)) {
-  let words = key.split('.')
-  let group = 'misc'
-  if (key.startsWith('io.k8s.api.')) group = words[3]
-  if (key.startsWith('io.k8s.apiextensions-apiserver.pkg.apis.apiextensions.')) group = 'apiextensions'
-  if (key.startsWith('io.k8s.apimachinery.')) group = 'apimachinery'
-  if (key.startsWith('io.k8s.kube-aggregator.pkg.apis.apiregistration.')) group = 'apiregistration'
-  let version = words[words.length - 2]
-  if (misc.includes(version)) version = 'misc'
-  let kind = words[words.length - 1]
-  forwardMap[key] = [group, version, kind]
-  reverseMap[group] = reverseMap[group] || {}
-  reverseMap[group][version] = reverseMap[group][version] || {}
-  reverseMap[group][version][kind] = key
+  let [group, version, kind] = split(key)
+  tree[group] = tree[group] || {}
+  tree[group][version] = tree[group][version] || {}
+  tree[group][version][kind] = key
 }
 
 // return type of property value
 function typeOf (value: any): string {
   if (value['$ref']) {
-    return forwardMap[value['$ref'].substring(14)].join('.')
+    return split(value['$ref'].substring(14)).join('.')
   }
   switch (value.type) {
     case 'integer':
+      return 'number'
     case 'string':
     case 'number':
     case 'boolean':
@@ -75,7 +74,7 @@ function format ([key, value, required]: [string, any, boolean]) {
 
 // build array of resource properties
 function propertiesOf (resource: Definition): [string, any, boolean][] {
-  if (!resource.properties) return [] // object with no properties
+  if (!resource.properties) return []
   let properties = Object.assign({}, resource.properties)
   let required = resource.required || []
   if (resource['x-kubernetes-group-version-kind']) { // omit apiVersion, kind, and status field in kube resource
@@ -113,12 +112,11 @@ console.log()
 
 // imports
 console.log(`import { Resource } from './bundle'`)
-console.log()
-console.log(`export type integer = number`)
+if (!tree.core) console.log(`import { core, meta, misc } from './core'`)
 console.log()
 
 // generate namespace, type, and class declarations
-for (let [group, g] of Object.entries(reverseMap)) {
+for (let [group, g] of Object.entries(tree)) {
   console.log(`export namespace ${group} {`) // outer namespace for the group
   for (let [version, v] of Object.entries(g)) {
     console.log(`  export namespace ${version} {`) // inner namespace for the version
@@ -133,7 +131,7 @@ for (let [group, g] of Object.entries(reverseMap)) {
       let properties = propertiesOf(resource)
       if (key === 'io.k8s.apimachinery.pkg.util.intstr.IntOrString') { // special case
         console.log(`    export type IntOrString = number | string`) // export special type declaration
-      } else if (resource.type !== 'object') { // type alias
+      } else if (resource.type !== 'object' && properties.length === 0) { // type alias
         console.log(`    export type ${kind} = ${resource.type || 'any'}`) // export simple type declaration
       } else {
         if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class

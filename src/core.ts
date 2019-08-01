@@ -18,358 +18,14 @@
 
 import { Resource } from './bundle'
 
-export type integer = number
-
 export namespace admissionregistration {
-  export namespace v1 {
-    /**
-     * MutatingWebhook describes an admission webhook and the resources and operations it applies to.
-     */
-    export interface MutatingWebhook {
-      /** AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy. */
-      admissionReviewVersions: string[]
-      /** ClientConfig defines how to communicate with the hook. Required */
-      clientConfig: admissionregistration.v1.WebhookClientConfig
-      /** FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail. */
-      failurePolicy?: string
-      /** matchPolicy defines how the "rules" list is used to match incoming requests. Allowed values are "Exact" or "Equivalent".
-
-- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
-
-- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
-
-Defaults to "Equivalent" */
-      matchPolicy?: string
-      /** The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required. */
-      name: string
-      /** NamespaceSelector decides whether to run the webhook on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the webhook.
-
-For example, to run the webhook on any objects whose namespace is not associated with "runlevel" of "0" or "1";  you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "runlevel",
-      "operator": "NotIn",
-      "values": [
-        "0",
-        "1"
-      ]
-    }
-  ]
-}
-
-If instead you want to only run the webhook on any objects whose namespace is associated with the "environment" of "prod" or "staging"; you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "environment",
-      "operator": "In",
-      "values": [
-        "prod",
-        "staging"
-      ]
-    }
-  ]
-}
-
-See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ for more examples of label selectors.
-
-Default to the empty LabelSelector, which matches everything. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
-      /** ObjectSelector decides whether to run the webhook based on if the object has matching labels. objectSelector is evaluated against both the oldObject and newObject that would be sent to the webhook, and is considered to match if either object matches the selector. A null object (oldObject in the case of create, or newObject in the case of delete) or an object that cannot have labels (like a DeploymentRollback or a PodProxyOptions object) is not considered to match. Use the object selector only if the webhook is opt-in, because end users may skip the admission webhook by setting the labels. Default to the empty LabelSelector, which matches everything. */
-      objectSelector?: apimachinery.v1.LabelSelector
-      /** reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation. Allowed values are "Never" and "IfNeeded".
-
-Never: the webhook will not be called more than once in a single admission evaluation.
-
-IfNeeded: the webhook will be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial webhook call. Webhooks that specify this option *must* be idempotent, able to process objects they previously admitted. Note: * the number of additional invocations is not guaranteed to be exactly one. * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again. * webhooks that use this option may be reordered to minimize the number of additional invocations. * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.
-
-Defaults to "Never". */
-      reinvocationPolicy?: string
-      /** Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects. */
-      rules?: admissionregistration.v1.RuleWithOperations[]
-      /** SideEffects states whether this webhookk has side effects. Acceptable values are: Unknown, None, Some, NoneOnDryRun Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission change and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some. */
-      sideEffects: string
-      /** TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 10 seconds. */
-      timeoutSeconds?: integer
-    }
-    /**
-     * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
-     */
-    export class MutatingWebhookConfiguration extends Resource implements IMutatingWebhookConfiguration {
-      metadata: apimachinery.v1.ObjectMeta
-      webhooks?: admissionregistration.v1.MutatingWebhook[]
-      /**
-       * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
-       */
-      constructor (properties: IMutatingWebhookConfiguration) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'MutatingWebhookConfiguration' })
-        this.metadata = properties.metadata
-        this.webhooks = properties.webhooks
-      }
-    }
-    export interface IMutatingWebhookConfiguration {
-      /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
-      /** Webhooks is a list of webhooks and the affected resources and operations. */
-      webhooks?: admissionregistration.v1.MutatingWebhook[]
-    }
-    /**
-     * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
-     */
-    export class MutatingWebhookConfigurationList extends Resource implements IMutatingWebhookConfigurationList {
-      items: admissionregistration.v1.MutatingWebhookConfiguration[]
-      metadata: apimachinery.v1.ListMeta
-      /**
-       * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
-       */
-      constructor (properties: IMutatingWebhookConfigurationList) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'MutatingWebhookConfigurationList' })
-        this.items = properties.items
-        this.metadata = properties.metadata
-      }
-    }
-    export interface IMutatingWebhookConfigurationList {
-      /** List of MutatingWebhookConfiguration. */
-      items: admissionregistration.v1.MutatingWebhookConfiguration[]
-      /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
-    }
-    /**
-     * RuleWithOperations is a tuple of Operations and Resources. It is recommended to make sure that all the tuple expansions are valid.
-     */
-    export interface RuleWithOperations {
-      /** APIGroups is the API groups the resources belong to. '*' is all groups. If '*' is present, the length of the slice must be one. Required. */
-      apiGroups?: string[]
-      /** APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required. */
-      apiVersions?: string[]
-      /** Operations is the operations the admission hook cares about - CREATE, UPDATE, or * for all operations. If '*' is present, the length of the slice must be one. Required. */
-      operations?: string[]
-      /** Resources is a list of resources this rule applies to.
-
-For example: 'pods' means pods. 'pods/log' means the log subresource of pods. '*' means all resources, but not subresources. 'pods/*' means all subresources of pods. '*\scale' means all scale subresources. '*\*' means all resources and their subresources.
-
-If wildcard is present, the validation rule will ensure resources do not overlap with each other.
-
-Depending on the enclosing object, subresources might not be allowed. Required. */
-      resources?: string[]
-      /** scope specifies the scope of this rule. Valid values are "Cluster", "Namespaced", and "*" "Cluster" means that only cluster-scoped resources will match this rule. Namespace API objects are cluster-scoped. "Namespaced" means that only namespaced resources will match this rule. "*" means that there are no scope restrictions. Subresources match the scope of their parent resource. Default is "*". */
-      scope?: string
-    }
-    /**
-     * ServiceReference holds a reference to Service.legacy.k8s.io
-     */
-    export interface ServiceReference {
-      /** `name` is the name of the service. Required */
-      name: string
-      /** `namespace` is the namespace of the service. Required */
-      namespace: string
-      /** `path` is an optional URL path which will be sent in any request to this service. */
-      path?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
-    }
-    /**
-     * ValidatingWebhook describes an admission webhook and the resources and operations it applies to.
-     */
-    export interface ValidatingWebhook {
-      /** AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy. */
-      admissionReviewVersions: string[]
-      /** ClientConfig defines how to communicate with the hook. Required */
-      clientConfig: admissionregistration.v1.WebhookClientConfig
-      /** FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail. */
-      failurePolicy?: string
-      /** matchPolicy defines how the "rules" list is used to match incoming requests. Allowed values are "Exact" or "Equivalent".
-
-- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
-
-- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
-
-Defaults to "Equivalent" */
-      matchPolicy?: string
-      /** The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required. */
-      name: string
-      /** NamespaceSelector decides whether to run the webhook on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the webhook.
-
-For example, to run the webhook on any objects whose namespace is not associated with "runlevel" of "0" or "1";  you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "runlevel",
-      "operator": "NotIn",
-      "values": [
-        "0",
-        "1"
-      ]
-    }
-  ]
-}
-
-If instead you want to only run the webhook on any objects whose namespace is associated with the "environment" of "prod" or "staging"; you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "environment",
-      "operator": "In",
-      "values": [
-        "prod",
-        "staging"
-      ]
-    }
-  ]
-}
-
-See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for more examples of label selectors.
-
-Default to the empty LabelSelector, which matches everything. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
-      /** ObjectSelector decides whether to run the webhook based on if the object has matching labels. objectSelector is evaluated against both the oldObject and newObject that would be sent to the webhook, and is considered to match if either object matches the selector. A null object (oldObject in the case of create, or newObject in the case of delete) or an object that cannot have labels (like a DeploymentRollback or a PodProxyOptions object) is not considered to match. Use the object selector only if the webhook is opt-in, because end users may skip the admission webhook by setting the labels. Default to the empty LabelSelector, which matches everything. */
-      objectSelector?: apimachinery.v1.LabelSelector
-      /** Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects. */
-      rules?: admissionregistration.v1.RuleWithOperations[]
-      /** SideEffects states whether this webhookk has side effects. Acceptable values are: Unknown, None, Some, NoneOnDryRun Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission change and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some. */
-      sideEffects: string
-      /** TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 10 seconds. */
-      timeoutSeconds?: integer
-    }
-    /**
-     * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
-     */
-    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
-      metadata: apimachinery.v1.ObjectMeta
-      webhooks?: admissionregistration.v1.ValidatingWebhook[]
-      /**
-       * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
-       */
-      constructor (properties: IValidatingWebhookConfiguration) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'ValidatingWebhookConfiguration' })
-        this.metadata = properties.metadata
-        this.webhooks = properties.webhooks
-      }
-    }
-    export interface IValidatingWebhookConfiguration {
-      /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
-      /** Webhooks is a list of webhooks and the affected resources and operations. */
-      webhooks?: admissionregistration.v1.ValidatingWebhook[]
-    }
-    /**
-     * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
-     */
-    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
-      items: admissionregistration.v1.ValidatingWebhookConfiguration[]
-      metadata: apimachinery.v1.ListMeta
-      /**
-       * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
-       */
-      constructor (properties: IValidatingWebhookConfigurationList) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1', kind: 'ValidatingWebhookConfigurationList' })
-        this.items = properties.items
-        this.metadata = properties.metadata
-      }
-    }
-    export interface IValidatingWebhookConfigurationList {
-      /** List of ValidatingWebhookConfiguration. */
-      items: admissionregistration.v1.ValidatingWebhookConfiguration[]
-      /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
-    }
-    /**
-     * WebhookClientConfig contains the information to make a TLS connection with the webhook
-     */
-    export interface WebhookClientConfig {
-      /** `caBundle` is a PEM encoded CA bundle which will be used to validate the webhook's server certificate. If unspecified, system trust roots on the apiserver are used. */
-      caBundle?: string
-      /** `service` is a reference to the service for this webhook. Either `service` or `url` must be specified.
-
-If the webhook is running within the cluster, then you should use `service`. */
-      service?: admissionregistration.v1.ServiceReference
-      /** `url` gives the location of the webhook, in standard URL form (`scheme://host:port/path`). Exactly one of `url` or `service` must be specified.
-
-The `host` should not refer to a service running in the cluster; use the `service` field instead. The host might be resolved via external DNS in some apiservers (e.g., `kube-apiserver` cannot resolve in-cluster DNS as that would be a layering violation). `host` may also be an IP address.
-
-Please note that using `localhost` or `127.0.0.1` as a `host` is risky unless you take great care to run this webhook on all hosts which run an apiserver which might need to make calls to this webhook. Such installs are likely to be non-portable, i.e., not easy to turn up in a new cluster.
-
-The scheme must be "https"; the URL must begin with "https://".
-
-A path is optional, and if present may be any string permissible in a URL. You may use the path to pass an arbitrary string to the webhook, for example, a cluster identifier.
-
-Attempting to use a user or basic auth e.g. "user:password@" is not allowed. Fragments ("#...") and query parameters ("?...") are not allowed, either. */
-      url?: string
-    }
-  }
   export namespace v1beta1 {
     /**
-     * MutatingWebhook describes an admission webhook and the resources and operations it applies to.
-     */
-    export interface MutatingWebhook {
-      /** AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy. Default to `['v1beta1']`. */
-      admissionReviewVersions?: string[]
-      /** ClientConfig defines how to communicate with the hook. Required */
-      clientConfig: admissionregistration.v1beta1.WebhookClientConfig
-      /** FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Ignore. */
-      failurePolicy?: string
-      /** matchPolicy defines how the "rules" list is used to match incoming requests. Allowed values are "Exact" or "Equivalent".
-
-- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
-
-- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
-
-Defaults to "Exact" */
-      matchPolicy?: string
-      /** The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required. */
-      name: string
-      /** NamespaceSelector decides whether to run the webhook on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the webhook.
-
-For example, to run the webhook on any objects whose namespace is not associated with "runlevel" of "0" or "1";  you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "runlevel",
-      "operator": "NotIn",
-      "values": [
-        "0",
-        "1"
-      ]
-    }
-  ]
-}
-
-If instead you want to only run the webhook on any objects whose namespace is associated with the "environment" of "prod" or "staging"; you will set the selector as follows: "namespaceSelector": {
-  "matchExpressions": [
-    {
-      "key": "environment",
-      "operator": "In",
-      "values": [
-        "prod",
-        "staging"
-      ]
-    }
-  ]
-}
-
-See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ for more examples of label selectors.
-
-Default to the empty LabelSelector, which matches everything. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
-      /** ObjectSelector decides whether to run the webhook based on if the object has matching labels. objectSelector is evaluated against both the oldObject and newObject that would be sent to the webhook, and is considered to match if either object matches the selector. A null object (oldObject in the case of create, or newObject in the case of delete) or an object that cannot have labels (like a DeploymentRollback or a PodProxyOptions object) is not considered to match. Use the object selector only if the webhook is opt-in, because end users may skip the admission webhook by setting the labels. Default to the empty LabelSelector, which matches everything. */
-      objectSelector?: apimachinery.v1.LabelSelector
-      /** reinvocationPolicy indicates whether this webhook should be called multiple times as part of a single admission evaluation. Allowed values are "Never" and "IfNeeded".
-
-Never: the webhook will not be called more than once in a single admission evaluation.
-
-IfNeeded: the webhook will be called at least one additional time as part of the admission evaluation if the object being admitted is modified by other admission plugins after the initial webhook call. Webhooks that specify this option *must* be idempotent, able to process objects they previously admitted. Note: * the number of additional invocations is not guaranteed to be exactly one. * if additional invocations result in further modifications to the object, webhooks are not guaranteed to be invoked again. * webhooks that use this option may be reordered to minimize the number of additional invocations. * to validate an object after all mutations are guaranteed complete, use a validating admission webhook instead.
-
-Defaults to "Never". */
-      reinvocationPolicy?: string
-      /** Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects. */
-      rules?: admissionregistration.v1beta1.RuleWithOperations[]
-      /** SideEffects states whether this webhookk has side effects. Acceptable values are: Unknown, None, Some, NoneOnDryRun Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission change and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some. Defaults to Unknown. */
-      sideEffects?: string
-      /** TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 30 seconds. */
-      timeoutSeconds?: integer
-    }
-    /**
      * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
      */
     export class MutatingWebhookConfiguration extends Resource implements IMutatingWebhookConfiguration {
-      metadata: apimachinery.v1.ObjectMeta
-      webhooks?: admissionregistration.v1beta1.MutatingWebhook[]
+      metadata: meta.v1.ObjectMeta
+      webhooks?: admissionregistration.v1beta1.Webhook[]
       /**
        * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
        */
@@ -381,16 +37,16 @@ Defaults to "Never". */
     }
     export interface IMutatingWebhookConfiguration {
       /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Webhooks is a list of webhooks and the affected resources and operations. */
-      webhooks?: admissionregistration.v1beta1.MutatingWebhook[]
+      webhooks?: admissionregistration.v1beta1.Webhook[]
     }
     /**
      * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
      */
     export class MutatingWebhookConfigurationList extends Resource implements IMutatingWebhookConfigurationList {
       items: admissionregistration.v1beta1.MutatingWebhookConfiguration[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
        */
@@ -404,7 +60,7 @@ Defaults to "Never". */
       /** List of MutatingWebhookConfiguration. */
       items: admissionregistration.v1beta1.MutatingWebhookConfiguration[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RuleWithOperations is a tuple of Operations and Resources. It is recommended to make sure that all the tuple expansions are valid.
@@ -437,27 +93,59 @@ Depending on the enclosing object, subresources might not be allowed. Required. 
       namespace: string
       /** `path` is an optional URL path which will be sent in any request to this service. */
       path?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
     }
     /**
-     * ValidatingWebhook describes an admission webhook and the resources and operations it applies to.
+     * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
      */
-    export interface ValidatingWebhook {
+    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
+      metadata: meta.v1.ObjectMeta
+      webhooks?: admissionregistration.v1beta1.Webhook[]
+      /**
+       * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
+       */
+      constructor (properties: IValidatingWebhookConfiguration) {
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfiguration' })
+        this.metadata = properties.metadata
+        this.webhooks = properties.webhooks
+      }
+    }
+    export interface IValidatingWebhookConfiguration {
+      /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Webhooks is a list of webhooks and the affected resources and operations. */
+      webhooks?: admissionregistration.v1beta1.Webhook[]
+    }
+    /**
+     * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
+     */
+    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
+      items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
+      metadata: meta.v1.ListMeta
+      /**
+       * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
+       */
+      constructor (properties: IValidatingWebhookConfigurationList) {
+        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfigurationList' })
+        this.items = properties.items
+        this.metadata = properties.metadata
+      }
+    }
+    export interface IValidatingWebhookConfigurationList {
+      /** List of ValidatingWebhookConfiguration. */
+      items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
+      /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
+      metadata: meta.v1.ListMeta
+    }
+    /**
+     * Webhook describes an admission webhook and the resources and operations it applies to.
+     */
+    export interface Webhook {
       /** AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy. Default to `['v1beta1']`. */
       admissionReviewVersions?: string[]
       /** ClientConfig defines how to communicate with the hook. Required */
       clientConfig: admissionregistration.v1beta1.WebhookClientConfig
       /** FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Ignore. */
       failurePolicy?: string
-      /** matchPolicy defines how the "rules" list is used to match incoming requests. Allowed values are "Exact" or "Equivalent".
-
-- Exact: match a request only if it exactly matches a specified rule. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, but "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would not be sent to the webhook.
-
-- Equivalent: match a request if modifies a resource listed in rules, even via another API group or version. For example, if deployments can be modified via apps/v1, apps/v1beta1, and extensions/v1beta1, and "rules" only included `apiGroups:["apps"], apiVersions:["v1"], resources: ["deployments"]`, a request to apps/v1beta1 or extensions/v1beta1 would be converted to apps/v1 and sent to the webhook.
-
-Defaults to "Exact" */
-      matchPolicy?: string
       /** The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required. */
       name: string
       /** NamespaceSelector decides whether to run the webhook on an object based on whether the namespace for that object matches the selector. If the object itself is a namespace, the matching is performed on object.metadata.labels. If the object is another cluster scoped resource, it never skips the webhook.
@@ -488,60 +176,16 @@ If instead you want to only run the webhook on any objects whose namespace is as
   ]
 }
 
-See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels for more examples of label selectors.
+See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ for more examples of label selectors.
 
 Default to the empty LabelSelector, which matches everything. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
-      /** ObjectSelector decides whether to run the webhook based on if the object has matching labels. objectSelector is evaluated against both the oldObject and newObject that would be sent to the webhook, and is considered to match if either object matches the selector. A null object (oldObject in the case of create, or newObject in the case of delete) or an object that cannot have labels (like a DeploymentRollback or a PodProxyOptions object) is not considered to match. Use the object selector only if the webhook is opt-in, because end users may skip the admission webhook by setting the labels. Default to the empty LabelSelector, which matches everything. */
-      objectSelector?: apimachinery.v1.LabelSelector
+      namespaceSelector?: meta.v1.LabelSelector
       /** Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects. */
       rules?: admissionregistration.v1beta1.RuleWithOperations[]
       /** SideEffects states whether this webhookk has side effects. Acceptable values are: Unknown, None, Some, NoneOnDryRun Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission change and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some. Defaults to Unknown. */
       sideEffects?: string
       /** TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 30 seconds. */
-      timeoutSeconds?: integer
-    }
-    /**
-     * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
-     */
-    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
-      metadata: apimachinery.v1.ObjectMeta
-      webhooks?: admissionregistration.v1beta1.ValidatingWebhook[]
-      /**
-       * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
-       */
-      constructor (properties: IValidatingWebhookConfiguration) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfiguration' })
-        this.metadata = properties.metadata
-        this.webhooks = properties.webhooks
-      }
-    }
-    export interface IValidatingWebhookConfiguration {
-      /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
-      /** Webhooks is a list of webhooks and the affected resources and operations. */
-      webhooks?: admissionregistration.v1beta1.ValidatingWebhook[]
-    }
-    /**
-     * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
-     */
-    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
-      items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
-      metadata: apimachinery.v1.ListMeta
-      /**
-       * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
-       */
-      constructor (properties: IValidatingWebhookConfigurationList) {
-        super({ apiVersion: 'admissionregistration.k8s.io/v1beta1', kind: 'ValidatingWebhookConfigurationList' })
-        this.items = properties.items
-        this.metadata = properties.metadata
-      }
-    }
-    export interface IValidatingWebhookConfigurationList {
-      /** List of ValidatingWebhookConfiguration. */
-      items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
-      /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      timeoutSeconds?: number
     }
     /**
      * WebhookClientConfig contains the information to make a TLS connection with the webhook
@@ -551,7 +195,9 @@ Default to the empty LabelSelector, which matches everything. */
       caBundle?: string
       /** `service` is a reference to the service for this webhook. Either `service` or `url` must be specified.
 
-If the webhook is running within the cluster, then you should use `service`. */
+If the webhook is running within the cluster, then you should use `service`.
+
+Port 443 will be used if it is open, otherwise it is an error. */
       service?: admissionregistration.v1beta1.ServiceReference
       /** `url` gives the location of the webhook, in standard URL form (`scheme://host:port/path`). Exactly one of `url` or `service` must be specified.
 
@@ -574,9 +220,9 @@ export namespace apps {
      * ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
     export class ControllerRevision extends Resource implements IControllerRevision {
-      data?: apimachinery.misc.RawExtension
-      metadata: apimachinery.v1.ObjectMeta
-      revision: integer
+      data?: misc.runtime.RawExtension
+      metadata: meta.v1.ObjectMeta
+      revision: number
       /**
        * ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
@@ -589,18 +235,18 @@ export namespace apps {
     }
     export interface IControllerRevision {
       /** Data is the serialized representation of the state. */
-      data?: apimachinery.misc.RawExtension
+      data?: misc.runtime.RawExtension
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Revision indicates the revision of the state represented by Data. */
-      revision: integer
+      revision: number
     }
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
     export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1.ControllerRevision[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
@@ -614,13 +260,13 @@ export namespace apps {
       /** Items is the list of ControllerRevisions */
       items: apps.v1.ControllerRevision[]
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DaemonSet represents the configuration of a daemon set.
      */
     export class DaemonSet extends Resource implements IDaemonSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1.DaemonSetSpec
       /**
        * DaemonSet represents the configuration of a daemon set.
@@ -633,7 +279,7 @@ export namespace apps {
     }
     export interface IDaemonSet {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The desired behavior of this daemon set. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: apps.v1.DaemonSetSpec
     }
@@ -642,7 +288,7 @@ export namespace apps {
      */
     export interface DaemonSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -657,7 +303,7 @@ export namespace apps {
      */
     export class DaemonSetList extends Resource implements IDaemonSetList {
       items: apps.v1.DaemonSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
@@ -671,18 +317,18 @@ export namespace apps {
       /** A list of daemon sets. */
       items: apps.v1.DaemonSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DaemonSetSpec is the specification of a daemon set.
      */
     export interface DaemonSetSpec {
       /** The minimum number of seconds for which a newly created DaemonSet pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready). */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** The number of old history to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** A label query over pods that are managed by the daemon set. Must match in order to be controlled. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template: core.v1.PodTemplateSpec
       /** An update strategy to replace existing DaemonSet pods with new pods. */
@@ -693,25 +339,25 @@ export namespace apps {
      */
     export interface DaemonSetStatus {
       /** Count of hash collisions for the DaemonSet. The DaemonSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a DaemonSet's current state. */
       conditions?: apps.v1.DaemonSetCondition[]
       /** The number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      currentNumberScheduled: integer
+      currentNumberScheduled: number
       /** The total number of nodes that should be running the daemon pod (including nodes correctly running the daemon pod). More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      desiredNumberScheduled: integer
+      desiredNumberScheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberAvailable?: integer
+      numberAvailable?: number
       /** The number of nodes that are running the daemon pod, but are not supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      numberMisscheduled: integer
+      numberMisscheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready. */
-      numberReady: integer
+      numberReady: number
       /** The number of nodes that should be running the daemon pod and have none of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberUnavailable?: integer
+      numberUnavailable?: number
       /** The most recent generation observed by the daemon set controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The total number of nodes that are running updated daemon pod */
-      updatedNumberScheduled?: integer
+      updatedNumberScheduled?: number
     }
     /**
      * DaemonSetUpdateStrategy is a struct used to control the update strategy for a DaemonSet.
@@ -726,7 +372,7 @@ export namespace apps {
      * Deployment enables declarative updates for Pods and ReplicaSets.
      */
     export class Deployment extends Resource implements IDeployment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1.DeploymentSpec
       /**
        * Deployment enables declarative updates for Pods and ReplicaSets.
@@ -739,7 +385,7 @@ export namespace apps {
     }
     export interface IDeployment {
       /** Standard object metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the Deployment. */
       spec: apps.v1.DeploymentSpec
     }
@@ -748,9 +394,9 @@ export namespace apps {
      */
     export interface DeploymentCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** The last time this condition was updated. */
-      lastUpdateTime?: apimachinery.v1.Time
+      lastUpdateTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -765,7 +411,7 @@ export namespace apps {
      */
     export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1.Deployment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
@@ -779,24 +425,24 @@ export namespace apps {
       /** Items is the list of Deployments. */
       items: apps.v1.Deployment[]
       /** Standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DeploymentSpec is the specification of the desired behavior of the Deployment.
      */
     export interface DeploymentSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Indicates that the deployment is paused. */
       paused?: boolean
       /** The maximum time in seconds for a deployment to make progress before it is considered to be failed. The deployment controller will continue to process failed deployments and a condition with a ProgressDeadlineExceeded reason will be surfaced in the deployment status. Note that progress will not be estimated during the time a deployment is paused. Defaults to 600s. */
-      progressDeadlineSeconds?: integer
+      progressDeadlineSeconds?: number
       /** Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. It must match the pod template's labels. */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** The deployment strategy to use to replace existing pods with new ones. */
       strategy?: apps.v1.DeploymentStrategy
       /** Template describes the pods that will be created. */
@@ -807,21 +453,21 @@ export namespace apps {
      */
     export interface DeploymentStatus {
       /** Total number of available pods (ready for at least minReadySeconds) targeted by this deployment. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Count of hash collisions for the Deployment. The Deployment controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a deployment's current state. */
       conditions?: apps.v1.DeploymentCondition[]
       /** The generation observed by the deployment controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** Total number of ready pods targeted by this deployment. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment (their labels match the selector). */
-      replicas?: integer
+      replicas?: number
       /** Total number of unavailable pods targeted by this deployment. This is the total number of pods that are still required for the deployment to have 100% available capacity. They may either be pods that are running but not yet available or pods that still have not been created. */
-      unavailableReplicas?: integer
+      unavailableReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment that have the desired template spec. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * DeploymentStrategy describes how to replace existing pods with new ones.
@@ -836,7 +482,7 @@ export namespace apps {
      * ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
     export class ReplicaSet extends Resource implements IReplicaSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1.ReplicaSetSpec
       /**
        * ReplicaSet ensures that a specified number of pod replicas are running at any given time.
@@ -849,7 +495,7 @@ export namespace apps {
     }
     export interface IReplicaSet {
       /** If the Labels of a ReplicaSet are empty, they are defaulted to be the same as the Pod(s) that the ReplicaSet manages. Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the specification of the desired behavior of the ReplicaSet. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: apps.v1.ReplicaSetSpec
     }
@@ -858,7 +504,7 @@ export namespace apps {
      */
     export interface ReplicaSetCondition {
       /** The last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -873,7 +519,7 @@ export namespace apps {
      */
     export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: apps.v1.ReplicaSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
@@ -887,18 +533,18 @@ export namespace apps {
       /** List of ReplicaSets. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller */
       items: apps.v1.ReplicaSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ReplicaSetSpec is the specification of a ReplicaSet.
      */
     export interface ReplicaSetSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas?: integer
+      replicas?: number
       /** Selector is a label query over pods that should match the replica count. Label keys and values that must match in order to be controlled by this replica set. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template?: core.v1.PodTemplateSpec
     }
@@ -907,40 +553,40 @@ export namespace apps {
      */
     export interface ReplicaSetStatus {
       /** The number of available replicas (ready for at least minReadySeconds) for this replica set. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Represents the latest available observations of a replica set's current state. */
       conditions?: apps.v1.ReplicaSetCondition[]
       /** The number of pods that have labels matching the labels of the pod template of the replicaset. */
-      fullyLabeledReplicas?: integer
+      fullyLabeledReplicas?: number
       /** ObservedGeneration reflects the generation of the most recently observed ReplicaSet. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The number of ready replicas for this replica set. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Replicas is the most recently oberved number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas: integer
+      replicas: number
     }
     /**
      * Spec to control the desired behavior of daemon set rolling update.
      */
     export interface RollingUpdateDaemonSet {
       /** The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0. Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * Spec to control the desired behavior of rolling update.
      */
     export interface RollingUpdateDeployment {
       /** The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. Defaults to 25%. Example: when this is set to 30%, the new ReplicaSet can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new ReplicaSet can be scaled up further, ensuring that total number of pods running at any time during the update is at most 130% of desired pods. */
-      maxSurge?: apimachinery.misc.IntOrString
+      maxSurge?: misc.intstr.IntOrString
       /** The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. Defaults to 25%. Example: when this is set to 30%, the old ReplicaSet can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old ReplicaSet can be scaled down further, followed by scaling up the new ReplicaSet, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
      */
     export interface RollingUpdateStatefulSetStrategy {
       /** Partition indicates the ordinal at which the StatefulSet should be partitioned. Default value is 0. */
-      partition?: integer
+      partition?: number
     }
     /**
      * StatefulSet represents a set of pods with consistent identities. Identities are defined as:
@@ -949,7 +595,7 @@ export namespace apps {
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
     export class StatefulSet extends Resource implements IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1.StatefulSetSpec
       /**
        * StatefulSet represents a set of pods with consistent identities. Identities are defined as:
@@ -964,7 +610,7 @@ export namespace apps {
       }
     }
     export interface IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the desired identities of pods in this set. */
       spec: apps.v1.StatefulSetSpec
     }
@@ -973,7 +619,7 @@ export namespace apps {
      */
     export interface StatefulSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -988,7 +634,7 @@ export namespace apps {
      */
     export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
@@ -1000,7 +646,7 @@ export namespace apps {
     }
     export interface IStatefulSetList {
       items: apps.v1.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * A StatefulSetSpec is the specification of a StatefulSet.
@@ -1009,11 +655,11 @@ export namespace apps {
       /** podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once. */
       podManagementPolicy?: string
       /** replicas is the desired number of replicas of the given Template. These are replicas in the sense that they are instantiations of the same Template, but individual replicas also have a consistent identity. If unspecified, defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** revisionHistoryLimit is the maximum number of revisions that will be maintained in the StatefulSet's revision history. The revision history consists of all revisions not represented by a currently applied StatefulSetSpec version. The default value is 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** selector is a label query over pods that should match the replica count. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** serviceName is the name of the service that governs this StatefulSet. This service must exist before the StatefulSet, and is responsible for the network identity of the set. Pods get DNS/hostnames that follow the pattern: pod-specific-string.serviceName.default.svc.cluster.local where "pod-specific-string" is managed by the StatefulSet controller. */
       serviceName: string
       /** template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. */
@@ -1028,23 +674,23 @@ export namespace apps {
      */
     export interface StatefulSetStatus {
       /** collisionCount is the count of hash collisions for the StatefulSet. The StatefulSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a statefulset's current state. */
       conditions?: apps.v1.StatefulSetCondition[]
       /** currentReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by currentRevision. */
-      currentReplicas?: integer
+      currentReplicas?: number
       /** currentRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [0,currentReplicas). */
       currentRevision?: string
       /** observedGeneration is the most recent generation observed for this StatefulSet. It corresponds to the StatefulSet's generation, which is updated on mutation by the API Server. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** readyReplicas is the number of Pods created by the StatefulSet controller that have a Ready Condition. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** replicas is the number of Pods created by the StatefulSet controller. */
-      replicas: integer
+      replicas: number
       /** updateRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [replicas-updatedReplicas,replicas) */
       updateRevision?: string
       /** updatedReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by updateRevision. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.
@@ -1061,9 +707,9 @@ export namespace apps {
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1beta2/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
     export class ControllerRevision extends Resource implements IControllerRevision {
-      data?: apimachinery.misc.RawExtension
-      metadata: apimachinery.v1.ObjectMeta
-      revision: integer
+      data?: misc.runtime.RawExtension
+      metadata: meta.v1.ObjectMeta
+      revision: number
       /**
        * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1beta2/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
@@ -1076,18 +722,18 @@ export namespace apps {
     }
     export interface IControllerRevision {
       /** Data is the serialized representation of the state. */
-      data?: apimachinery.misc.RawExtension
+      data?: misc.runtime.RawExtension
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Revision indicates the revision of the state represented by Data. */
-      revision: integer
+      revision: number
     }
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
     export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1beta1.ControllerRevision[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
@@ -1101,13 +747,13 @@ export namespace apps {
       /** Items is the list of ControllerRevisions */
       items: apps.v1beta1.ControllerRevision[]
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
     export class Deployment extends Resource implements IDeployment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
@@ -1120,7 +766,7 @@ export namespace apps {
     }
     export interface IDeployment {
       /** Standard object metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the Deployment. */
       spec: apps.v1beta1.DeploymentSpec
     }
@@ -1129,9 +775,9 @@ export namespace apps {
      */
     export interface DeploymentCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** The last time this condition was updated. */
-      lastUpdateTime?: apimachinery.v1.Time
+      lastUpdateTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1146,7 +792,7 @@ export namespace apps {
      */
     export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1beta1.Deployment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
@@ -1160,7 +806,7 @@ export namespace apps {
       /** Items is the list of Deployments. */
       items: apps.v1beta1.Deployment[]
       /** Standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
@@ -1192,19 +838,19 @@ export namespace apps {
      */
     export interface DeploymentSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Indicates that the deployment is paused. */
       paused?: boolean
       /** The maximum time in seconds for a deployment to make progress before it is considered to be failed. The deployment controller will continue to process failed deployments and a condition with a ProgressDeadlineExceeded reason will be surfaced in the deployment status. Note that progress will not be estimated during the time a deployment is paused. Defaults to 600s. */
-      progressDeadlineSeconds?: integer
+      progressDeadlineSeconds?: number
       /** Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 2. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** DEPRECATED. The config this deployment is rolling back to. Will be cleared after rollback is done. */
       rollbackTo?: apps.v1beta1.RollbackConfig
       /** Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** The deployment strategy to use to replace existing pods with new ones. */
       strategy?: apps.v1beta1.DeploymentStrategy
       /** Template describes the pods that will be created. */
@@ -1215,21 +861,21 @@ export namespace apps {
      */
     export interface DeploymentStatus {
       /** Total number of available pods (ready for at least minReadySeconds) targeted by this deployment. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Count of hash collisions for the Deployment. The Deployment controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a deployment's current state. */
       conditions?: apps.v1beta1.DeploymentCondition[]
       /** The generation observed by the deployment controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** Total number of ready pods targeted by this deployment. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment (their labels match the selector). */
-      replicas?: integer
+      replicas?: number
       /** Total number of unavailable pods targeted by this deployment. This is the total number of pods that are still required for the deployment to have 100% available capacity. They may either be pods that are running but not yet available or pods that still have not been created. */
-      unavailableReplicas?: integer
+      unavailableReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment that have the desired template spec. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * DeploymentStrategy describes how to replace existing pods with new ones.
@@ -1245,29 +891,29 @@ export namespace apps {
      */
     export interface RollbackConfig {
       /** The revision to rollback to. If set to 0, rollback to the last revision. */
-      revision?: integer
+      revision?: number
     }
     /**
      * Spec to control the desired behavior of rolling update.
      */
     export interface RollingUpdateDeployment {
       /** The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. Defaults to 25%. Example: when this is set to 30%, the new ReplicaSet can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new ReplicaSet can be scaled up further, ensuring that total number of pods running at any time during the update is at most 130% of desired pods. */
-      maxSurge?: apimachinery.misc.IntOrString
+      maxSurge?: misc.intstr.IntOrString
       /** The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. Defaults to 25%. Example: when this is set to 30%, the old ReplicaSet can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old ReplicaSet can be scaled down further, followed by scaling up the new ReplicaSet, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
      */
     export interface RollingUpdateStatefulSetStrategy {
       /** Partition indicates the ordinal at which the StatefulSet should be partitioned. */
-      partition?: integer
+      partition?: number
     }
     /**
      * Scale represents a scaling request for a resource.
      */
     export class Scale extends Resource implements IScale {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
@@ -1280,7 +926,7 @@ export namespace apps {
     }
     export interface IScale {
       /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. */
       spec: apps.v1beta1.ScaleSpec
     }
@@ -1289,14 +935,14 @@ export namespace apps {
      */
     export interface ScaleSpec {
       /** desired number of instances for the scaled object. */
-      replicas?: integer
+      replicas?: number
     }
     /**
      * ScaleStatus represents the current status of a scale subresource.
      */
     export interface ScaleStatus {
       /** actual number of observed instances of the scaled object. */
-      replicas: integer
+      replicas: number
       /** label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors */
       selector?: { [k: string]: string }
       /** label selector for pods that should match the replicas count. This is a serializated version of both map-based and more expressive set-based selectors. This is done to avoid introspection in the clients. The string will be in the same format as the query-param syntax. If the target type only supports map-based selectors, both this field and map-based selector field are populated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
@@ -1309,7 +955,7 @@ export namespace apps {
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
     export class StatefulSet extends Resource implements IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.StatefulSetSpec
       /**
        * DEPRECATED - This group version of StatefulSet is deprecated by apps/v1beta2/StatefulSet. See the release notes for more information. StatefulSet represents a set of pods with consistent identities. Identities are defined as:
@@ -1324,7 +970,7 @@ export namespace apps {
       }
     }
     export interface IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the desired identities of pods in this set. */
       spec: apps.v1beta1.StatefulSetSpec
     }
@@ -1333,7 +979,7 @@ export namespace apps {
      */
     export interface StatefulSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1348,7 +994,7 @@ export namespace apps {
      */
     export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1beta1.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
@@ -1360,7 +1006,7 @@ export namespace apps {
     }
     export interface IStatefulSetList {
       items: apps.v1beta1.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * A StatefulSetSpec is the specification of a StatefulSet.
@@ -1369,11 +1015,11 @@ export namespace apps {
       /** podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once. */
       podManagementPolicy?: string
       /** replicas is the desired number of replicas of the given Template. These are replicas in the sense that they are instantiations of the same Template, but individual replicas also have a consistent identity. If unspecified, defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** revisionHistoryLimit is the maximum number of revisions that will be maintained in the StatefulSet's revision history. The revision history consists of all revisions not represented by a currently applied StatefulSetSpec version. The default value is 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** selector is a label query over pods that should match the replica count. If empty, defaulted to labels on the pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** serviceName is the name of the service that governs this StatefulSet. This service must exist before the StatefulSet, and is responsible for the network identity of the set. Pods get DNS/hostnames that follow the pattern: pod-specific-string.serviceName.default.svc.cluster.local where "pod-specific-string" is managed by the StatefulSet controller. */
       serviceName: string
       /** template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. */
@@ -1388,23 +1034,23 @@ export namespace apps {
      */
     export interface StatefulSetStatus {
       /** collisionCount is the count of hash collisions for the StatefulSet. The StatefulSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a statefulset's current state. */
       conditions?: apps.v1beta1.StatefulSetCondition[]
       /** currentReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by currentRevision. */
-      currentReplicas?: integer
+      currentReplicas?: number
       /** currentRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [0,currentReplicas). */
       currentRevision?: string
       /** observedGeneration is the most recent generation observed for this StatefulSet. It corresponds to the StatefulSet's generation, which is updated on mutation by the API Server. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** readyReplicas is the number of Pods created by the StatefulSet controller that have a Ready Condition. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** replicas is the number of Pods created by the StatefulSet controller. */
-      replicas: integer
+      replicas: number
       /** updateRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [replicas-updatedReplicas,replicas) */
       updateRevision?: string
       /** updatedReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by updateRevision. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.
@@ -1421,9 +1067,9 @@ export namespace apps {
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
     export class ControllerRevision extends Resource implements IControllerRevision {
-      data?: apimachinery.misc.RawExtension
-      metadata: apimachinery.v1.ObjectMeta
-      revision: integer
+      data?: misc.runtime.RawExtension
+      metadata: meta.v1.ObjectMeta
+      revision: number
       /**
        * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
        */
@@ -1436,18 +1082,18 @@ export namespace apps {
     }
     export interface IControllerRevision {
       /** Data is the serialized representation of the state. */
-      data?: apimachinery.misc.RawExtension
+      data?: misc.runtime.RawExtension
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Revision indicates the revision of the state represented by Data. */
-      revision: integer
+      revision: number
     }
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
     export class ControllerRevisionList extends Resource implements IControllerRevisionList {
       items: apps.v1beta2.ControllerRevision[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
        */
@@ -1461,13 +1107,13 @@ export namespace apps {
       /** Items is the list of ControllerRevisions */
       items: apps.v1beta2.ControllerRevision[]
       /** More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
     export class DaemonSet extends Resource implements IDaemonSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.DaemonSetSpec
       /**
        * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
@@ -1480,7 +1126,7 @@ export namespace apps {
     }
     export interface IDaemonSet {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The desired behavior of this daemon set. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status */
       spec: apps.v1beta2.DaemonSetSpec
     }
@@ -1489,7 +1135,7 @@ export namespace apps {
      */
     export interface DaemonSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1504,7 +1150,7 @@ export namespace apps {
      */
     export class DaemonSetList extends Resource implements IDaemonSetList {
       items: apps.v1beta2.DaemonSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
@@ -1518,18 +1164,18 @@ export namespace apps {
       /** A list of daemon sets. */
       items: apps.v1beta2.DaemonSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DaemonSetSpec is the specification of a daemon set.
      */
     export interface DaemonSetSpec {
       /** The minimum number of seconds for which a newly created DaemonSet pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready). */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** The number of old history to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** A label query over pods that are managed by the daemon set. Must match in order to be controlled. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template: core.v1.PodTemplateSpec
       /** An update strategy to replace existing DaemonSet pods with new pods. */
@@ -1540,25 +1186,25 @@ export namespace apps {
      */
     export interface DaemonSetStatus {
       /** Count of hash collisions for the DaemonSet. The DaemonSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a DaemonSet's current state. */
       conditions?: apps.v1beta2.DaemonSetCondition[]
       /** The number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      currentNumberScheduled: integer
+      currentNumberScheduled: number
       /** The total number of nodes that should be running the daemon pod (including nodes correctly running the daemon pod). More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      desiredNumberScheduled: integer
+      desiredNumberScheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberAvailable?: integer
+      numberAvailable?: number
       /** The number of nodes that are running the daemon pod, but are not supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      numberMisscheduled: integer
+      numberMisscheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready. */
-      numberReady: integer
+      numberReady: number
       /** The number of nodes that should be running the daemon pod and have none of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberUnavailable?: integer
+      numberUnavailable?: number
       /** The most recent generation observed by the daemon set controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The total number of nodes that are running updated daemon pod */
-      updatedNumberScheduled?: integer
+      updatedNumberScheduled?: number
     }
     /**
      * DaemonSetUpdateStrategy is a struct used to control the update strategy for a DaemonSet.
@@ -1573,7 +1219,7 @@ export namespace apps {
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
     export class Deployment extends Resource implements IDeployment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
@@ -1586,7 +1232,7 @@ export namespace apps {
     }
     export interface IDeployment {
       /** Standard object metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the Deployment. */
       spec: apps.v1beta2.DeploymentSpec
     }
@@ -1595,9 +1241,9 @@ export namespace apps {
      */
     export interface DeploymentCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** The last time this condition was updated. */
-      lastUpdateTime?: apimachinery.v1.Time
+      lastUpdateTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1612,7 +1258,7 @@ export namespace apps {
      */
     export class DeploymentList extends Resource implements IDeploymentList {
       items: apps.v1beta2.Deployment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
@@ -1626,24 +1272,24 @@ export namespace apps {
       /** Items is the list of Deployments. */
       items: apps.v1beta2.Deployment[]
       /** Standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DeploymentSpec is the specification of the desired behavior of the Deployment.
      */
     export interface DeploymentSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Indicates that the deployment is paused. */
       paused?: boolean
       /** The maximum time in seconds for a deployment to make progress before it is considered to be failed. The deployment controller will continue to process failed deployments and a condition with a ProgressDeadlineExceeded reason will be surfaced in the deployment status. Note that progress will not be estimated during the time a deployment is paused. Defaults to 600s. */
-      progressDeadlineSeconds?: integer
+      progressDeadlineSeconds?: number
       /** Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. It must match the pod template's labels. */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** The deployment strategy to use to replace existing pods with new ones. */
       strategy?: apps.v1beta2.DeploymentStrategy
       /** Template describes the pods that will be created. */
@@ -1654,21 +1300,21 @@ export namespace apps {
      */
     export interface DeploymentStatus {
       /** Total number of available pods (ready for at least minReadySeconds) targeted by this deployment. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Count of hash collisions for the Deployment. The Deployment controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a deployment's current state. */
       conditions?: apps.v1beta2.DeploymentCondition[]
       /** The generation observed by the deployment controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** Total number of ready pods targeted by this deployment. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment (their labels match the selector). */
-      replicas?: integer
+      replicas?: number
       /** Total number of unavailable pods targeted by this deployment. This is the total number of pods that are still required for the deployment to have 100% available capacity. They may either be pods that are running but not yet available or pods that still have not been created. */
-      unavailableReplicas?: integer
+      unavailableReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment that have the desired template spec. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * DeploymentStrategy describes how to replace existing pods with new ones.
@@ -1683,7 +1329,7 @@ export namespace apps {
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
     export class ReplicaSet extends Resource implements IReplicaSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.ReplicaSetSpec
       /**
        * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
@@ -1696,7 +1342,7 @@ export namespace apps {
     }
     export interface IReplicaSet {
       /** If the Labels of a ReplicaSet are empty, they are defaulted to be the same as the Pod(s) that the ReplicaSet manages. Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the specification of the desired behavior of the ReplicaSet. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status */
       spec: apps.v1beta2.ReplicaSetSpec
     }
@@ -1705,7 +1351,7 @@ export namespace apps {
      */
     export interface ReplicaSetCondition {
       /** The last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1720,7 +1366,7 @@ export namespace apps {
      */
     export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: apps.v1beta2.ReplicaSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
@@ -1734,18 +1380,18 @@ export namespace apps {
       /** List of ReplicaSets. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller */
       items: apps.v1beta2.ReplicaSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ReplicaSetSpec is the specification of a ReplicaSet.
      */
     export interface ReplicaSetSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas?: integer
+      replicas?: number
       /** Selector is a label query over pods that should match the replica count. Label keys and values that must match in order to be controlled by this replica set. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template?: core.v1.PodTemplateSpec
     }
@@ -1754,46 +1400,46 @@ export namespace apps {
      */
     export interface ReplicaSetStatus {
       /** The number of available replicas (ready for at least minReadySeconds) for this replica set. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Represents the latest available observations of a replica set's current state. */
       conditions?: apps.v1beta2.ReplicaSetCondition[]
       /** The number of pods that have labels matching the labels of the pod template of the replicaset. */
-      fullyLabeledReplicas?: integer
+      fullyLabeledReplicas?: number
       /** ObservedGeneration reflects the generation of the most recently observed ReplicaSet. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The number of ready replicas for this replica set. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Replicas is the most recently oberved number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas: integer
+      replicas: number
     }
     /**
      * Spec to control the desired behavior of daemon set rolling update.
      */
     export interface RollingUpdateDaemonSet {
       /** The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0. Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * Spec to control the desired behavior of rolling update.
      */
     export interface RollingUpdateDeployment {
       /** The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. Defaults to 25%. Example: when this is set to 30%, the new ReplicaSet can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new ReplicaSet can be scaled up further, ensuring that total number of pods running at any time during the update is at most 130% of desired pods. */
-      maxSurge?: apimachinery.misc.IntOrString
+      maxSurge?: misc.intstr.IntOrString
       /** The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. Defaults to 25%. Example: when this is set to 30%, the old ReplicaSet can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old ReplicaSet can be scaled down further, followed by scaling up the new ReplicaSet, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
      */
     export interface RollingUpdateStatefulSetStrategy {
       /** Partition indicates the ordinal at which the StatefulSet should be partitioned. Default value is 0. */
-      partition?: integer
+      partition?: number
     }
     /**
      * Scale represents a scaling request for a resource.
      */
     export class Scale extends Resource implements IScale {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
@@ -1806,7 +1452,7 @@ export namespace apps {
     }
     export interface IScale {
       /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status. */
       spec: apps.v1beta2.ScaleSpec
     }
@@ -1815,14 +1461,14 @@ export namespace apps {
      */
     export interface ScaleSpec {
       /** desired number of instances for the scaled object. */
-      replicas?: integer
+      replicas?: number
     }
     /**
      * ScaleStatus represents the current status of a scale subresource.
      */
     export interface ScaleStatus {
       /** actual number of observed instances of the scaled object. */
-      replicas: integer
+      replicas: number
       /** label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors */
       selector?: { [k: string]: string }
       /** label selector for pods that should match the replicas count. This is a serializated version of both map-based and more expressive set-based selectors. This is done to avoid introspection in the clients. The string will be in the same format as the query-param syntax. If the target type only supports map-based selectors, both this field and map-based selector field are populated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
@@ -1835,7 +1481,7 @@ export namespace apps {
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
     export class StatefulSet extends Resource implements IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.StatefulSetSpec
       /**
        * DEPRECATED - This group version of StatefulSet is deprecated by apps/v1/StatefulSet. See the release notes for more information. StatefulSet represents a set of pods with consistent identities. Identities are defined as:
@@ -1850,7 +1496,7 @@ export namespace apps {
       }
     }
     export interface IStatefulSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the desired identities of pods in this set. */
       spec: apps.v1beta2.StatefulSetSpec
     }
@@ -1859,7 +1505,7 @@ export namespace apps {
      */
     export interface StatefulSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -1874,7 +1520,7 @@ export namespace apps {
      */
     export class StatefulSetList extends Resource implements IStatefulSetList {
       items: apps.v1beta2.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * StatefulSetList is a collection of StatefulSets.
        */
@@ -1886,7 +1532,7 @@ export namespace apps {
     }
     export interface IStatefulSetList {
       items: apps.v1beta2.StatefulSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * A StatefulSetSpec is the specification of a StatefulSet.
@@ -1895,11 +1541,11 @@ export namespace apps {
       /** podManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down. The default policy is `OrderedReady`, where pods are created in increasing order (pod-0, then pod-1, etc) and the controller will wait until each pod is ready before continuing. When scaling down, the pods are removed in the opposite order. The alternative policy is `Parallel` which will create pods in parallel to match the desired scale without waiting, and on scale down will delete all pods at once. */
       podManagementPolicy?: string
       /** replicas is the desired number of replicas of the given Template. These are replicas in the sense that they are instantiations of the same Template, but individual replicas also have a consistent identity. If unspecified, defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** revisionHistoryLimit is the maximum number of revisions that will be maintained in the StatefulSet's revision history. The revision history consists of all revisions not represented by a currently applied StatefulSetSpec version. The default value is 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** selector is a label query over pods that should match the replica count. It must match the pod template's labels. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector: apimachinery.v1.LabelSelector
+      selector: meta.v1.LabelSelector
       /** serviceName is the name of the service that governs this StatefulSet. This service must exist before the StatefulSet, and is responsible for the network identity of the set. Pods get DNS/hostnames that follow the pattern: pod-specific-string.serviceName.default.svc.cluster.local where "pod-specific-string" is managed by the StatefulSet controller. */
       serviceName: string
       /** template is the object that describes the pod that will be created if insufficient replicas are detected. Each pod stamped out by the StatefulSet will fulfill this Template, but have a unique identity from the rest of the StatefulSet. */
@@ -1914,23 +1560,23 @@ export namespace apps {
      */
     export interface StatefulSetStatus {
       /** collisionCount is the count of hash collisions for the StatefulSet. The StatefulSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a statefulset's current state. */
       conditions?: apps.v1beta2.StatefulSetCondition[]
       /** currentReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by currentRevision. */
-      currentReplicas?: integer
+      currentReplicas?: number
       /** currentRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [0,currentReplicas). */
       currentRevision?: string
       /** observedGeneration is the most recent generation observed for this StatefulSet. It corresponds to the StatefulSet's generation, which is updated on mutation by the API Server. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** readyReplicas is the number of Pods created by the StatefulSet controller that have a Ready Condition. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** replicas is the number of Pods created by the StatefulSet controller. */
-      replicas: integer
+      replicas: number
       /** updateRevision, if not empty, indicates the version of the StatefulSet used to generate Pods in the sequence [replicas-updatedReplicas,replicas) */
       updateRevision?: string
       /** updatedReplicas is the number of Pods created by the StatefulSet controller from the StatefulSet version indicated by updateRevision. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.
@@ -1949,7 +1595,7 @@ export namespace auditregistration {
      * AuditSink represents a cluster level audit sink
      */
     export class AuditSink extends Resource implements IAuditSink {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: auditregistration.v1alpha1.AuditSinkSpec
       /**
        * AuditSink represents a cluster level audit sink
@@ -1961,7 +1607,7 @@ export namespace auditregistration {
       }
     }
     export interface IAuditSink {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the audit configuration spec */
       spec: auditregistration.v1alpha1.AuditSinkSpec
     }
@@ -1970,7 +1616,7 @@ export namespace auditregistration {
      */
     export class AuditSinkList extends Resource implements IAuditSinkList {
       items: auditregistration.v1alpha1.AuditSink[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * AuditSinkList is a list of AuditSink items.
        */
@@ -1983,7 +1629,7 @@ export namespace auditregistration {
     export interface IAuditSinkList {
       /** List of audit configurations. */
       items: auditregistration.v1alpha1.AuditSink[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * AuditSinkSpec holds the spec for the audit sink
@@ -2013,8 +1659,6 @@ export namespace auditregistration {
       namespace: string
       /** `path` is an optional URL path which will be sent in any request to this service. */
       path?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
     }
     /**
      * Webhook holds the configuration of the webhook
@@ -2033,7 +1677,9 @@ export namespace auditregistration {
       caBundle?: string
       /** `service` is a reference to the service for this webhook. Either `service` or `url` must be specified.
 
-If the webhook is running within the cluster, then you should use `service`. */
+If the webhook is running within the cluster, then you should use `service`.
+
+Port 443 will be used if it is open, otherwise it is an error. */
       service?: auditregistration.v1alpha1.ServiceReference
       /** `url` gives the location of the webhook, in standard URL form (`scheme://host:port/path`). Exactly one of `url` or `service` must be specified.
 
@@ -2053,71 +1699,19 @@ Attempting to use a user or basic auth e.g. "user:password@" is not allowed. Fra
      */
     export interface WebhookThrottleConfig {
       /** ThrottleBurst is the maximum number of events sent at the same moment default 15 QPS */
-      burst?: integer
+      burst?: number
       /** ThrottleQPS maximum number of batches per second default 10 QPS */
-      qps?: integer
+      qps?: number
     }
   }
 }
 export namespace authentication {
   export namespace v1 {
     /**
-     * BoundObjectReference is a reference to an object that a token is bound to.
-     */
-    export interface BoundObjectReference {
-      /** API version of the referent. */
-      apiVersion?: string
-      /** Kind of the referent. Valid kinds are 'Pod' and 'Secret'. */
-      kind?: string
-      /** Name of the referent. */
-      name?: string
-      /** UID of the referent. */
-      uid?: string
-    }
-    /**
-     * TokenRequest requests a token for a given service account.
-     */
-    export class TokenRequest extends Resource implements ITokenRequest {
-      metadata: apimachinery.v1.ObjectMeta
-      spec: authentication.v1.TokenRequestSpec
-      /**
-       * TokenRequest requests a token for a given service account.
-       */
-      constructor (properties: ITokenRequest) {
-        super({ apiVersion: 'authentication.k8s.io/v1', kind: 'TokenRequest' })
-        this.metadata = properties.metadata
-        this.spec = properties.spec
-      }
-    }
-    export interface ITokenRequest {
-      metadata: apimachinery.v1.ObjectMeta
-      spec: authentication.v1.TokenRequestSpec
-    }
-    /**
-     * TokenRequestSpec contains client provided parameters of a token request.
-     */
-    export interface TokenRequestSpec {
-      /** Audiences are the intendend audiences of the token. A recipient of a token must identitfy themself with an identifier in the list of audiences of the token, and otherwise should reject the token. A token issued for multiple audiences may be used to authenticate against any of the audiences listed but implies a high degree of trust between the target audiences. */
-      audiences: string[]
-      /** BoundObjectRef is a reference to an object that the token will be bound to. The token will only be valid for as long as the bound object exists. NOTE: The API server's TokenReview endpoint will validate the BoundObjectRef, but other audiences may not. Keep ExpirationSeconds small if you want prompt revocation. */
-      boundObjectRef?: authentication.v1.BoundObjectReference
-      /** ExpirationSeconds is the requested duration of validity of the request. The token issuer may return a token with a different validity duration so a client needs to check the 'expiration' field in a response. */
-      expirationSeconds?: integer
-    }
-    /**
-     * TokenRequestStatus is the result of a token request.
-     */
-    export interface TokenRequestStatus {
-      /** ExpirationTimestamp is the time of expiration of the returned token. */
-      expirationTimestamp: apimachinery.v1.Time
-      /** Token is the opaque bearer token. */
-      token: string
-    }
-    /**
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
     export class TokenReview extends Resource implements ITokenReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authentication.v1.TokenReviewSpec
       /**
        * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
@@ -2129,7 +1723,7 @@ export namespace authentication {
       }
     }
     export interface ITokenReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated */
       spec: authentication.v1.TokenReviewSpec
     }
@@ -2174,7 +1768,7 @@ export namespace authentication {
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
     export class TokenReview extends Resource implements ITokenReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authentication.v1beta1.TokenReviewSpec
       /**
        * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
@@ -2186,7 +1780,7 @@ export namespace authentication {
       }
     }
     export interface ITokenReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated */
       spec: authentication.v1beta1.TokenReviewSpec
     }
@@ -2233,7 +1827,7 @@ export namespace authorization {
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
     export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
        * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
@@ -2245,7 +1839,7 @@ export namespace authorization {
       }
     }
     export interface ILocalSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated.  spec.namespace must be equal to the namespace you made the request against.  If empty, it is defaulted. */
       spec: authorization.v1.SubjectAccessReviewSpec
     }
@@ -2304,7 +1898,7 @@ export namespace authorization {
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
     export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectAccessReviewSpec
       /**
        * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
@@ -2316,7 +1910,7 @@ export namespace authorization {
       }
     }
     export interface ISelfSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated.  user and groups must be empty */
       spec: authorization.v1.SelfSubjectAccessReviewSpec
     }
@@ -2333,7 +1927,7 @@ export namespace authorization {
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
     export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectRulesReviewSpec
       /**
        * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
@@ -2345,7 +1939,7 @@ export namespace authorization {
       }
     }
     export interface ISelfSubjectRulesReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated. */
       spec: authorization.v1.SelfSubjectRulesReviewSpec
     }
@@ -2357,7 +1951,7 @@ export namespace authorization {
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
     export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
        * SubjectAccessReview checks whether or not a user or group can perform an action.
@@ -2369,7 +1963,7 @@ export namespace authorization {
       }
     }
     export interface ISubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated */
       spec: authorization.v1.SubjectAccessReviewSpec
     }
@@ -2422,7 +2016,7 @@ export namespace authorization {
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
     export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
        * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
@@ -2434,7 +2028,7 @@ export namespace authorization {
       }
     }
     export interface ILocalSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated.  spec.namespace must be equal to the namespace you made the request against.  If empty, it is defaulted. */
       spec: authorization.v1beta1.SubjectAccessReviewSpec
     }
@@ -2493,7 +2087,7 @@ export namespace authorization {
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
     export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectAccessReviewSpec
       /**
        * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
@@ -2505,7 +2099,7 @@ export namespace authorization {
       }
     }
     export interface ISelfSubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated.  user and groups must be empty */
       spec: authorization.v1beta1.SelfSubjectAccessReviewSpec
     }
@@ -2522,7 +2116,7 @@ export namespace authorization {
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
     export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectRulesReviewSpec
       /**
        * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
@@ -2534,7 +2128,7 @@ export namespace authorization {
       }
     }
     export interface ISelfSubjectRulesReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated. */
       spec: authorization.v1beta1.SelfSubjectRulesReviewSpec
     }
@@ -2546,7 +2140,7 @@ export namespace authorization {
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
     export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
        * SubjectAccessReview checks whether or not a user or group can perform an action.
@@ -2558,7 +2152,7 @@ export namespace authorization {
       }
     }
     export interface ISubjectAccessReview {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec holds information about the request being evaluated */
       spec: authorization.v1beta1.SubjectAccessReviewSpec
     }
@@ -2624,7 +2218,7 @@ export namespace autoscaling {
      * configuration of a horizontal pod autoscaler.
      */
     export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: autoscaling.v1.HorizontalPodAutoscalerSpec
       /**
        * configuration of a horizontal pod autoscaler.
@@ -2637,7 +2231,7 @@ export namespace autoscaling {
     }
     export interface IHorizontalPodAutoscaler {
       /** Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** behaviour of autoscaler. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. */
       spec: autoscaling.v1.HorizontalPodAutoscalerSpec
     }
@@ -2646,7 +2240,7 @@ export namespace autoscaling {
      */
     export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v1.HorizontalPodAutoscaler[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * list of horizontal pod autoscaler objects.
        */
@@ -2660,41 +2254,41 @@ export namespace autoscaling {
       /** list of horizontal pod autoscaler objects. */
       items: autoscaling.v1.HorizontalPodAutoscaler[]
       /** Standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * specification of a horizontal pod autoscaler.
      */
     export interface HorizontalPodAutoscalerSpec {
       /** upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas. */
-      maxReplicas: integer
-      /** minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.  It defaults to 1 pod.  minReplicas is allowed to be 0 if the alpha feature gate HPAScaleToZero is enabled and at least one Object or External metric is configured.  Scaling is active as long as at least one metric value is available. */
-      minReplicas?: integer
+      maxReplicas: number
+      /** lower limit for the number of pods that can be set by the autoscaler, default 1. */
+      minReplicas?: number
       /** reference to scaled resource; horizontal pod autoscaler will learn the current resource consumption and will set the desired number of pods by using its Scale subresource. */
       scaleTargetRef: autoscaling.v1.CrossVersionObjectReference
       /** target average CPU utilization (represented as a percentage of requested CPU) over all the pods; if not specified the default autoscaling policy will be used. */
-      targetCPUUtilizationPercentage?: integer
+      targetCPUUtilizationPercentage?: number
     }
     /**
      * current status of a horizontal pod autoscaler
      */
     export interface HorizontalPodAutoscalerStatus {
       /** current average CPU utilization over all pods, represented as a percentage of requested CPU, e.g. 70 means that an average pod is using now 70% of its requested CPU. */
-      currentCPUUtilizationPercentage?: integer
+      currentCPUUtilizationPercentage?: number
       /** current number of replicas of pods managed by this autoscaler. */
-      currentReplicas: integer
+      currentReplicas: number
       /** desired number of replicas of pods managed by this autoscaler. */
-      desiredReplicas: integer
+      desiredReplicas: number
       /** last time the HorizontalPodAutoscaler scaled the number of pods; used by the autoscaler to control how often the number of pods is changed. */
-      lastScaleTime?: apimachinery.v1.Time
+      lastScaleTime?: meta.v1.Time
       /** most recent generation observed by this autoscaler. */
-      observedGeneration?: integer
+      observedGeneration?: number
     }
     /**
      * Scale represents a scaling request for a resource.
      */
     export class Scale extends Resource implements IScale {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: autoscaling.v1.ScaleSpec
       /**
        * Scale represents a scaling request for a resource.
@@ -2707,7 +2301,7 @@ export namespace autoscaling {
     }
     export interface IScale {
       /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. */
       spec: autoscaling.v1.ScaleSpec
     }
@@ -2716,14 +2310,14 @@ export namespace autoscaling {
      */
     export interface ScaleSpec {
       /** desired number of instances for the scaled object. */
-      replicas?: integer
+      replicas?: number
     }
     /**
      * ScaleStatus represents the current status of a scale subresource.
      */
     export interface ScaleStatus {
       /** actual number of observed instances of the scaled object. */
-      replicas: integer
+      replicas: number
       /** label query over pods that should match the replicas count. This is same as the label selector but in the string format to avoid introspection by clients. The string will be in the same format as the query-param syntax. More info about label selectors: http://kubernetes.io/docs/user-guide/labels#label-selectors */
       selector?: string
     }
@@ -2747,30 +2341,30 @@ export namespace autoscaling {
       /** metricName is the name of the metric in question. */
       metricName: string
       /** metricSelector is used to identify a specific time series within a given metric. */
-      metricSelector?: apimachinery.v1.LabelSelector
+      metricSelector?: meta.v1.LabelSelector
       /** targetAverageValue is the target per-pod value of global metric (as a quantity). Mutually exclusive with TargetValue. */
-      targetAverageValue?: apimachinery.misc.Quantity
+      targetAverageValue?: misc.resource.Quantity
       /** targetValue is the target value of the metric (as a quantity). Mutually exclusive with TargetAverageValue. */
-      targetValue?: apimachinery.misc.Quantity
+      targetValue?: misc.resource.Quantity
     }
     /**
      * ExternalMetricStatus indicates the current value of a global metric not associated with any Kubernetes object.
      */
     export interface ExternalMetricStatus {
       /** currentAverageValue is the current value of metric averaged over autoscaled pods. */
-      currentAverageValue?: apimachinery.misc.Quantity
+      currentAverageValue?: misc.resource.Quantity
       /** currentValue is the current value of the metric (as a quantity) */
-      currentValue: apimachinery.misc.Quantity
+      currentValue: misc.resource.Quantity
       /** metricName is the name of a metric used for autoscaling in metric system. */
       metricName: string
       /** metricSelector is used to identify a specific time series within a given metric. */
-      metricSelector?: apimachinery.v1.LabelSelector
+      metricSelector?: meta.v1.LabelSelector
     }
     /**
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
     export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: autoscaling.v2beta1.HorizontalPodAutoscalerSpec
       /**
        * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
@@ -2783,7 +2377,7 @@ export namespace autoscaling {
     }
     export interface IHorizontalPodAutoscaler {
       /** metadata is the standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** spec is the specification for the behaviour of the autoscaler. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. */
       spec: autoscaling.v2beta1.HorizontalPodAutoscalerSpec
     }
@@ -2792,7 +2386,7 @@ export namespace autoscaling {
      */
     export interface HorizontalPodAutoscalerCondition {
       /** lastTransitionTime is the last time the condition transitioned from one status to another */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** message is a human-readable explanation containing details about the transition */
       message?: string
       /** reason is the reason for the condition's last transition. */
@@ -2807,7 +2401,7 @@ export namespace autoscaling {
      */
     export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta1.HorizontalPodAutoscaler[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * HorizontalPodAutoscaler is a list of horizontal pod autoscaler objects.
        */
@@ -2821,18 +2415,18 @@ export namespace autoscaling {
       /** items is the list of horizontal pod autoscaler objects. */
       items: autoscaling.v2beta1.HorizontalPodAutoscaler[]
       /** metadata is the standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * HorizontalPodAutoscalerSpec describes the desired functionality of the HorizontalPodAutoscaler.
      */
     export interface HorizontalPodAutoscalerSpec {
       /** maxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. It cannot be less that minReplicas. */
-      maxReplicas: integer
+      maxReplicas: number
       /** metrics contains the specifications for which to use to calculate the desired replica count (the maximum replica count across all metrics will be used).  The desired replica count is calculated multiplying the ratio between the target value and the current value by the current number of pods.  Ergo, metrics used must decrease as the pod count is increased, and vice-versa.  See the individual metric source types for more information about how each type of metric must respond. */
       metrics?: autoscaling.v2beta1.MetricSpec[]
-      /** minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.  It defaults to 1 pod.  minReplicas is allowed to be 0 if the alpha feature gate HPAScaleToZero is enabled and at least one Object or External metric is configured.  Scaling is active as long as at least one metric value is available. */
-      minReplicas?: integer
+      /** minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod. */
+      minReplicas?: number
       /** scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count. */
       scaleTargetRef: autoscaling.v2beta1.CrossVersionObjectReference
     }
@@ -2845,13 +2439,13 @@ export namespace autoscaling {
       /** currentMetrics is the last read state of the metrics used by this autoscaler. */
       currentMetrics?: autoscaling.v2beta1.MetricStatus[]
       /** currentReplicas is current number of replicas of pods managed by this autoscaler, as last seen by the autoscaler. */
-      currentReplicas: integer
+      currentReplicas: number
       /** desiredReplicas is the desired number of replicas of pods managed by this autoscaler, as last calculated by the autoscaler. */
-      desiredReplicas: integer
+      desiredReplicas: number
       /** lastScaleTime is the last time the HorizontalPodAutoscaler scaled the number of pods, used by the autoscaler to control how often the number of pods is changed. */
-      lastScaleTime?: apimachinery.v1.Time
+      lastScaleTime?: meta.v1.Time
       /** observedGeneration is the most recent generation observed by this autoscaler. */
-      observedGeneration?: integer
+      observedGeneration?: number
     }
     /**
      * MetricSpec specifies how to scale based on a single metric (only `type` and one other matching field should be set at once).
@@ -2888,28 +2482,28 @@ export namespace autoscaling {
      */
     export interface ObjectMetricSource {
       /** averageValue is the target value of the average of the metric across all relevant pods (as a quantity) */
-      averageValue?: apimachinery.misc.Quantity
+      averageValue?: misc.resource.Quantity
       /** metricName is the name of the metric in question. */
       metricName: string
       /** selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more specific metrics scoping When unset, just the metricName will be used to gather metrics. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** target is the described Kubernetes object. */
       target: autoscaling.v2beta1.CrossVersionObjectReference
       /** targetValue is the target value of the metric (as a quantity). */
-      targetValue: apimachinery.misc.Quantity
+      targetValue: misc.resource.Quantity
     }
     /**
      * ObjectMetricStatus indicates the current value of a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).
      */
     export interface ObjectMetricStatus {
       /** averageValue is the current value of the average of the metric across all relevant pods (as a quantity) */
-      averageValue?: apimachinery.misc.Quantity
+      averageValue?: misc.resource.Quantity
       /** currentValue is the current value of the metric (as a quantity). */
-      currentValue: apimachinery.misc.Quantity
+      currentValue: misc.resource.Quantity
       /** metricName is the name of the metric in question. */
       metricName: string
       /** selector is the string-encoded form of a standard kubernetes label selector for the given metric When set in the ObjectMetricSource, it is passed as an additional parameter to the metrics server for more specific metrics scoping. When unset, just the metricName will be used to gather metrics. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** target is the described Kubernetes object. */
       target: autoscaling.v2beta1.CrossVersionObjectReference
     }
@@ -2920,20 +2514,20 @@ export namespace autoscaling {
       /** metricName is the name of the metric in question */
       metricName: string
       /** selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more specific metrics scoping When unset, just the metricName will be used to gather metrics. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** targetAverageValue is the target value of the average of the metric across all relevant pods (as a quantity) */
-      targetAverageValue: apimachinery.misc.Quantity
+      targetAverageValue: misc.resource.Quantity
     }
     /**
      * PodsMetricStatus indicates the current value of a metric describing each pod in the current scale target (for example, transactions-processed-per-second).
      */
     export interface PodsMetricStatus {
       /** currentAverageValue is the current value of the average of the metric across all relevant pods (as a quantity) */
-      currentAverageValue: apimachinery.misc.Quantity
+      currentAverageValue: misc.resource.Quantity
       /** metricName is the name of the metric in question */
       metricName: string
       /** selector is the string-encoded form of a standard kubernetes label selector for the given metric When set in the PodsMetricSource, it is passed as an additional parameter to the metrics server for more specific metrics scoping. When unset, just the metricName will be used to gather metrics. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
     }
     /**
      * ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the "pods" source.  Only one "target" type should be set.
@@ -2942,18 +2536,18 @@ export namespace autoscaling {
       /** name is the name of the resource in question. */
       name: string
       /** targetAverageUtilization is the target value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods. */
-      targetAverageUtilization?: integer
+      targetAverageUtilization?: number
       /** targetAverageValue is the target value of the average of the resource metric across all relevant pods, as a raw value (instead of as a percentage of the request), similar to the "pods" metric source type. */
-      targetAverageValue?: apimachinery.misc.Quantity
+      targetAverageValue?: misc.resource.Quantity
     }
     /**
      * ResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the "pods" source.
      */
     export interface ResourceMetricStatus {
       /** currentAverageUtilization is the current value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods.  It will only be present if `targetAverageValue` was set in the corresponding metric specification. */
-      currentAverageUtilization?: integer
+      currentAverageUtilization?: number
       /** currentAverageValue is the current value of the average of the resource metric across all relevant pods, as a raw value (instead of as a percentage of the request), similar to the "pods" metric source type. It will always be set, regardless of the corresponding metric specification. */
-      currentAverageValue: apimachinery.misc.Quantity
+      currentAverageValue: misc.resource.Quantity
       /** name is the name of the resource in question. */
       name: string
     }
@@ -2992,7 +2586,7 @@ export namespace autoscaling {
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
     export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: autoscaling.v2beta2.HorizontalPodAutoscalerSpec
       /**
        * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
@@ -3005,7 +2599,7 @@ export namespace autoscaling {
     }
     export interface IHorizontalPodAutoscaler {
       /** metadata is the standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** spec is the specification for the behaviour of the autoscaler. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. */
       spec: autoscaling.v2beta2.HorizontalPodAutoscalerSpec
     }
@@ -3014,7 +2608,7 @@ export namespace autoscaling {
      */
     export interface HorizontalPodAutoscalerCondition {
       /** lastTransitionTime is the last time the condition transitioned from one status to another */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** message is a human-readable explanation containing details about the transition */
       message?: string
       /** reason is the reason for the condition's last transition. */
@@ -3029,7 +2623,7 @@ export namespace autoscaling {
      */
     export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta2.HorizontalPodAutoscaler[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * HorizontalPodAutoscalerList is a list of horizontal pod autoscaler objects.
        */
@@ -3043,18 +2637,18 @@ export namespace autoscaling {
       /** items is the list of horizontal pod autoscaler objects. */
       items: autoscaling.v2beta2.HorizontalPodAutoscaler[]
       /** metadata is the standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * HorizontalPodAutoscalerSpec describes the desired functionality of the HorizontalPodAutoscaler.
      */
     export interface HorizontalPodAutoscalerSpec {
       /** maxReplicas is the upper limit for the number of replicas to which the autoscaler can scale up. It cannot be less that minReplicas. */
-      maxReplicas: integer
+      maxReplicas: number
       /** metrics contains the specifications for which to use to calculate the desired replica count (the maximum replica count across all metrics will be used).  The desired replica count is calculated multiplying the ratio between the target value and the current value by the current number of pods.  Ergo, metrics used must decrease as the pod count is increased, and vice-versa.  See the individual metric source types for more information about how each type of metric must respond. If not set, the default metric will be set to 80% average CPU utilization. */
       metrics?: autoscaling.v2beta2.MetricSpec[]
-      /** minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down.  It defaults to 1 pod.  minReplicas is allowed to be 0 if the alpha feature gate HPAScaleToZero is enabled and at least one Object or External metric is configured.  Scaling is active as long as at least one metric value is available. */
-      minReplicas?: integer
+      /** minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod. */
+      minReplicas?: number
       /** scaleTargetRef points to the target resource to scale, and is used to the pods for which metrics should be collected, as well as to actually change the replica count. */
       scaleTargetRef: autoscaling.v2beta2.CrossVersionObjectReference
     }
@@ -3067,13 +2661,13 @@ export namespace autoscaling {
       /** currentMetrics is the last read state of the metrics used by this autoscaler. */
       currentMetrics?: autoscaling.v2beta2.MetricStatus[]
       /** currentReplicas is current number of replicas of pods managed by this autoscaler, as last seen by the autoscaler. */
-      currentReplicas: integer
+      currentReplicas: number
       /** desiredReplicas is the desired number of replicas of pods managed by this autoscaler, as last calculated by the autoscaler. */
-      desiredReplicas: integer
+      desiredReplicas: number
       /** lastScaleTime is the last time the HorizontalPodAutoscaler scaled the number of pods, used by the autoscaler to control how often the number of pods is changed. */
-      lastScaleTime?: apimachinery.v1.Time
+      lastScaleTime?: meta.v1.Time
       /** observedGeneration is the most recent generation observed by this autoscaler. */
-      observedGeneration?: integer
+      observedGeneration?: number
     }
     /**
      * MetricIdentifier defines the name and optionally selector for a metric
@@ -3082,7 +2676,7 @@ export namespace autoscaling {
       /** name is the name of the given metric */
       name: string
       /** selector is the string-encoded form of a standard kubernetes label selector for the given metric When set, it is passed as an additional parameter to the metrics server for more specific metrics scoping. When unset, just the metricName will be used to gather metrics. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
     }
     /**
      * MetricSpec specifies how to scale based on a single metric (only `type` and one other matching field should be set at once).
@@ -3119,24 +2713,24 @@ export namespace autoscaling {
      */
     export interface MetricTarget {
       /** averageUtilization is the target value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods. Currently only valid for Resource metric source type */
-      averageUtilization?: integer
+      averageUtilization?: number
       /** averageValue is the target value of the average of the metric across all relevant pods (as a quantity) */
-      averageValue?: apimachinery.misc.Quantity
+      averageValue?: misc.resource.Quantity
       /** type represents whether the metric type is Utilization, Value, or AverageValue */
       type: string
       /** value is the target value of the metric (as a quantity). */
-      value?: apimachinery.misc.Quantity
+      value?: misc.resource.Quantity
     }
     /**
      * MetricValueStatus holds the current value for a metric
      */
     export interface MetricValueStatus {
       /** currentAverageUtilization is the current value of the average of the resource metric across all relevant pods, represented as a percentage of the requested value of the resource for the pods. */
-      averageUtilization?: integer
+      averageUtilization?: number
       /** averageValue is the current value of the average of the metric across all relevant pods (as a quantity) */
-      averageValue?: apimachinery.misc.Quantity
+      averageValue?: misc.resource.Quantity
       /** value is the current value of the metric (as a quantity). */
-      value?: apimachinery.misc.Quantity
+      value?: misc.resource.Quantity
     }
     /**
      * ObjectMetricSource indicates how to scale on a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).
@@ -3202,7 +2796,7 @@ export namespace batch {
      * Job represents the configuration of a single job.
      */
     export class Job extends Resource implements IJob {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: batch.v1.JobSpec
       /**
        * Job represents the configuration of a single job.
@@ -3215,7 +2809,7 @@ export namespace batch {
     }
     export interface IJob {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of a job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: batch.v1.JobSpec
     }
@@ -3224,9 +2818,9 @@ export namespace batch {
      */
     export interface JobCondition {
       /** Last time the condition was checked. */
-      lastProbeTime?: apimachinery.v1.Time
+      lastProbeTime?: meta.v1.Time
       /** Last time the condition transit from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human readable message indicating details about last transition. */
       message?: string
       /** (brief) reason for the condition's last transition. */
@@ -3241,7 +2835,7 @@ export namespace batch {
      */
     export class JobList extends Resource implements IJobList {
       items: batch.v1.Job[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * JobList is a collection of jobs.
        */
@@ -3255,45 +2849,45 @@ export namespace batch {
       /** items is the list of Jobs. */
       items: batch.v1.Job[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * JobSpec describes how the job execution will look like.
      */
     export interface JobSpec {
       /** Specifies the duration in seconds relative to the startTime that the job may be active before the system tries to terminate it; value must be positive integer */
-      activeDeadlineSeconds?: integer
+      activeDeadlineSeconds?: number
       /** Specifies the number of retries before marking this job failed. Defaults to 6 */
-      backoffLimit?: integer
+      backoffLimit?: number
       /** Specifies the desired number of successfully finished pods the job should be run with.  Setting to nil means that the success of any pod signals the success of all pods, and allows parallelism to have any positive value.  Setting to 1 means that parallelism is limited to 1 and the success of that pod signals the success of the job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/ */
-      completions?: integer
+      completions?: number
       /** manualSelector controls generation of pod labels and pod selectors. Leave `manualSelector` unset unless you are certain what you are doing. When false or unset, the system pick labels unique to this job and appends those labels to the pod template.  When true, the user is responsible for picking unique labels and specifying the selector.  Failure to pick a unique label may cause this and other jobs to not function correctly.  However, You may see `manualSelector=true` in jobs that were created with the old `extensions/v1beta1` API. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#specifying-your-own-pod-selector */
       manualSelector?: boolean
       /** Specifies the maximum desired number of pods the job should run at any given time. The actual number of pods running in steady state will be less than this number when ((.spec.completions - .status.successful) < .spec.parallelism), i.e. when the work left to do is less than max parallelism. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/ */
-      parallelism?: integer
+      parallelism?: number
       /** A label query over pods that should match the pod count. Normally, the system sets this field for you. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** Describes the pod that will be created when executing a job. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/ */
       template: core.v1.PodTemplateSpec
       /** ttlSecondsAfterFinished limits the lifetime of a Job that has finished execution (either Complete or Failed). If this field is set, ttlSecondsAfterFinished after the Job finishes, it is eligible to be automatically deleted. When the Job is being deleted, its lifecycle guarantees (e.g. finalizers) will be honored. If this field is unset, the Job won't be automatically deleted. If this field is set to zero, the Job becomes eligible to be deleted immediately after it finishes. This field is alpha-level and is only honored by servers that enable the TTLAfterFinished feature. */
-      ttlSecondsAfterFinished?: integer
+      ttlSecondsAfterFinished?: number
     }
     /**
      * JobStatus represents the current state of a Job.
      */
     export interface JobStatus {
       /** The number of actively running pods. */
-      active?: integer
+      active?: number
       /** Represents time when the job was completed. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. */
-      completionTime?: apimachinery.v1.Time
+      completionTime?: meta.v1.Time
       /** The latest available observations of an object's current state. More info: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/ */
       conditions?: batch.v1.JobCondition[]
       /** The number of pods which reached phase Failed. */
-      failed?: integer
+      failed?: number
       /** Represents time when the job was acknowledged by the job controller. It is not guaranteed to be set in happens-before order across separate operations. It is represented in RFC3339 form and is in UTC. */
-      startTime?: apimachinery.v1.Time
+      startTime?: meta.v1.Time
       /** The number of pods which reached phase Succeeded. */
-      succeeded?: integer
+      succeeded?: number
     }
   }
   export namespace v1beta1 {
@@ -3301,7 +2895,7 @@ export namespace batch {
      * CronJob represents the configuration of a single cron job.
      */
     export class CronJob extends Resource implements ICronJob {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: batch.v1beta1.CronJobSpec
       /**
        * CronJob represents the configuration of a single cron job.
@@ -3314,7 +2908,7 @@ export namespace batch {
     }
     export interface ICronJob {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of a cron job, including the schedule. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: batch.v1beta1.CronJobSpec
     }
@@ -3323,7 +2917,7 @@ export namespace batch {
      */
     export class CronJobList extends Resource implements ICronJobList {
       items: batch.v1beta1.CronJob[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * CronJobList is a collection of cron jobs.
        */
@@ -3337,7 +2931,7 @@ export namespace batch {
       /** items is the list of CronJobs. */
       items: batch.v1beta1.CronJob[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * CronJobSpec describes how the job execution will look like and when it will actually run.
@@ -3346,15 +2940,15 @@ export namespace batch {
       /** Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one */
       concurrencyPolicy?: string
       /** The number of failed finished jobs to retain. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1. */
-      failedJobsHistoryLimit?: integer
+      failedJobsHistoryLimit?: number
       /** Specifies the job that will be created when executing a CronJob. */
       jobTemplate: batch.v1beta1.JobTemplateSpec
       /** The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron. */
       schedule: string
       /** Optional deadline in seconds for starting the job if it misses scheduled time for any reason.  Missed jobs executions will be counted as failed ones. */
-      startingDeadlineSeconds?: integer
+      startingDeadlineSeconds?: number
       /** The number of successful finished jobs to retain. This is a pointer to distinguish between explicit zero and not specified. Defaults to 3. */
-      successfulJobsHistoryLimit?: integer
+      successfulJobsHistoryLimit?: number
       /** This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false. */
       suspend?: boolean
     }
@@ -3365,14 +2959,14 @@ export namespace batch {
       /** A list of pointers to currently running jobs. */
       active?: core.v1.ObjectReference[]
       /** Information when was the last time the job was successfully scheduled. */
-      lastScheduleTime?: apimachinery.v1.Time
+      lastScheduleTime?: meta.v1.Time
     }
     /**
      * JobTemplateSpec describes the data a Job should have when created from a template
      */
     export interface JobTemplateSpec {
       /** Standard object's metadata of the jobs created from this template. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata?: apimachinery.v1.ObjectMeta
+      metadata?: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec?: batch.v1.JobSpec
     }
@@ -3382,7 +2976,7 @@ export namespace batch {
      * CronJob represents the configuration of a single cron job.
      */
     export class CronJob extends Resource implements ICronJob {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: batch.v2alpha1.CronJobSpec
       /**
        * CronJob represents the configuration of a single cron job.
@@ -3395,7 +2989,7 @@ export namespace batch {
     }
     export interface ICronJob {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of a cron job, including the schedule. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: batch.v2alpha1.CronJobSpec
     }
@@ -3404,7 +2998,7 @@ export namespace batch {
      */
     export class CronJobList extends Resource implements ICronJobList {
       items: batch.v2alpha1.CronJob[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * CronJobList is a collection of cron jobs.
        */
@@ -3418,7 +3012,7 @@ export namespace batch {
       /** items is the list of CronJobs. */
       items: batch.v2alpha1.CronJob[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * CronJobSpec describes how the job execution will look like and when it will actually run.
@@ -3427,15 +3021,15 @@ export namespace batch {
       /** Specifies how to treat concurrent executions of a Job. Valid values are: - "Allow" (default): allows CronJobs to run concurrently; - "Forbid": forbids concurrent runs, skipping next run if previous run hasn't finished yet; - "Replace": cancels currently running job and replaces it with a new one */
       concurrencyPolicy?: string
       /** The number of failed finished jobs to retain. This is a pointer to distinguish between explicit zero and not specified. */
-      failedJobsHistoryLimit?: integer
+      failedJobsHistoryLimit?: number
       /** Specifies the job that will be created when executing a CronJob. */
       jobTemplate: batch.v2alpha1.JobTemplateSpec
       /** The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron. */
       schedule: string
       /** Optional deadline in seconds for starting the job if it misses scheduled time for any reason.  Missed jobs executions will be counted as failed ones. */
-      startingDeadlineSeconds?: integer
+      startingDeadlineSeconds?: number
       /** The number of successful finished jobs to retain. This is a pointer to distinguish between explicit zero and not specified. */
-      successfulJobsHistoryLimit?: integer
+      successfulJobsHistoryLimit?: number
       /** This flag tells the controller to suspend subsequent executions, it does not apply to already started executions.  Defaults to false. */
       suspend?: boolean
     }
@@ -3446,14 +3040,14 @@ export namespace batch {
       /** A list of pointers to currently running jobs. */
       active?: core.v1.ObjectReference[]
       /** Information when was the last time the job was successfully scheduled. */
-      lastScheduleTime?: apimachinery.v1.Time
+      lastScheduleTime?: meta.v1.Time
     }
     /**
      * JobTemplateSpec describes the data a Job should have when created from a template
      */
     export interface JobTemplateSpec {
       /** Standard object's metadata of the jobs created from this template. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata?: apimachinery.v1.ObjectMeta
+      metadata?: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the job. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec?: batch.v1.JobSpec
     }
@@ -3465,7 +3059,7 @@ export namespace certificates {
      * Describes a certificate signing request
      */
     export class CertificateSigningRequest extends Resource implements ICertificateSigningRequest {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: certificates.v1beta1.CertificateSigningRequestSpec
       /**
        * Describes a certificate signing request
@@ -3477,13 +3071,13 @@ export namespace certificates {
       }
     }
     export interface ICertificateSigningRequest {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The certificate request itself and any additional information. */
       spec: certificates.v1beta1.CertificateSigningRequestSpec
     }
     export interface CertificateSigningRequestCondition {
       /** timestamp for the last update to this condition */
-      lastUpdateTime?: apimachinery.v1.Time
+      lastUpdateTime?: meta.v1.Time
       /** human readable message with details about the request state */
       message?: string
       /** brief reason for the request state */
@@ -3493,7 +3087,7 @@ export namespace certificates {
     }
     export class CertificateSigningRequestList extends Resource implements ICertificateSigningRequestList {
       items: certificates.v1beta1.CertificateSigningRequest[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       constructor (properties: ICertificateSigningRequestList) {
         super({ apiVersion: 'certificates.k8s.io/v1beta1', kind: 'CertificateSigningRequestList' })
         this.items = properties.items
@@ -3502,7 +3096,7 @@ export namespace certificates {
     }
     export interface ICertificateSigningRequestList {
       items: certificates.v1beta1.CertificateSigningRequest[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * This information is immutable after the request is created. Only the Request and Usages fields can be set on creation, other fields are derived by Kubernetes and cannot be modified by users.
@@ -3536,7 +3130,7 @@ export namespace coordination {
      * Lease defines a lease concept.
      */
     export class Lease extends Resource implements ILease {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: coordination.v1.LeaseSpec
       /**
        * Lease defines a lease concept.
@@ -3549,7 +3143,7 @@ export namespace coordination {
     }
     export interface ILease {
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: coordination.v1.LeaseSpec
     }
@@ -3558,7 +3152,7 @@ export namespace coordination {
      */
     export class LeaseList extends Resource implements ILeaseList {
       items: coordination.v1.Lease[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * LeaseList is a list of Lease objects.
        */
@@ -3572,22 +3166,22 @@ export namespace coordination {
       /** Items is a list of schema objects. */
       items: coordination.v1.Lease[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * LeaseSpec is a specification of a Lease.
      */
     export interface LeaseSpec {
       /** acquireTime is a time when the current lease was acquired. */
-      acquireTime?: apimachinery.v1.MicroTime
+      acquireTime?: meta.v1.MicroTime
       /** holderIdentity contains the identity of the holder of a current lease. */
       holderIdentity?: string
       /** leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measure against time of last observed RenewTime. */
-      leaseDurationSeconds?: integer
+      leaseDurationSeconds?: number
       /** leaseTransitions is the number of transitions of a lease between holders. */
-      leaseTransitions?: integer
+      leaseTransitions?: number
       /** renewTime is a time when the current holder of a lease has last updated the lease. */
-      renewTime?: apimachinery.v1.MicroTime
+      renewTime?: meta.v1.MicroTime
     }
   }
   export namespace v1beta1 {
@@ -3595,7 +3189,7 @@ export namespace coordination {
      * Lease defines a lease concept.
      */
     export class Lease extends Resource implements ILease {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: coordination.v1beta1.LeaseSpec
       /**
        * Lease defines a lease concept.
@@ -3608,7 +3202,7 @@ export namespace coordination {
     }
     export interface ILease {
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: coordination.v1beta1.LeaseSpec
     }
@@ -3617,7 +3211,7 @@ export namespace coordination {
      */
     export class LeaseList extends Resource implements ILeaseList {
       items: coordination.v1beta1.Lease[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * LeaseList is a list of Lease objects.
        */
@@ -3631,22 +3225,22 @@ export namespace coordination {
       /** Items is a list of schema objects. */
       items: coordination.v1beta1.Lease[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * LeaseSpec is a specification of a Lease.
      */
     export interface LeaseSpec {
       /** acquireTime is a time when the current lease was acquired. */
-      acquireTime?: apimachinery.v1.MicroTime
+      acquireTime?: meta.v1.MicroTime
       /** holderIdentity contains the identity of the holder of a current lease. */
       holderIdentity?: string
       /** leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measure against time of last observed RenewTime. */
-      leaseDurationSeconds?: integer
+      leaseDurationSeconds?: number
       /** leaseTransitions is the number of transitions of a lease between holders. */
-      leaseTransitions?: integer
+      leaseTransitions?: number
       /** renewTime is a time when the current holder of a lease has last updated the lease. */
-      renewTime?: apimachinery.v1.MicroTime
+      renewTime?: meta.v1.MicroTime
     }
   }
 }
@@ -3661,7 +3255,7 @@ export namespace core {
       /** Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore */
       fsType?: string
       /** The partition in the volume that you want to mount. If omitted, the default is to mount by volume name. Examples: For volume /dev/sda1, you specify the partition as "1". Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty). */
-      partition?: integer
+      partition?: number
       /** Specify "true" to force and set the ReadOnly property in VolumeMounts to "true". If omitted, the default is "false". More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore */
       readOnly?: boolean
       /** Unique ID of the persistent disk resource in AWS (Amazon EBS volume). More info: https://kubernetes.io/docs/concepts/storage/volumes#awselasticblockstore */
@@ -3732,7 +3326,7 @@ export namespace core {
      * Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
      */
     export class Binding extends Resource implements IBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       target: core.v1.ObjectReference
       /**
        * Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
@@ -3745,7 +3339,7 @@ export namespace core {
     }
     export interface IBinding {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The target object that you want to bind to the standard object. */
       target: core.v1.ObjectReference
     }
@@ -3753,8 +3347,6 @@ export namespace core {
      * Represents storage that is managed by an external CSI volume driver (Beta feature)
      */
     export interface CSIPersistentVolumeSource {
-      /** ControllerExpandSecretRef is a reference to the secret object containing sensitive information to pass to the CSI driver to complete the CSI ControllerExpandVolume call. This is an alpha field and requires enabling ExpandCSIVolumes feature gate. This field is optional, and may be empty if no secret is required. If the secret object contains more than one secret, all secrets are passed. */
-      controllerExpandSecretRef?: core.v1.SecretReference
       /** ControllerPublishSecretRef is a reference to the secret object containing sensitive information to pass to the CSI driver to complete the CSI ControllerPublishVolume and ControllerUnpublishVolume calls. This field is optional, and may be empty if no secret is required. If the secret object contains more than one secret, all secrets are passed. */
       controllerPublishSecretRef?: core.v1.SecretReference
       /** Driver is the name of the driver to use for this volume. Required. */
@@ -3861,7 +3453,7 @@ export namespace core {
      */
     export interface ClientIPConfig {
       /** timeoutSeconds specifies the seconds of ClientIP type session sticky time. The value must be >0 && <=86400(for 1 day) if ServiceAffinity == "ClientIP". Default value is 10800(for 3 hours). */
-      timeoutSeconds?: integer
+      timeoutSeconds?: number
     }
     /**
      * Information about the condition of a component.
@@ -3881,7 +3473,7 @@ export namespace core {
      */
     export class ComponentStatus extends Resource implements IComponentStatus {
       conditions?: core.v1.ComponentCondition[]
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /**
        * ComponentStatus (and ComponentStatusList) holds the cluster validation info.
        */
@@ -3895,14 +3487,14 @@ export namespace core {
       /** List of component conditions observed */
       conditions?: core.v1.ComponentCondition[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
     }
     /**
      * Status of all the conditions for the component as a list of ComponentStatus objects.
      */
     export class ComponentStatusList extends Resource implements IComponentStatusList {
       items: core.v1.ComponentStatus[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * Status of all the conditions for the component as a list of ComponentStatus objects.
        */
@@ -3916,7 +3508,7 @@ export namespace core {
       /** List of ComponentStatus objects. */
       items: core.v1.ComponentStatus[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ConfigMap holds configuration data for pods to consume.
@@ -3924,7 +3516,7 @@ export namespace core {
     export class ConfigMap extends Resource implements IConfigMap {
       binaryData?: { [k: string]: string }
       data?: { [k: string]: string }
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /**
        * ConfigMap holds configuration data for pods to consume.
        */
@@ -3941,7 +3533,7 @@ export namespace core {
       /** Data contains the configuration data. Each key must consist of alphanumeric characters, '-', '_' or '.'. Values with non-UTF-8 byte sequences must use the BinaryData field. The keys stored in Data must not overlap with the keys in the BinaryData field, this is enforced during validation process. */
       data?: { [k: string]: string }
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
     }
     /**
      * ConfigMapEnvSource selects a ConfigMap to populate the environment variables with.
@@ -3962,7 +3554,7 @@ export namespace core {
       key: string
       /** Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names */
       name?: string
-      /** Specify whether the ConfigMap or its key must be defined */
+      /** Specify whether the ConfigMap or it's key must be defined */
       optional?: boolean
     }
     /**
@@ -3970,7 +3562,7 @@ export namespace core {
      */
     export class ConfigMapList extends Resource implements IConfigMapList {
       items: core.v1.ConfigMap[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ConfigMapList is a resource containing a list of ConfigMap objects.
        */
@@ -3984,7 +3576,7 @@ export namespace core {
       /** Items is the list of ConfigMaps. */
       items: core.v1.ConfigMap[]
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node.
@@ -4011,7 +3603,7 @@ export namespace core {
       items?: core.v1.KeyToPath[]
       /** Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names */
       name?: string
-      /** Specify whether the ConfigMap or its keys must be defined */
+      /** Specify whether the ConfigMap or it's keys must be defined */
       optional?: boolean
     }
     /**
@@ -4021,12 +3613,12 @@ export namespace core {
      */
     export interface ConfigMapVolumeSource {
       /** Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      defaultMode?: integer
+      defaultMode?: number
       /** If unspecified, each key-value pair in the Data field of the referenced ConfigMap will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the ConfigMap, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'. */
       items?: core.v1.KeyToPath[]
       /** Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names */
       name?: string
-      /** Specify whether the ConfigMap or its keys must be defined */
+      /** Specify whether the ConfigMap or it's keys must be defined */
       optional?: boolean
     }
     /**
@@ -4083,18 +3675,18 @@ export namespace core {
       /** Names by which this image is known. e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"] */
       names: string[]
       /** The size of the image in bytes. */
-      sizeBytes?: integer
+      sizeBytes?: number
     }
     /**
      * ContainerPort represents a network port in a single container.
      */
     export interface ContainerPort {
       /** Number of port to expose on the pod's IP address. This must be a valid port number, 0 < x < 65536. */
-      containerPort: integer
+      containerPort: number
       /** What host IP to bind the external port to. */
       hostIP?: string
       /** Number of port to expose on the host. If specified, this must be a valid port number, 0 < x < 65536. If HostNetwork is specified, this must match ContainerPort. Most containers do not need this. */
-      hostPort?: integer
+      hostPort?: number
       /** If specified, this must be an IANA_SVC_NAME and unique within the pod. Each named port in a pod must have a unique name. Name for the port that can be referred to by services. */
       name?: string
       /** Protocol for port. Must be UDP, TCP, or SCTP. Defaults to "TCP". */
@@ -4116,7 +3708,7 @@ export namespace core {
      */
     export interface ContainerStateRunning {
       /** Time at which the container was last (re-)started */
-      startedAt?: apimachinery.v1.Time
+      startedAt?: meta.v1.Time
     }
     /**
      * ContainerStateTerminated is a terminated state of a container.
@@ -4125,17 +3717,17 @@ export namespace core {
       /** Container's ID in the format 'docker://<container_id>' */
       containerID?: string
       /** Exit status from the last termination of the container */
-      exitCode: integer
+      exitCode: number
       /** Time at which the container last terminated */
-      finishedAt?: apimachinery.v1.Time
+      finishedAt?: meta.v1.Time
       /** Message regarding the last termination of the container */
       message?: string
       /** (brief) reason from the last termination of the container */
       reason?: string
       /** Signal from the last termination of the container */
-      signal?: integer
+      signal?: number
       /** Time at which previous execution of the container started */
-      startedAt?: apimachinery.v1.Time
+      startedAt?: meta.v1.Time
     }
     /**
      * ContainerStateWaiting is a waiting state of a container.
@@ -4163,7 +3755,7 @@ export namespace core {
       /** Specifies whether the container has passed its readiness probe. */
       ready: boolean
       /** The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection. This value will get capped at 5 by GC. */
-      restartCount: integer
+      restartCount: number
       /** Details about the container's current condition. */
       state?: core.v1.ContainerState
     }
@@ -4172,7 +3764,7 @@ export namespace core {
      */
     export interface DaemonEndpoint {
       /** Port number of the given endpoint. */
-      Port: integer
+      Port: number
     }
     /**
      * Represents downward API info for projecting into a projected volume. Note that this is identical to a downwardAPI volume source without the default mode.
@@ -4188,7 +3780,7 @@ export namespace core {
       /** Required: Selects a field of the pod: only annotations, labels, name and namespace are supported. */
       fieldRef?: core.v1.ObjectFieldSelector
       /** Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      mode?: integer
+      mode?: number
       /** Required: Path is  the relative path name of the file to be created. Must not be absolute or contain the '..' path. Must be utf-8 encoded. The first item of the relative path must not start with '..' */
       path: string
       /** Selects a resource of the container: only resources limits and requests (limits.cpu, limits.memory, requests.cpu and requests.memory) are currently supported. */
@@ -4199,7 +3791,7 @@ export namespace core {
      */
     export interface DownwardAPIVolumeSource {
       /** Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      defaultMode?: integer
+      defaultMode?: number
       /** Items is a list of downward API volume file */
       items?: core.v1.DownwardAPIVolumeFile[]
     }
@@ -4210,7 +3802,7 @@ export namespace core {
       /** What type of storage medium should back this directory. The default is "" which means to use the node's default medium. Must be an empty string (default) or Memory. More info: https://kubernetes.io/docs/concepts/storage/volumes#emptydir */
       medium?: string
       /** Total amount of local storage required for this EmptyDir volume. The size limit is also applicable for memory medium. The maximum usage on memory medium EmptyDir would be the minimum value between the SizeLimit specified here and the sum of memory limits of all containers in a pod. The default is nil which means that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir */
-      sizeLimit?: apimachinery.misc.Quantity
+      sizeLimit?: misc.resource.Quantity
     }
     /**
      * EndpointAddress is a tuple that describes single IP address.
@@ -4232,7 +3824,7 @@ export namespace core {
       /** The name of this port (corresponds to ServicePort.Name). Must be a DNS_LABEL. Optional only if one port is defined. */
       name?: string
       /** The port number of the endpoint. */
-      port: integer
+      port: number
       /** The IP protocol for this port. Must be UDP, TCP, or SCTP. Default is TCP. */
       protocol?: string
     }
@@ -4269,7 +3861,7 @@ export namespace core {
      *  ]
      */
     export class Endpoints extends Resource implements IEndpoints {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       subsets?: core.v1.EndpointSubset[]
       /**
        * Endpoints is a collection of endpoints that implement the actual service. Example:
@@ -4293,7 +3885,7 @@ export namespace core {
     }
     export interface IEndpoints {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The set of all endpoints is the union of all subsets. Addresses are placed into subsets according to the IPs they share. A single address with multiple ports, some of which are ready and some of which are not (because they come from different containers) will result in the address being displayed in different subsets for the different ports. No address will appear in both Addresses and NotReadyAddresses in the same subset. Sets of addresses and ports that comprise a service. */
       subsets?: core.v1.EndpointSubset[]
     }
@@ -4302,7 +3894,7 @@ export namespace core {
      */
     export class EndpointsList extends Resource implements IEndpointsList {
       items: core.v1.Endpoints[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * EndpointsList is a list of endpoints.
        */
@@ -4316,7 +3908,7 @@ export namespace core {
       /** List of endpoints. */
       items: core.v1.Endpoints[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * EnvFromSource represents the source of a set of ConfigMaps
@@ -4354,66 +3946,17 @@ export namespace core {
       secretKeyRef?: core.v1.SecretKeySelector
     }
     /**
-     * An EphemeralContainer is a special type of container which doesn't come with any resource or scheduling guarantees but can be added to a pod that has already been created. They are intended for user-initiated activities such as troubleshooting a running pod. Ephemeral containers will not be restarted when they exit, and they will be killed if the pod is removed or restarted. If an ephemeral container causes a pod to exceed its resource allocation, the pod may be evicted. Ephemeral containers are added via a pod's ephemeralcontainers subresource and will appear in the pod spec once added. No fields in EphemeralContainer may be changed once added. This is an alpha feature enabled by the EphemeralContainers feature flag.
-     */
-    export interface EphemeralContainer {
-      /** Arguments to the entrypoint. The docker image's CMD is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell */
-      args?: string[]
-      /** Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided. Variable references $(VAR_NAME) are expanded using the container's environment. If a variable cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded, regardless of whether the variable exists or not. Cannot be updated. More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell */
-      command?: string[]
-      /** List of environment variables to set in the container. Cannot be updated. */
-      env?: core.v1.EnvVar[]
-      /** List of sources to populate environment variables in the container. The keys defined within a source must be a C_IDENTIFIER. All invalid keys will be reported as an event when the container is starting. When a key exists in multiple sources, the value associated with the last source will take precedence. Values defined by an Env with a duplicate key will take precedence. Cannot be updated. */
-      envFrom?: core.v1.EnvFromSource[]
-      /** Docker image name. More info: https://kubernetes.io/docs/concepts/containers/images */
-      image?: string
-      /** Image pull policy. One of Always, Never, IfNotPresent. Defaults to Always if :latest tag is specified, or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images */
-      imagePullPolicy?: string
-      /** Lifecycle is not allowed for ephemeral containers. */
-      lifecycle?: core.v1.Lifecycle
-      /** Probes are not allowed for ephemeral containers. */
-      livenessProbe?: core.v1.Probe
-      /** Name of the ephemeral container specified as a DNS_LABEL. This name must be unique among all containers, init containers and ephemeral containers. */
-      name: string
-      /** Ports are not allowed for ephemeral containers. */
-      ports?: core.v1.ContainerPort[]
-      /** Probes are not allowed for ephemeral containers. */
-      readinessProbe?: core.v1.Probe
-      /** Resources are not allowed for ephemeral containers. Ephemeral containers use spare resources already allocated to the pod. */
-      resources?: core.v1.ResourceRequirements
-      /** SecurityContext is not allowed for ephemeral containers. */
-      securityContext?: core.v1.SecurityContext
-      /** Whether this container should allocate a buffer for stdin in the container runtime. If this is not set, reads from stdin in the container will always result in EOF. Default is false. */
-      stdin?: boolean
-      /** Whether the container runtime should close the stdin channel after it has been opened by a single attach. When stdin is true the stdin stream will remain open across multiple attach sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the first client attaches to stdin, and then remains open and accepts data until the client disconnects, at which time stdin is closed and remains closed until the container is restarted. If this flag is false, a container processes that reads from stdin will never receive an EOF. Default is false */
-      stdinOnce?: boolean
-      /** If set, the name of the container from PodSpec that this ephemeral container targets. The ephemeral container will be run in the namespaces (IPC, PID, etc) of this container. If not set then the ephemeral container is run in whatever namespaces are shared for the pod. Note that the container runtime must support this feature. */
-      targetContainerName?: string
-      /** Optional: Path at which the file to which the container's termination message will be written is mounted into the container's filesystem. Message written is intended to be brief final status, such as an assertion failure message. Will be truncated by the node if greater than 4096 bytes. The total message length across all containers will be limited to 12kb. Defaults to /dev/termination-log. Cannot be updated. */
-      terminationMessagePath?: string
-      /** Indicate how the termination message should be populated. File will use the contents of terminationMessagePath to populate the container status message on both success and failure. FallbackToLogsOnError will use the last chunk of container log output if the termination message file is empty and the container exited with an error. The log output is limited to 2048 bytes or 80 lines, whichever is smaller. Defaults to File. Cannot be updated. */
-      terminationMessagePolicy?: string
-      /** Whether this container should allocate a TTY for itself, also requires 'stdin' to be true. Default is false. */
-      tty?: boolean
-      /** volumeDevices is the list of block devices to be used by the container. This is a beta feature. */
-      volumeDevices?: core.v1.VolumeDevice[]
-      /** Pod volumes to mount into the container's filesystem. Cannot be updated. */
-      volumeMounts?: core.v1.VolumeMount[]
-      /** Container's working directory. If not specified, the container runtime's default will be used, which might be configured in the container image. Cannot be updated. */
-      workingDir?: string
-    }
-    /**
      * Event is a report of an event somewhere in the cluster.
      */
     export class Event extends Resource implements IEvent {
       action?: string
-      count?: integer
-      eventTime?: apimachinery.v1.MicroTime
-      firstTimestamp?: apimachinery.v1.Time
+      count?: number
+      eventTime?: meta.v1.MicroTime
+      firstTimestamp?: meta.v1.Time
       involvedObject: core.v1.ObjectReference
-      lastTimestamp?: apimachinery.v1.Time
+      lastTimestamp?: meta.v1.Time
       message?: string
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       reason?: string
       related?: core.v1.ObjectReference
       reportingComponent?: string
@@ -4447,19 +3990,19 @@ export namespace core {
       /** What action was taken/failed regarding to the Regarding object. */
       action?: string
       /** The number of times this event has occurred. */
-      count?: integer
+      count?: number
       /** Time when this Event was first observed. */
-      eventTime?: apimachinery.v1.MicroTime
+      eventTime?: meta.v1.MicroTime
       /** The time at which the event was first recorded. (Time of server receipt is in TypeMeta.) */
-      firstTimestamp?: apimachinery.v1.Time
+      firstTimestamp?: meta.v1.Time
       /** The object that this event is about. */
       involvedObject: core.v1.ObjectReference
       /** The time at which the most recent occurrence of this event was recorded. */
-      lastTimestamp?: apimachinery.v1.Time
+      lastTimestamp?: meta.v1.Time
       /** A human-readable description of the status of this operation. */
       message?: string
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** This should be a short, machine understandable string that gives the reason for the transition into the object's current status. */
       reason?: string
       /** Optional secondary object for more complex actions. */
@@ -4480,7 +4023,7 @@ export namespace core {
      */
     export class EventList extends Resource implements IEventList {
       items: core.v1.Event[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * EventList is a list of events.
        */
@@ -4494,17 +4037,17 @@ export namespace core {
       /** List of events */
       items: core.v1.Event[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * EventSeries contain information on series of events, i.e. thing that was/is happening continuously for some time.
      */
     export interface EventSeries {
       /** Number of occurrences in this series up to the last heartbeat time */
-      count?: integer
+      count?: number
       /** Time of the last occurrence observed */
-      lastObservedTime?: apimachinery.v1.MicroTime
-      /** State of this Series: Ongoing or Finished Deprecated. Planned removal for 1.18 */
+      lastObservedTime?: meta.v1.MicroTime
+      /** State of this Series: Ongoing or Finished */
       state?: string
     }
     /**
@@ -4530,7 +4073,7 @@ export namespace core {
       /** Filesystem type to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. */
       fsType?: string
       /** Optional: FC target lun number */
-      lun?: integer
+      lun?: number
       /** Optional: Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts. */
       readOnly?: boolean
       /** Optional: FC target worldwide names (WWNs) */
@@ -4586,7 +4129,7 @@ export namespace core {
       /** Filesystem type of the volume that you want to mount. Tip: Ensure that the filesystem type is supported by the host operating system. Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk */
       fsType?: string
       /** The partition in the volume that you want to mount. If omitted, the default is to mount by volume name. Examples: For volume /dev/sda1, you specify the partition as "1". Similarly, the volume partition for /dev/sda is "0" (or you can leave the property empty). More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk */
-      partition?: integer
+      partition?: number
       /** Unique name of the PD resource in GCE. Used to identify the disk in GCE. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk */
       pdName: string
       /** ReadOnly here will force the ReadOnly setting in VolumeMounts. Defaults to false. More info: https://kubernetes.io/docs/concepts/storage/volumes#gcepersistentdisk */
@@ -4640,7 +4183,7 @@ export namespace core {
       /** Path to access on the HTTP server. */
       path?: string
       /** Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. */
-      port: apimachinery.misc.IntOrString
+      port: misc.intstr.IntOrString
       /** Scheme to use for connecting to the host. Defaults to HTTP. */
       scheme?: string
     }
@@ -4699,7 +4242,7 @@ export namespace core {
       /** iSCSI Interface Name that uses an iSCSI transport. Defaults to 'default' (tcp). */
       iscsiInterface?: string
       /** iSCSI Target Lun number. */
-      lun: integer
+      lun: number
       /** iSCSI Target Portal List. The Portal is either an IP or ip_addr:port if the port is other than default (typically TCP ports 860 and 3260). */
       portals?: string[]
       /** ReadOnly here will force the ReadOnly setting in VolumeMounts. Defaults to false. */
@@ -4726,7 +4269,7 @@ export namespace core {
       /** iSCSI Interface Name that uses an iSCSI transport. Defaults to 'default' (tcp). */
       iscsiInterface?: string
       /** iSCSI Target Lun number. */
-      lun: integer
+      lun: number
       /** iSCSI Target Portal List. The portal is either an IP or ip_addr:port if the port is other than default (typically TCP ports 860 and 3260). */
       portals?: string[]
       /** ReadOnly here will force the ReadOnly setting in VolumeMounts. Defaults to false. */
@@ -4743,7 +4286,7 @@ export namespace core {
       /** The key to project. */
       key: string
       /** Optional: mode bits to use on this file, must be a value between 0 and 0777. If not specified, the volume defaultMode will be used. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      mode?: integer
+      mode?: number
       /** The relative path of the file to map the key to. May not be an absolute path. May not contain the path element '..'. May not start with the string '..'. */
       path: string
     }
@@ -4760,7 +4303,7 @@ export namespace core {
      * LimitRange sets resource usage limits for each kind of resource in a Namespace.
      */
     export class LimitRange extends Resource implements ILimitRange {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.LimitRangeSpec
       /**
        * LimitRange sets resource usage limits for each kind of resource in a Namespace.
@@ -4773,7 +4316,7 @@ export namespace core {
     }
     export interface ILimitRange {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the limits enforced. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.LimitRangeSpec
     }
@@ -4782,15 +4325,15 @@ export namespace core {
      */
     export interface LimitRangeItem {
       /** Default resource requirement limit value by resource name if resource limit is omitted. */
-      default?: { [k: string]: apimachinery.misc.Quantity }
+      default?: { [k: string]: misc.resource.Quantity }
       /** DefaultRequest is the default resource requirement request value by resource name if resource request is omitted. */
-      defaultRequest?: { [k: string]: apimachinery.misc.Quantity }
+      defaultRequest?: { [k: string]: misc.resource.Quantity }
       /** Max usage constraints on this kind by resource name. */
-      max?: { [k: string]: apimachinery.misc.Quantity }
+      max?: { [k: string]: misc.resource.Quantity }
       /** MaxLimitRequestRatio if specified, the named resource must have a request and limit that are both non-zero where limit divided by request is less than or equal to the enumerated value; this represents the max burst for the named resource. */
-      maxLimitRequestRatio?: { [k: string]: apimachinery.misc.Quantity }
+      maxLimitRequestRatio?: { [k: string]: misc.resource.Quantity }
       /** Min usage constraints on this kind by resource name. */
-      min?: { [k: string]: apimachinery.misc.Quantity }
+      min?: { [k: string]: misc.resource.Quantity }
       /** Type of resource that this limit applies to. */
       type?: string
     }
@@ -4799,7 +4342,7 @@ export namespace core {
      */
     export class LimitRangeList extends Resource implements ILimitRangeList {
       items: core.v1.LimitRange[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * LimitRangeList is a list of LimitRange items.
        */
@@ -4813,7 +4356,7 @@ export namespace core {
       /** Items is a list of LimitRange objects. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/ */
       items: core.v1.LimitRange[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * LimitRangeSpec defines a min/max usage limit for resources that match on kind.
@@ -4869,7 +4412,7 @@ export namespace core {
      * Namespace provides a scope for Names. Use of multiple namespaces is optional.
      */
     export class Namespace extends Resource implements INamespace {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.NamespaceSpec
       /**
        * Namespace provides a scope for Names. Use of multiple namespaces is optional.
@@ -4882,7 +4425,7 @@ export namespace core {
     }
     export interface INamespace {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the behavior of the Namespace. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.NamespaceSpec
     }
@@ -4891,7 +4434,7 @@ export namespace core {
      */
     export class NamespaceList extends Resource implements INamespaceList {
       items: core.v1.Namespace[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * NamespaceList is a list of Namespaces.
        */
@@ -4905,7 +4448,7 @@ export namespace core {
       /** Items is the list of Namespace objects in the list. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/ */
       items: core.v1.Namespace[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * NamespaceSpec describes the attributes on a Namespace.
@@ -4925,7 +4468,7 @@ export namespace core {
      * Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
      */
     export class Node extends Resource implements INode {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.NodeSpec
       /**
        * Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
@@ -4938,7 +4481,7 @@ export namespace core {
     }
     export interface INode {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the behavior of a node. https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.NodeSpec
     }
@@ -4965,9 +4508,9 @@ export namespace core {
      */
     export interface NodeCondition {
       /** Last time we got an update on a given condition. */
-      lastHeartbeatTime?: apimachinery.v1.Time
+      lastHeartbeatTime?: meta.v1.Time
       /** Last time the condition transit from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human readable message indicating details about last transition. */
       message?: string
       /** (brief) reason for the condition's last transition. */
@@ -5009,7 +4552,7 @@ export namespace core {
      */
     export class NodeList extends Resource implements INodeList {
       items: core.v1.Node[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * NodeList is the whole list of all Nodes which have been registered with master.
        */
@@ -5023,7 +4566,7 @@ export namespace core {
       /** List of nodes */
       items: core.v1.Node[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * A node selector represents the union of the results of one or more label queries over a set of nodes; that is, it represents the OR of the selectors represented by the node selector terms.
@@ -5062,8 +4605,6 @@ export namespace core {
       externalID?: string
       /** PodCIDR represents the pod IP range assigned to the node. */
       podCIDR?: string
-      /** podCIDRs represents the IP ranges assigned to the node for usage by Pods on that node. If this field is specified, the 0th entry must match the podCIDR field. It may contain at most 1 value for each of IPv4 and IPv6. */
-      podCIDRs?: string[]
       /** ID of the node assigned by the cloud provider in the format: <ProviderName>://<ProviderSpecificNodeID> */
       providerID?: string
       /** If specified, the node's taints. */
@@ -5075,12 +4616,12 @@ export namespace core {
      * NodeStatus is information about the current status of a node.
      */
     export interface NodeStatus {
-      /** List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses Note: This field is declared as mergeable, but the merge key is not sufficiently unique, which can cause data corruption when it is merged. Callers should instead use a full-replacement patch. See http://pr.k8s.io/79391 for an example. */
+      /** List of addresses reachable to the node. Queried from cloud provider, if available. More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses */
       addresses?: core.v1.NodeAddress[]
       /** Allocatable represents the resources of a node that are available for scheduling. Defaults to Capacity. */
-      allocatable?: { [k: string]: apimachinery.misc.Quantity }
+      allocatable?: { [k: string]: misc.resource.Quantity }
       /** Capacity represents the total resources of a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity */
-      capacity?: { [k: string]: apimachinery.misc.Quantity }
+      capacity?: { [k: string]: misc.resource.Quantity }
       /** Conditions is an array of current observed node conditions. More info: https://kubernetes.io/docs/concepts/nodes/node/#condition */
       conditions?: core.v1.NodeCondition[]
       /** Status of the config assigned to the node via the dynamic Kubelet config feature. */
@@ -5155,7 +4696,7 @@ export namespace core {
      * PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
      */
     export class PersistentVolume extends Resource implements IPersistentVolume {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.PersistentVolumeSpec
       /**
        * PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
@@ -5168,7 +4709,7 @@ export namespace core {
     }
     export interface IPersistentVolume {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines a specification of a persistent volume owned by the cluster. Provisioned by an administrator. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistent-volumes */
       spec: core.v1.PersistentVolumeSpec
     }
@@ -5176,7 +4717,7 @@ export namespace core {
      * PersistentVolumeClaim is a user's request for and claim to a persistent volume
      */
     export class PersistentVolumeClaim extends Resource implements IPersistentVolumeClaim {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.PersistentVolumeClaimSpec
       /**
        * PersistentVolumeClaim is a user's request for and claim to a persistent volume
@@ -5189,7 +4730,7 @@ export namespace core {
     }
     export interface IPersistentVolumeClaim {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the desired characteristics of a volume requested by a pod author. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims */
       spec: core.v1.PersistentVolumeClaimSpec
     }
@@ -5198,9 +4739,9 @@ export namespace core {
      */
     export interface PersistentVolumeClaimCondition {
       /** Last time we probed the condition. */
-      lastProbeTime?: apimachinery.v1.Time
+      lastProbeTime?: meta.v1.Time
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human-readable message indicating details about last transition. */
       message?: string
       /** Unique, this should be a short, machine understandable string that gives the reason for condition's last transition. If it reports "ResizeStarted" that means the underlying persistent volume is being resized. */
@@ -5213,7 +4754,7 @@ export namespace core {
      */
     export class PersistentVolumeClaimList extends Resource implements IPersistentVolumeClaimList {
       items: core.v1.PersistentVolumeClaim[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
        */
@@ -5227,7 +4768,7 @@ export namespace core {
       /** A list of persistent volume claims. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#persistentvolumeclaims */
       items: core.v1.PersistentVolumeClaim[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PersistentVolumeClaimSpec describes the common attributes of storage devices and allows a Source for provider-specific attributes
@@ -5240,7 +4781,7 @@ export namespace core {
       /** Resources represents the minimum resources the volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources */
       resources?: core.v1.ResourceRequirements
       /** A label query over volumes to consider for binding. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** Name of the StorageClass required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1 */
       storageClassName?: string
       /** volumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec. This is a beta feature. */
@@ -5255,7 +4796,7 @@ export namespace core {
       /** AccessModes contains the actual access modes the volume backing the PVC has. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1 */
       accessModes?: string[]
       /** Represents the actual resources of the underlying volume. */
-      capacity?: { [k: string]: apimachinery.misc.Quantity }
+      capacity?: { [k: string]: misc.resource.Quantity }
       /** Current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'ResizeStarted'. */
       conditions?: core.v1.PersistentVolumeClaimCondition[]
       /** Phase represents the current phase of PersistentVolumeClaim. */
@@ -5275,7 +4816,7 @@ export namespace core {
      */
     export class PersistentVolumeList extends Resource implements IPersistentVolumeList {
       items: core.v1.PersistentVolume[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PersistentVolumeList is a list of PersistentVolume items.
        */
@@ -5289,7 +4830,7 @@ export namespace core {
       /** List of persistent volumes. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes */
       items: core.v1.PersistentVolume[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PersistentVolumeSpec is the specification of a persistent volume.
@@ -5304,7 +4845,7 @@ export namespace core {
       /** AzureFile represents an Azure File Service mount on the host and bind mount to the pod. */
       azureFile?: core.v1.AzureFilePersistentVolumeSource
       /** A description of the persistent volume's resources and capacity. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#capacity */
-      capacity?: { [k: string]: apimachinery.misc.Quantity }
+      capacity?: { [k: string]: misc.resource.Quantity }
       /** CephFS represents a Ceph FS mount on the host that shares a pod's lifetime */
       cephfs?: core.v1.CephFSPersistentVolumeSource
       /** Cinder represents a cinder volume attached and mounted on kubelets host machine More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md */
@@ -5380,7 +4921,7 @@ export namespace core {
      * Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
      */
     export class Pod extends Resource implements IPod {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.PodSpec
       /**
        * Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
@@ -5393,7 +4934,7 @@ export namespace core {
     }
     export interface IPod {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the pod. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.PodSpec
     }
@@ -5411,7 +4952,7 @@ export namespace core {
      */
     export interface PodAffinityTerm {
       /** A label query over a set of resources, in this case pods. */
-      labelSelector?: apimachinery.v1.LabelSelector
+      labelSelector?: meta.v1.LabelSelector
       /** namespaces specifies which namespaces the labelSelector applies to (matches against); null or empty list means "this pod's namespace" */
       namespaces?: string[]
       /** This pod should be co-located (affinity) or not co-located (anti-affinity) with the pods matching the labelSelector in the specified namespaces, where co-located is defined as running on a node whose value of the label with key topologyKey matches that of any node on which any of the selected pods is running. Empty topologyKey is not allowed. */
@@ -5431,9 +4972,9 @@ export namespace core {
      */
     export interface PodCondition {
       /** Last time we probed the condition. */
-      lastProbeTime?: apimachinery.v1.Time
+      lastProbeTime?: meta.v1.Time
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human-readable message indicating details about last transition. */
       message?: string
       /** Unique, one-word, CamelCase reason for the condition's last transition. */
@@ -5463,19 +5004,11 @@ export namespace core {
       value?: string
     }
     /**
-     * IP address information for entries in the (plural) PodIPs field. Each entry includes:
-     *    IP: An IP address allocated to the pod. Routable at least within the cluster.
-     */
-    export interface PodIP {
-      /** ip is an IP address (IPv4 or IPv6) assigned to the pod */
-      ip?: string
-    }
-    /**
      * PodList is a list of Pods.
      */
     export class PodList extends Resource implements IPodList {
       items: core.v1.Pod[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodList is a list of Pods.
        */
@@ -5489,7 +5022,7 @@ export namespace core {
       /** List of pods. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md */
       items: core.v1.Pod[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodReadinessGate contains the reference to a pod condition
@@ -5507,28 +5040,26 @@ export namespace core {
 1. The owning GID will be the FSGroup 2. The setgid bit is set (new files created in the volume will be owned by FSGroup) 3. The permission bits are OR'd with rw-rw----
 
 If unset, the Kubelet will not modify the ownership and permissions of any volume. */
-      fsGroup?: integer
+      fsGroup?: number
       /** The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. */
-      runAsGroup?: integer
+      runAsGroup?: number
       /** Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
       runAsNonRoot?: boolean
       /** The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. */
-      runAsUser?: integer
+      runAsUser?: number
       /** The SELinux context to be applied to all containers. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. */
       seLinuxOptions?: core.v1.SELinuxOptions
       /** A list of groups applied to the first process run in each container, in addition to the container's primary GID.  If unspecified, no groups will be added to any container. */
-      supplementalGroups?: integer[]
+      supplementalGroups?: number[]
       /** Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. */
       sysctls?: core.v1.Sysctl[]
-      /** The Windows specific settings applied to all containers. If unspecified, the options within a container's SecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
-      windowsOptions?: core.v1.WindowsSecurityContextOptions
     }
     /**
      * PodSpec is a description of a pod.
      */
     export interface PodSpec {
       /** Optional duration in seconds the pod may be active on the node relative to StartTime before the system will actively try to mark it failed and kill associated containers. Value must be a positive integer. */
-      activeDeadlineSeconds?: integer
+      activeDeadlineSeconds?: number
       /** If specified, the pod's scheduling constraints */
       affinity?: core.v1.Affinity
       /** AutomountServiceAccountToken indicates whether a service account token should be automatically mounted. */
@@ -5541,8 +5072,6 @@ If unset, the Kubelet will not modify the ownership and permissions of any volum
       dnsPolicy?: string
       /** EnableServiceLinks indicates whether information about services should be injected into pod's environment variables, matching the syntax of Docker links. Optional: Defaults to true. */
       enableServiceLinks?: boolean
-      /** EphemeralContainers is the list of ephemeral containers that run in this pod. Ephemeral containers are added to an existing pod as a result of a user-initiated action such as troubleshooting. This list is read-only in the pod spec. It may not be specified in a create or modified in an update of a pod or pod template. To add an ephemeral container use the pod's ephemeralcontainers subresource, which allows update using the EphemeralContainers kind. This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature. */
-      ephemeralContainers?: core.v1.EphemeralContainer[]
       /** HostAliases is an optional list of hosts and IPs that will be injected into the pod's hosts file if specified. This is only valid for non-hostNetwork pods. */
       hostAliases?: core.v1.HostAlias[]
       /** Use the host's ipc namespace. Optional: Default to false. */
@@ -5561,19 +5090,15 @@ If unset, the Kubelet will not modify the ownership and permissions of any volum
       nodeName?: string
       /** NodeSelector is a selector which must be true for the pod to fit on a node. Selector which must match a node's labels for the pod to be scheduled on that node. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ */
       nodeSelector?: { [k: string]: string }
-      /** Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. This field will be autopopulated at admission time by the RuntimeClass admission controller. If the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests. The RuntimeClass admission controller will reject Pod create requests which have the overhead already set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero. More info: https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.16, and is only honored by servers that enable the PodOverhead feature. */
-      overhead?: { [k: string]: apimachinery.misc.Quantity }
-      /** PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset. This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature. */
-      preemptionPolicy?: string
       /** The priority value. Various system components use this field to find the priority of the pod. When Priority Admission Controller is enabled, it prevents users from setting this field. The admission controller populates this field from PriorityClassName. The higher the value, the higher the priority. */
-      priority?: integer
+      priority?: number
       /** If specified, indicates the pod's priority. "system-node-critical" and "system-cluster-critical" are two special keywords which indicate the highest priorities with the former being the highest priority. Any other name must be defined by creating a PriorityClass object with that name. If not specified, the pod priority will be default or zero if there is no default. */
       priorityClassName?: string
       /** If specified, all readiness gates will be evaluated for pod readiness. A pod is ready when all its containers are ready AND all conditions specified in the readiness gates have status equal to "True" More info: https://git.k8s.io/enhancements/keps/sig-network/0007-pod-ready%2B%2B.md */
       readinessGates?: core.v1.PodReadinessGate[]
       /** Restart policy for all containers within the pod. One of Always, OnFailure, Never. Default to Always. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#restart-policy */
       restartPolicy?: string
-      /** RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run. If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an empty definition that uses the default runtime handler. More info: https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md This is a beta feature as of Kubernetes v1.14. */
+      /** RuntimeClassName refers to a RuntimeClass object in the node.k8s.io group, which should be used to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run. If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an empty definition that uses the default runtime handler. More info: https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md This is an alpha feature and may change in the future. */
       runtimeClassName?: string
       /** If specified, the pod will be dispatched by specified scheduler. If not specified, the pod will be dispatched by default scheduler. */
       schedulerName?: string
@@ -5588,11 +5113,9 @@ If unset, the Kubelet will not modify the ownership and permissions of any volum
       /** If specified, the fully qualified Pod hostname will be "<hostname>.<subdomain>.<pod namespace>.svc.<cluster domain>". If not specified, the pod will not have a domainname at all. */
       subdomain?: string
       /** Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period will be used instead. The grace period is the duration in seconds after the processes running in the pod are sent a termination signal and the time when the processes are forcibly halted with a kill signal. Set this value longer than the expected cleanup time for your process. Defaults to 30 seconds. */
-      terminationGracePeriodSeconds?: integer
+      terminationGracePeriodSeconds?: number
       /** If specified, the pod's tolerations. */
       tolerations?: core.v1.Toleration[]
-      /** TopologySpreadConstraints describes how a group of pods ought to spread across topology domains. Scheduler will schedule pods in a way which abides by the constraints. This field is alpha-level and is only honored by clusters that enables the EvenPodsSpread feature. All topologySpreadConstraints are ANDed. */
-      topologySpreadConstraints?: core.v1.TopologySpreadConstraint[]
       /** List of volumes that can be mounted by containers belonging to the pod. More info: https://kubernetes.io/docs/concepts/storage/volumes */
       volumes?: core.v1.Volume[]
     }
@@ -5604,8 +5127,6 @@ If unset, the Kubelet will not modify the ownership and permissions of any volum
       conditions?: core.v1.PodCondition[]
       /** The list has one entry per container in the manifest. Each entry is currently the output of `docker inspect`. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status */
       containerStatuses?: core.v1.ContainerStatus[]
-      /** Status for any ephemeral containers that running in this pod. This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature. */
-      ephemeralContainerStatuses?: core.v1.ContainerStatus[]
       /** IP address of the host to which the pod is assigned. Empty if not yet scheduled. */
       hostIP?: string
       /** The list has one entry per init container in the manifest. The most recent successful init container will have ready = true, the most recently started container will have startTime set. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status */
@@ -5622,20 +5143,18 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       phase?: string
       /** IP address allocated to the pod. Routable at least within the cluster. Empty if not yet allocated. */
       podIP?: string
-      /** podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list is empty if no IPs have been allocated yet. */
-      podIPs?: core.v1.PodIP[]
       /** The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md */
       qosClass?: string
       /** A brief CamelCase message indicating details about why the pod is in this state. e.g. 'Evicted' */
       reason?: string
       /** RFC 3339 date and time at which the object was acknowledged by the Kubelet. This is before the Kubelet pulled the container image(s) for the pod. */
-      startTime?: apimachinery.v1.Time
+      startTime?: meta.v1.Time
     }
     /**
      * PodTemplate describes a template for creating copies of a predefined pod.
      */
     export class PodTemplate extends Resource implements IPodTemplate {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       template?: core.v1.PodTemplateSpec
       /**
        * PodTemplate describes a template for creating copies of a predefined pod.
@@ -5648,7 +5167,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     }
     export interface IPodTemplate {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Template defines the pods that will be created from this pod template. https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       template?: core.v1.PodTemplateSpec
     }
@@ -5657,7 +5176,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class PodTemplateList extends Resource implements IPodTemplateList {
       items: core.v1.PodTemplate[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodTemplateList is a list of PodTemplates.
        */
@@ -5671,14 +5190,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** List of pod templates */
       items: core.v1.PodTemplate[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodTemplateSpec describes the data a pod should have when created from a template
      */
     export interface PodTemplateSpec {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata?: apimachinery.v1.ObjectMeta
+      metadata?: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the pod. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec?: core.v1.PodSpec
     }
@@ -5700,7 +5219,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** A node selector term, associated with the corresponding weight. */
       preference: core.v1.NodeSelectorTerm
       /** Weight associated with matching the corresponding nodeSelectorTerm, in the range 1-100. */
-      weight: integer
+      weight: number
     }
     /**
      * Probe describes a health check to be performed against a container to determine whether it is alive or ready to receive traffic.
@@ -5709,26 +5228,26 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** One and only one of the following should be specified. Exec specifies the action to take. */
       exec?: core.v1.ExecAction
       /** Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1. */
-      failureThreshold?: integer
+      failureThreshold?: number
       /** HTTPGet specifies the http request to perform. */
       httpGet?: core.v1.HTTPGetAction
       /** Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes */
-      initialDelaySeconds?: integer
+      initialDelaySeconds?: number
       /** How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1. */
-      periodSeconds?: integer
+      periodSeconds?: number
       /** Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1. Must be 1 for liveness. Minimum value is 1. */
-      successThreshold?: integer
+      successThreshold?: number
       /** TCPSocket specifies an action involving a TCP port. TCP hooks not yet supported */
       tcpSocket?: core.v1.TCPSocketAction
       /** Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes */
-      timeoutSeconds?: integer
+      timeoutSeconds?: number
     }
     /**
      * Represents a projected volume source
      */
     export interface ProjectedVolumeSource {
       /** Mode bits to use on created files by default. Must be a value between 0 and 0777. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      defaultMode?: integer
+      defaultMode?: number
       /** list of volume projections */
       sources: core.v1.VolumeProjection[]
     }
@@ -5795,7 +5314,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      * ReplicationController represents the configuration of a replication controller.
      */
     export class ReplicationController extends Resource implements IReplicationController {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.ReplicationControllerSpec
       /**
        * ReplicationController represents the configuration of a replication controller.
@@ -5808,7 +5327,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     }
     export interface IReplicationController {
       /** If the Labels of a ReplicationController are empty, they are defaulted to be the same as the Pod(s) that the replication controller manages. Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the specification of the desired behavior of the replication controller. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.ReplicationControllerSpec
     }
@@ -5817,7 +5336,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export interface ReplicationControllerCondition {
       /** The last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -5832,7 +5351,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class ReplicationControllerList extends Resource implements IReplicationControllerList {
       items: core.v1.ReplicationController[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ReplicationControllerList is a collection of replication controllers.
        */
@@ -5846,16 +5365,16 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** List of replication controllers. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller */
       items: core.v1.ReplicationController[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ReplicationControllerSpec is the specification of a replication controller.
      */
     export interface ReplicationControllerSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#what-is-a-replicationcontroller */
-      replicas?: integer
+      replicas?: number
       /** Selector is a label query over pods that should match the Replicas count. If Selector is empty, it is defaulted to the labels present on the Pod template. Label keys and values that must match in order to be controlled by this replication controller, if empty defaulted to labels on Pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
       selector?: { [k: string]: string }
       /** Template is the object that describes the pod that will be created if insufficient replicas are detected. This takes precedence over a TemplateRef. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
@@ -5866,17 +5385,17 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export interface ReplicationControllerStatus {
       /** The number of available replicas (ready for at least minReadySeconds) for this replication controller. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Represents the latest available observations of a replication controller's current state. */
       conditions?: core.v1.ReplicationControllerCondition[]
       /** The number of pods that have labels matching the labels of the pod template of the replication controller. */
-      fullyLabeledReplicas?: integer
+      fullyLabeledReplicas?: number
       /** ObservedGeneration reflects the generation of the most recently observed replication controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The number of ready replicas for this replication controller. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Replicas is the most recently oberved number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#what-is-a-replicationcontroller */
-      replicas: integer
+      replicas: number
     }
     /**
      * ResourceFieldSelector represents container resources (cpu, memory) and their output format
@@ -5885,7 +5404,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Container name: required for volumes, optional for env vars */
       containerName?: string
       /** Specifies the output format of the exposed resources, defaults to "1" */
-      divisor?: apimachinery.misc.Quantity
+      divisor?: misc.resource.Quantity
       /** Required: resource to select */
       resource: string
     }
@@ -5893,7 +5412,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      * ResourceQuota sets aggregate quota restrictions enforced per namespace
      */
     export class ResourceQuota extends Resource implements IResourceQuota {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.ResourceQuotaSpec
       /**
        * ResourceQuota sets aggregate quota restrictions enforced per namespace
@@ -5906,7 +5425,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     }
     export interface IResourceQuota {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the desired quota. https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.ResourceQuotaSpec
     }
@@ -5915,7 +5434,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class ResourceQuotaList extends Resource implements IResourceQuotaList {
       items: core.v1.ResourceQuota[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ResourceQuotaList is a list of ResourceQuota items.
        */
@@ -5929,14 +5448,14 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Items is a list of ResourceQuota objects. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/ */
       items: core.v1.ResourceQuota[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
      */
     export interface ResourceQuotaSpec {
       /** hard is the set of desired hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/ */
-      hard?: { [k: string]: apimachinery.misc.Quantity }
+      hard?: { [k: string]: misc.resource.Quantity }
       /** scopeSelector is also a collection of filters like scopes that must match each object tracked by a quota but expressed using ScopeSelectorOperator in combination with possible values. For a resource to match, both scopes AND scopeSelector (if specified in spec), must be matched. */
       scopeSelector?: core.v1.ScopeSelector
       /** A collection of filters that must match each object tracked by a quota. If not specified, the quota matches all objects. */
@@ -5947,18 +5466,18 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export interface ResourceQuotaStatus {
       /** Hard is the set of enforced hard limits for each named resource. More info: https://kubernetes.io/docs/concepts/policy/resource-quotas/ */
-      hard?: { [k: string]: apimachinery.misc.Quantity }
+      hard?: { [k: string]: misc.resource.Quantity }
       /** Used is the current observed total usage of the resource in the namespace. */
-      used?: { [k: string]: apimachinery.misc.Quantity }
+      used?: { [k: string]: misc.resource.Quantity }
     }
     /**
      * ResourceRequirements describes the compute resource requirements.
      */
     export interface ResourceRequirements {
       /** Limits describes the maximum amount of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/ */
-      limits?: { [k: string]: apimachinery.misc.Quantity }
+      limits?: { [k: string]: misc.resource.Quantity }
       /** Requests describes the minimum amount of compute resources required. If Requests is omitted for a container, it defaults to Limits if that is explicitly specified, otherwise to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/ */
-      requests?: { [k: string]: apimachinery.misc.Quantity }
+      requests?: { [k: string]: misc.resource.Quantity }
     }
     /**
      * SELinuxOptions are the labels to be applied to the container
@@ -6046,7 +5565,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class Secret extends Resource implements ISecret {
       data?: { [k: string]: string }
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       stringData?: { [k: string]: string }
       type?: string
       /**
@@ -6064,7 +5583,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Data contains the secret data. Each key must consist of alphanumeric characters, '-', '_' or '.'. The serialized form of the secret data is a base64 encoded string, representing the arbitrary (possibly non-string) data value here. Described in https://tools.ietf.org/html/rfc4648#section-4 */
       data?: { [k: string]: string }
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** stringData allows specifying non-binary secret data in string form. It is provided as a write-only convenience method. All keys and values are merged into the data field on write, overwriting any existing values. It is never output when reading from the API. */
       stringData?: { [k: string]: string }
       /** Used to facilitate programmatic handling of secret data. */
@@ -6089,7 +5608,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       key: string
       /** Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names */
       name?: string
-      /** Specify whether the Secret or its key must be defined */
+      /** Specify whether the Secret or it's key must be defined */
       optional?: boolean
     }
     /**
@@ -6097,7 +5616,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class SecretList extends Resource implements ISecretList {
       items: core.v1.Secret[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * SecretList is a list of Secret.
        */
@@ -6111,7 +5630,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Items is a list of secret objects. More info: https://kubernetes.io/docs/concepts/configuration/secret */
       items: core.v1.Secret[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * Adapts a secret into a projected volume.
@@ -6142,10 +5661,10 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export interface SecretVolumeSource {
       /** Optional: mode bits to use on created files by default. Must be a value between 0 and 0777. Defaults to 0644. Directories within the path are not affected by this setting. This might be in conflict with other options that affect the file mode, like fsGroup, and the result can be other mode bits set. */
-      defaultMode?: integer
+      defaultMode?: number
       /** If unspecified, each key-value pair in the Data field of the referenced Secret will be projected into the volume as a file whose name is the key and content is the value. If specified, the listed keys will be projected into the specified paths, and unlisted keys will not be present. If a key is specified which is not present in the Secret, the volume setup will error unless it is marked optional. Paths must be relative and may not contain the '..' path or start with '..'. */
       items?: core.v1.KeyToPath[]
-      /** Specify whether the Secret or its keys must be defined */
+      /** Specify whether the Secret or it's keys must be defined */
       optional?: boolean
       /** Name of the secret in the pod's namespace to use. More info: https://kubernetes.io/docs/concepts/storage/volumes#secret */
       secretName?: string
@@ -6165,21 +5684,19 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Whether this container has a read-only root filesystem. Default is false. */
       readOnlyRootFilesystem?: boolean
       /** The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
-      runAsGroup?: integer
+      runAsGroup?: number
       /** Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
       runAsNonRoot?: boolean
       /** The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
-      runAsUser?: integer
+      runAsUser?: number
       /** The SELinux context to be applied to the container. If unspecified, the container runtime will allocate a random SELinux context for each container.  May also be set in PodSecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
       seLinuxOptions?: core.v1.SELinuxOptions
-      /** The Windows specific settings applied to all containers. If unspecified, the options from the PodSecurityContext will be used. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. */
-      windowsOptions?: core.v1.WindowsSecurityContextOptions
     }
     /**
      * Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
      */
     export class Service extends Resource implements IService {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: core.v1.ServiceSpec
       /**
        * Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
@@ -6192,7 +5709,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     }
     export interface IService {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the behavior of a service. https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: core.v1.ServiceSpec
     }
@@ -6202,7 +5719,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     export class ServiceAccount extends Resource implements IServiceAccount {
       automountServiceAccountToken?: boolean
       imagePullSecrets?: core.v1.LocalObjectReference[]
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       secrets?: core.v1.ObjectReference[]
       /**
        * ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
@@ -6221,7 +5738,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** ImagePullSecrets is a list of references to secrets in the same namespace to use for pulling any images in pods that reference this ServiceAccount. ImagePullSecrets are distinct from Secrets because Secrets can be mounted in the pod, but ImagePullSecrets are only accessed by the kubelet. More info: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod */
       imagePullSecrets?: core.v1.LocalObjectReference[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Secrets is the list of secrets allowed to be used by pods running using this ServiceAccount. More info: https://kubernetes.io/docs/concepts/configuration/secret */
       secrets?: core.v1.ObjectReference[]
     }
@@ -6230,7 +5747,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class ServiceAccountList extends Resource implements IServiceAccountList {
       items: core.v1.ServiceAccount[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ServiceAccountList is a list of ServiceAccount objects
        */
@@ -6244,7 +5761,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** List of ServiceAccounts. More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/ */
       items: core.v1.ServiceAccount[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ServiceAccountTokenProjection represents a projected service account token volume. This projection can be used to insert a service account token into the pods runtime filesystem for use against APIs (Kubernetes API Server or otherwise).
@@ -6253,7 +5770,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Audience is the intended audience of the token. A recipient of a token must identify itself with an identifier specified in the audience of the token, and otherwise should reject the token. The audience defaults to the identifier of the apiserver. */
       audience?: string
       /** ExpirationSeconds is the requested duration of validity of the service account token. As the token approaches expiration, the kubelet volume plugin will proactively rotate the service account token. The kubelet will start trying to rotate the token if the token is older than 80 percent of its time to live or if the token is older than 24 hours.Defaults to 1 hour and must be at least 10 minutes. */
-      expirationSeconds?: integer
+      expirationSeconds?: number
       /** Path is the path relative to the mount point of the file to project the token into. */
       path: string
     }
@@ -6262,7 +5779,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
      */
     export class ServiceList extends Resource implements IServiceList {
       items: core.v1.Service[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ServiceList holds a list of services.
        */
@@ -6276,7 +5793,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** List of services */
       items: core.v1.Service[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ServicePort contains information on service's port.
@@ -6285,13 +5802,13 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** The name of this port within the service. This must be a DNS_LABEL. All ports within a ServiceSpec must have unique names. This maps to the 'Name' field in EndpointPort objects. Optional if only one ServicePort is defined on this service. */
       name?: string
       /** The port on each node on which this service is exposed when type=NodePort or LoadBalancer. Usually assigned by the system. If specified, it will be allocated to the service if unused or else creation of the service will fail. Default is to auto-allocate a port if the ServiceType of this Service requires one. More info: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport */
-      nodePort?: integer
+      nodePort?: number
       /** The port that will be exposed by this service. */
-      port: integer
+      port: number
       /** The IP protocol for this port. Supports "TCP", "UDP", and "SCTP". Default is TCP. */
       protocol?: string
       /** Number or name of the port to access on the pods targeted by the service. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. If this is a string, it will be looked up as a named port in the target Pod's container ports. If this is not specified, the value of the 'port' field is used (an identity map). This field is ignored for services with clusterIP=None, and should be omitted or set equal to the 'port' field. More info: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service */
-      targetPort?: apimachinery.misc.IntOrString
+      targetPort?: misc.intstr.IntOrString
     }
     /**
      * ServiceSpec describes the attributes that a user creates on a service.
@@ -6306,7 +5823,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** externalTrafficPolicy denotes if this Service desires to route external traffic to node-local or cluster-wide endpoints. "Local" preserves the client source IP and avoids a second hop for LoadBalancer and Nodeport type services, but risks potentially imbalanced traffic spreading. "Cluster" obscures the client source IP and may cause a second hop to another node, but should have good overall load-spreading. */
       externalTrafficPolicy?: string
       /** healthCheckNodePort specifies the healthcheck nodePort for the service. If not specified, HealthCheckNodePort is created by the service api backend with the allocated nodePort. Will use user-specified nodePort value if specified by the client. Only effects when Type is set to LoadBalancer and ExternalTrafficPolicy is set to Local. */
-      healthCheckNodePort?: integer
+      healthCheckNodePort?: number
       /** Only applies to Service Type: LoadBalancer LoadBalancer will get created with the IP specified in this field. This feature depends on whether the underlying cloud-provider supports specifying the loadBalancerIP when a load balancer is created. This field will be ignored if the cloud-provider does not support the feature. */
       loadBalancerIP?: string
       /** If specified and supported by the platform, this will restrict traffic through the cloud-provider load-balancer will be restricted to the specified client IPs. This field will be ignored if the cloud-provider does not support the feature." More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/ */
@@ -6384,7 +5901,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Optional: Host name to connect to, defaults to the pod IP. */
       host?: string
       /** Number or name of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME. */
-      port: apimachinery.misc.IntOrString
+      port: misc.intstr.IntOrString
     }
     /**
      * The node this Taint is attached to has the "effect" on any pod that does not tolerate the Taint.
@@ -6395,7 +5912,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Required. The taint key to be applied to a node. */
       key: string
       /** TimeAdded represents the time at which the taint was added. It is only written for NoExecute taints. */
-      timeAdded?: apimachinery.v1.Time
+      timeAdded?: meta.v1.Time
       /** Required. The taint value corresponding to the taint key. */
       value?: string
     }
@@ -6410,7 +5927,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Operator represents a key's relationship to the value. Valid operators are Exists and Equal. Defaults to Equal. Exists is equivalent to wildcard for value, so that a pod can tolerate all taints of a particular category. */
       operator?: string
       /** TolerationSeconds represents the period of time the toleration (which must be of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default, it is not set, which means tolerate the taint forever (do not evict). Zero and negative values will be treated as 0 (evict immediately) by the system. */
-      tolerationSeconds?: integer
+      tolerationSeconds?: number
       /** Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string. */
       value?: string
     }
@@ -6429,19 +5946,6 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     export interface TopologySelectorTerm {
       /** A list of topology selector requirements by labels. */
       matchLabelExpressions?: core.v1.TopologySelectorLabelRequirement[]
-    }
-    /**
-     * TopologySpreadConstraint specifies how to spread matching pods among the given topology.
-     */
-    export interface TopologySpreadConstraint {
-      /** LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain. */
-      labelSelector?: apimachinery.v1.LabelSelector
-      /** MaxSkew describes the degree to which pods may be unevenly distributed. It's the maximum permitted difference between the number of matching pods in any two topology domains of a given topology type. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 1/1/0: | zone1 | zone2 | zone3 | |   P   |   P   |       | - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1; scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2) violate MaxSkew(1). - if MaxSkew is 2, incoming pod can be scheduled onto any zone. It's a required field. Default value is 1 and 0 is not allowed. */
-      maxSkew: integer
-      /** TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. It's a required field. */
-      topologyKey: string
-      /** WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it - ScheduleAnyway tells the scheduler to still schedule it It's considered as "Unsatisfiable" if and only if placing incoming pod on any topology violates "MaxSkew". For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won't make it *more* imbalanced. It's a required field. */
-      whenUnsatisfiable: string
     }
     /**
      * TypedLocalObjectReference contains enough information to let you locate the typed referenced object inside the same namespace.
@@ -6540,7 +6044,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       readOnly?: boolean
       /** Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root). */
       subPath?: string
-      /** Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is beta in 1.15. */
+      /** Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive. This field is alpha in 1.14. */
       subPathExpr?: string
     }
     /**
@@ -6583,18 +6087,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
       /** Required. A pod affinity term, associated with the corresponding weight. */
       podAffinityTerm: core.v1.PodAffinityTerm
       /** weight associated with matching the corresponding podAffinityTerm, in the range 1-100. */
-      weight: integer
-    }
-    /**
-     * WindowsSecurityContextOptions contain Windows-specific options and credentials.
-     */
-    export interface WindowsSecurityContextOptions {
-      /** GMSACredentialSpec is where the GMSA admission webhook (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the GMSA credential spec named by the GMSACredentialSpecName field. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag. */
-      gmsaCredentialSpec?: string
-      /** GMSACredentialSpecName is the name of the GMSA credential spec to use. This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag. */
-      gmsaCredentialSpecName?: string
-      /** The UserName in Windows to run the entrypoint of the container process. Defaults to the user specified in image metadata if unspecified. May also be set in PodSecurityContext. If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence. This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag. */
-      runAsUserName?: string
+      weight: number
     }
   }
 }
@@ -6605,12 +6098,12 @@ export namespace events {
      */
     export class Event extends Resource implements IEvent {
       action?: string
-      deprecatedCount?: integer
-      deprecatedFirstTimestamp?: apimachinery.v1.Time
-      deprecatedLastTimestamp?: apimachinery.v1.Time
+      deprecatedCount?: number
+      deprecatedFirstTimestamp?: meta.v1.Time
+      deprecatedLastTimestamp?: meta.v1.Time
       deprecatedSource?: core.v1.EventSource
-      eventTime: apimachinery.v1.MicroTime
-      metadata: apimachinery.v1.ObjectMeta
+      eventTime: meta.v1.MicroTime
+      metadata: meta.v1.ObjectMeta
       note?: string
       reason?: string
       regarding?: core.v1.ObjectReference
@@ -6645,16 +6138,16 @@ export namespace events {
       /** What action was taken/failed regarding to the regarding object. */
       action?: string
       /** Deprecated field assuring backward compatibility with core.v1 Event type */
-      deprecatedCount?: integer
+      deprecatedCount?: number
       /** Deprecated field assuring backward compatibility with core.v1 Event type */
-      deprecatedFirstTimestamp?: apimachinery.v1.Time
+      deprecatedFirstTimestamp?: meta.v1.Time
       /** Deprecated field assuring backward compatibility with core.v1 Event type */
-      deprecatedLastTimestamp?: apimachinery.v1.Time
+      deprecatedLastTimestamp?: meta.v1.Time
       /** Deprecated field assuring backward compatibility with core.v1 Event type */
       deprecatedSource?: core.v1.EventSource
       /** Required. Time when this Event was first observed. */
-      eventTime: apimachinery.v1.MicroTime
-      metadata: apimachinery.v1.ObjectMeta
+      eventTime: meta.v1.MicroTime
+      metadata: meta.v1.ObjectMeta
       /** Optional. A human-readable description of the status of this operation. Maximal length of the note is 1kB, but libraries should be prepared to handle values up to 64kB. */
       note?: string
       /** Why the action was taken. */
@@ -6677,7 +6170,7 @@ export namespace events {
      */
     export class EventList extends Resource implements IEventList {
       items: events.v1beta1.Event[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * EventList is a list of Event objects.
        */
@@ -6691,17 +6184,17 @@ export namespace events {
       /** Items is a list of schema objects. */
       items: events.v1beta1.Event[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * EventSeries contain information on series of events, i.e. thing that was/is happening continuously for some time.
      */
     export interface EventSeries {
       /** Number of occurrences in this series up to the last heartbeat time */
-      count: integer
+      count: number
       /** Time when last Event from the series was seen before last heartbeat. */
-      lastObservedTime: apimachinery.v1.MicroTime
-      /** Information whether this series is ongoing or finished. Deprecated. Planned removal for 1.18 */
+      lastObservedTime: meta.v1.MicroTime
+      /** Information whether this series is ongoing or finished. */
       state: string
     }
   }
@@ -6737,7 +6230,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
     export class DaemonSet extends Resource implements IDaemonSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.DaemonSetSpec
       /**
        * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
@@ -6750,7 +6243,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IDaemonSet {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** The desired behavior of this daemon set. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status */
       spec: extensions.v1beta1.DaemonSetSpec
     }
@@ -6759,7 +6252,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface DaemonSetCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -6774,7 +6267,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export class DaemonSetList extends Resource implements IDaemonSetList {
       items: extensions.v1beta1.DaemonSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DaemonSetList is a collection of daemon sets.
        */
@@ -6788,22 +6281,22 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       /** A list of daemon sets. */
       items: extensions.v1beta1.DaemonSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DaemonSetSpec is the specification of a daemon set.
      */
     export interface DaemonSetSpec {
       /** The minimum number of seconds for which a newly created DaemonSet pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready). */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** The number of old history to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. Defaults to 10. */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** A label query over pods that are managed by the daemon set. Must match in order to be controlled. If empty, defaulted to labels on Pod template. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** An object that describes the pod that will be created. The DaemonSet will create exactly one copy of this pod on every node that matches the template's node selector (or on every node if no node selector is specified). More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template: core.v1.PodTemplateSpec
       /** DEPRECATED. A sequence number representing a specific generation of the template. Populated by the system. It can be set only during the creation. */
-      templateGeneration?: integer
+      templateGeneration?: number
       /** An update strategy to replace existing DaemonSet pods with new pods. */
       updateStrategy?: extensions.v1beta1.DaemonSetUpdateStrategy
     }
@@ -6812,25 +6305,25 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface DaemonSetStatus {
       /** Count of hash collisions for the DaemonSet. The DaemonSet controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ControllerRevision. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a DaemonSet's current state. */
       conditions?: extensions.v1beta1.DaemonSetCondition[]
       /** The number of nodes that are running at least 1 daemon pod and are supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      currentNumberScheduled: integer
+      currentNumberScheduled: number
       /** The total number of nodes that should be running the daemon pod (including nodes correctly running the daemon pod). More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      desiredNumberScheduled: integer
+      desiredNumberScheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberAvailable?: integer
+      numberAvailable?: number
       /** The number of nodes that are running the daemon pod, but are not supposed to run the daemon pod. More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/ */
-      numberMisscheduled: integer
+      numberMisscheduled: number
       /** The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready. */
-      numberReady: integer
+      numberReady: number
       /** The number of nodes that should be running the daemon pod and have none of the daemon pod running and available (ready for at least spec.minReadySeconds) */
-      numberUnavailable?: integer
+      numberUnavailable?: number
       /** The most recent generation observed by the daemon set controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The total number of nodes that are running updated daemon pod */
-      updatedNumberScheduled?: integer
+      updatedNumberScheduled?: number
     }
     export interface DaemonSetUpdateStrategy {
       /** Rolling update config params. Present only if type = "RollingUpdate". */
@@ -6842,7 +6335,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
     export class Deployment extends Resource implements IDeployment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.DeploymentSpec
       /**
        * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
@@ -6855,7 +6348,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IDeployment {
       /** Standard object metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the Deployment. */
       spec: extensions.v1beta1.DeploymentSpec
     }
@@ -6864,9 +6357,9 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface DeploymentCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** The last time this condition was updated. */
-      lastUpdateTime?: apimachinery.v1.Time
+      lastUpdateTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -6881,7 +6374,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export class DeploymentList extends Resource implements IDeploymentList {
       items: extensions.v1beta1.Deployment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DeploymentList is a list of Deployments.
        */
@@ -6895,7 +6388,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       /** Items is the list of Deployments. */
       items: extensions.v1beta1.Deployment[]
       /** Standard list metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
@@ -6927,19 +6420,19 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface DeploymentSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Indicates that the deployment is paused and will not be processed by the deployment controller. */
       paused?: boolean
       /** The maximum time in seconds for a deployment to make progress before it is considered to be failed. The deployment controller will continue to process failed deployments and a condition with a ProgressDeadlineExceeded reason will be surfaced in the deployment status. Note that progress will not be estimated during the time a deployment is paused. This is set to the max value of int32 (i.e. 2147483647) by default, which means "no deadline". */
-      progressDeadlineSeconds?: integer
+      progressDeadlineSeconds?: number
       /** Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1. */
-      replicas?: integer
+      replicas?: number
       /** The number of old ReplicaSets to retain to allow rollback. This is a pointer to distinguish between explicit zero and not specified. This is set to the max value of int32 (i.e. 2147483647) by default, which means "retaining all old RelicaSets". */
-      revisionHistoryLimit?: integer
+      revisionHistoryLimit?: number
       /** DEPRECATED. The config this deployment is rolling back to. Will be cleared after rollback is done. */
       rollbackTo?: extensions.v1beta1.RollbackConfig
       /** Label selector for pods. Existing ReplicaSets whose pods are selected by this will be the ones affected by this deployment. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** The deployment strategy to use to replace existing pods with new ones. */
       strategy?: extensions.v1beta1.DeploymentStrategy
       /** Template describes the pods that will be created. */
@@ -6950,21 +6443,21 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface DeploymentStatus {
       /** Total number of available pods (ready for at least minReadySeconds) targeted by this deployment. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Count of hash collisions for the Deployment. The Deployment controller uses this field as a collision avoidance mechanism when it needs to create the name for the newest ReplicaSet. */
-      collisionCount?: integer
+      collisionCount?: number
       /** Represents the latest available observations of a deployment's current state. */
       conditions?: extensions.v1beta1.DeploymentCondition[]
       /** The generation observed by the deployment controller. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** Total number of ready pods targeted by this deployment. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment (their labels match the selector). */
-      replicas?: integer
+      replicas?: number
       /** Total number of unavailable pods targeted by this deployment. This is the total number of pods that are still required for the deployment to have 100% available capacity. They may either be pods that are running but not yet available or pods that still have not been created. */
-      unavailableReplicas?: integer
+      unavailableReplicas?: number
       /** Total number of non-terminated pods targeted by this deployment that have the desired template spec. */
-      updatedReplicas?: integer
+      updatedReplicas?: number
     }
     /**
      * DeploymentStrategy describes how to replace existing pods with new ones.
@@ -7005,18 +6498,18 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface HostPortRange {
       /** max is the end of the range, inclusive. */
-      max: integer
+      max: number
       /** min is the start of the range, inclusive. */
-      min: integer
+      min: number
     }
     /**
      * IDRange provides a min/max of an allowed range of IDs. Deprecated: use IDRange from policy API Group instead.
      */
     export interface IDRange {
       /** max is the end of the range, inclusive. */
-      max: integer
+      max: number
       /** min is the start of the range, inclusive. */
-      min: integer
+      min: number
     }
     /**
      * DEPRECATED 1.9 - This group version of IPBlock is deprecated by networking/v1/IPBlock. IPBlock describes a particular CIDR (Ex. "192.168.1.1/24") that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The except entry describes CIDRs that should not be included within this rule.
@@ -7031,7 +6524,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc. DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
      */
     export class Ingress extends Resource implements IIngress {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.IngressSpec
       /**
        * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc. DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
@@ -7044,7 +6537,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IIngress {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec is the desired state of the Ingress. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status */
       spec: extensions.v1beta1.IngressSpec
     }
@@ -7055,14 +6548,14 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       /** Specifies the name of the referenced service. */
       serviceName: string
       /** Specifies the port of the referenced service. */
-      servicePort: apimachinery.misc.IntOrString
+      servicePort: misc.intstr.IntOrString
     }
     /**
      * IngressList is a collection of Ingress.
      */
     export class IngressList extends Resource implements IIngressList {
       items: extensions.v1beta1.Ingress[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * IngressList is a collection of Ingress.
        */
@@ -7076,7 +6569,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       /** Items is the list of Ingress. */
       items: extensions.v1beta1.Ingress[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * IngressRule represents the rules mapping the paths under a specified host to the related backend services. Incoming requests are first evaluated for a host match, then routed to the backend associated with the matching IngressRuleValue.
@@ -7122,7 +6615,7 @@ Both these may change in the future. Incoming requests are matched against the h
      * DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
     export class NetworkPolicy extends Resource implements INetworkPolicy {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.NetworkPolicySpec
       /**
        * DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods
@@ -7135,7 +6628,7 @@ Both these may change in the future. Incoming requests are matched against the h
     }
     export interface INetworkPolicy {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior for this NetworkPolicy. */
       spec: extensions.v1beta1.NetworkPolicySpec
     }
@@ -7152,7 +6645,7 @@ Both these may change in the future. Incoming requests are matched against the h
      * DEPRECATED 1.9 - This group version of NetworkPolicyIngressRule is deprecated by networking/v1/NetworkPolicyIngressRule. This NetworkPolicyIngressRule matches traffic if and only if the traffic matches both ports AND from.
      */
     export interface NetworkPolicyIngressRule {
-      /** List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the from list. */
+      /** List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least on item, this rule allows traffic only if the traffic matches at least one item in the from list. */
       from?: extensions.v1beta1.NetworkPolicyPeer[]
       /** List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list. */
       ports?: extensions.v1beta1.NetworkPolicyPort[]
@@ -7162,7 +6655,7 @@ Both these may change in the future. Incoming requests are matched against the h
      */
     export class NetworkPolicyList extends Resource implements INetworkPolicyList {
       items: extensions.v1beta1.NetworkPolicy[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * DEPRECATED 1.9 - This group version of NetworkPolicyList is deprecated by networking/v1/NetworkPolicyList. Network Policy List is a list of NetworkPolicy objects.
        */
@@ -7176,7 +6669,7 @@ Both these may change in the future. Incoming requests are matched against the h
       /** Items is a list of schema objects. */
       items: extensions.v1beta1.NetworkPolicy[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicyPeer is deprecated by networking/v1/NetworkPolicyPeer.
@@ -7187,18 +6680,18 @@ Both these may change in the future. Incoming requests are matched against the h
       /** Selects Namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.
 
 If PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
+      namespaceSelector?: meta.v1.LabelSelector
       /** This is a label selector which selects Pods. This field follows standard label selector semantics; if present but empty, it selects all pods.
 
 If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace. */
-      podSelector?: apimachinery.v1.LabelSelector
+      podSelector?: meta.v1.LabelSelector
     }
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicyPort is deprecated by networking/v1/NetworkPolicyPort.
      */
     export interface NetworkPolicyPort {
       /** If specified, the port on the given protocol.  This can either be a numerical or named port on a pod.  If this field is not provided, this matches all port names and numbers. If present, only traffic on the specified protocol AND port will be matched. */
-      port?: apimachinery.misc.IntOrString
+      port?: misc.intstr.IntOrString
       /** Optional.  The protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP. */
       protocol?: string
     }
@@ -7211,7 +6704,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
       /** List of ingress rules to be applied to the selected pods. Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod OR if the traffic source is the pod's local node, OR if the traffic matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy does not allow any traffic (and serves solely to ensure that the pods it selects are isolated by default). */
       ingress?: extensions.v1beta1.NetworkPolicyIngressRule[]
       /** Selects the pods to which this NetworkPolicy object applies.  The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods.  In this case, the ingress rules for each are combined additively. This field is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace. */
-      podSelector: apimachinery.v1.LabelSelector
+      podSelector: meta.v1.LabelSelector
       /** List of rule types that the NetworkPolicy relates to. Valid options are "Ingress", "Egress", or "Ingress,Egress". If this field is not specified, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ "Egress" ]. Likewise, if you want to write a policy that specifies that no egress is allowed, you must specify a policyTypes value that include "Egress" (since such a policy would not include an Egress section and would otherwise default to just [ "Ingress" ]). This field is beta-level in 1.8 */
       policyTypes?: string[]
     }
@@ -7219,7 +6712,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.
      */
     export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.PodSecurityPolicySpec
       /**
        * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.
@@ -7232,7 +6725,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     }
     export interface IPodSecurityPolicy {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** spec defines the policy enforced. */
       spec: extensions.v1beta1.PodSecurityPolicySpec
     }
@@ -7241,7 +6734,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
      */
     export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
       items: extensions.v1beta1.PodSecurityPolicy[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodSecurityPolicyList is a list of PodSecurityPolicy objects. Deprecated: use PodSecurityPolicyList from policy API Group instead.
        */
@@ -7255,7 +6748,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
       /** items is a list of schema objects. */
       items: extensions.v1beta1.PodSecurityPolicy[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodSecurityPolicySpec defines the policy enforced. Deprecated: use PodSecurityPolicySpec from policy API Group instead.
@@ -7263,7 +6756,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     export interface PodSecurityPolicySpec {
       /** allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspecified, defaults to true. */
       allowPrivilegeEscalation?: boolean
-      /** AllowedCSIDrivers is a whitelist of inline CSI drivers that must be explicitly set to be embedded within a pod spec. An empty value indicates that any CSI driver can be used for inline ephemeral volumes. This is an alpha field, and is only honored if the API server enables the CSIInlineVolume feature gate. */
+      /** AllowedCSIDrivers is a whitelist of inline CSI drivers that must be explicitly set to be embedded within a pod spec. An empty value means no CSI drivers can run inline within a pod spec. */
       allowedCSIDrivers?: extensions.v1beta1.AllowedCSIDriver[]
       /** allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this field may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities. */
       allowedCapabilities?: string[]
@@ -7305,8 +6798,6 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
       runAsGroup?: extensions.v1beta1.RunAsGroupStrategyOptions
       /** runAsUser is the strategy that will dictate the allowable RunAsUser values that may be set. */
       runAsUser: extensions.v1beta1.RunAsUserStrategyOptions
-      /** runtimeClass is the strategy that will dictate the allowable RuntimeClasses for a pod. If this field is omitted, the pod's runtimeClassName field is unrestricted. Enforcement of this field depends on the RuntimeClass feature gate being enabled. */
-      runtimeClass?: extensions.v1beta1.RuntimeClassStrategyOptions
       /** seLinux is the strategy that will dictate the allowable labels that may be set. */
       seLinux: extensions.v1beta1.SELinuxStrategyOptions
       /** supplementalGroups is the strategy that will dictate what supplemental groups are used by the SecurityContext. */
@@ -7318,7 +6809,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
     export class ReplicaSet extends Resource implements IReplicaSet {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.ReplicaSetSpec
       /**
        * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
@@ -7331,7 +6822,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     }
     export interface IReplicaSet {
       /** If the Labels of a ReplicaSet are empty, they are defaulted to be the same as the Pod(s) that the ReplicaSet manages. Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec defines the specification of the desired behavior of the ReplicaSet. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status */
       spec: extensions.v1beta1.ReplicaSetSpec
     }
@@ -7340,7 +6831,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      */
     export interface ReplicaSetCondition {
       /** The last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** A human readable message indicating details about the transition. */
       message?: string
       /** The reason for the condition's last transition. */
@@ -7355,7 +6846,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      */
     export class ReplicaSetList extends Resource implements IReplicaSetList {
       items: extensions.v1beta1.ReplicaSet[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ReplicaSetList is a collection of ReplicaSets.
        */
@@ -7369,18 +6860,18 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
       /** List of ReplicaSets. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller */
       items: extensions.v1beta1.ReplicaSet[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ReplicaSetSpec is the specification of a ReplicaSet.
      */
     export interface ReplicaSetSpec {
       /** Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready) */
-      minReadySeconds?: integer
+      minReadySeconds?: number
       /** Replicas is the number of desired replicas. This is a pointer to distinguish between explicit zero and unspecified. Defaults to 1. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas?: integer
+      replicas?: number
       /** Selector is a label query over pods that should match the replica count. If the selector is empty, it is defaulted to the labels present on the pod template. Label keys and values that must match in order to be controlled by this replica set. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** Template is the object that describes the pod that will be created if insufficient replicas are detected. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller#pod-template */
       template?: core.v1.PodTemplateSpec
     }
@@ -7389,40 +6880,40 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      */
     export interface ReplicaSetStatus {
       /** The number of available replicas (ready for at least minReadySeconds) for this replica set. */
-      availableReplicas?: integer
+      availableReplicas?: number
       /** Represents the latest available observations of a replica set's current state. */
       conditions?: extensions.v1beta1.ReplicaSetCondition[]
       /** The number of pods that have labels matching the labels of the pod template of the replicaset. */
-      fullyLabeledReplicas?: integer
+      fullyLabeledReplicas?: number
       /** ObservedGeneration reflects the generation of the most recently observed ReplicaSet. */
-      observedGeneration?: integer
+      observedGeneration?: number
       /** The number of ready replicas for this replica set. */
-      readyReplicas?: integer
+      readyReplicas?: number
       /** Replicas is the most recently oberved number of replicas. More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller */
-      replicas: integer
+      replicas: number
     }
     /**
      * DEPRECATED.
      */
     export interface RollbackConfig {
       /** The revision to rollback to. If set to 0, rollback to the last revision. */
-      revision?: integer
+      revision?: number
     }
     /**
      * Spec to control the desired behavior of daemon set rolling update.
      */
     export interface RollingUpdateDaemonSet {
       /** The maximum number of DaemonSet pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of total number of DaemonSet pods at the start of the update (ex: 10%). Absolute number is calculated from percentage by rounding up. This cannot be 0. Default value is 1. Example: when this is set to 30%, at most 30% of the total number of nodes that should be running the daemon pod (i.e. status.desiredNumberScheduled) can have their pods stopped for an update at any given time. The update starts by stopping at most 30% of those DaemonSet pods and then brings up new DaemonSet pods in their place. Once the new pods are available, it then proceeds onto other DaemonSet pods, thus ensuring that at least 70% of original number of DaemonSet pods are available at all times during the update. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * Spec to control the desired behavior of rolling update.
      */
     export interface RollingUpdateDeployment {
       /** The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. By default, a value of 1 is used. Example: when this is set to 30%, the new RC can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new RC can be scaled up further, ensuring that total number of pods running at any time during the update is at most 130% of desired pods. */
-      maxSurge?: apimachinery.misc.IntOrString
+      maxSurge?: misc.intstr.IntOrString
       /** The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. By default, a fixed value of 1 is used. Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old RC can be scaled down further, followed by scaling up the new RC, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods. */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
     }
     /**
      * RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use RunAsGroupStrategyOptions from policy API Group instead.
@@ -7443,15 +6934,6 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
       rule: string
     }
     /**
-     * RuntimeClassStrategyOptions define the strategy that will dictate the allowable RuntimeClasses for a pod.
-     */
-    export interface RuntimeClassStrategyOptions {
-      /** allowedRuntimeClassNames is a whitelist of RuntimeClass names that may be specified on a pod. A value of "*" means that any RuntimeClass name is allowed, and must be the only item in the list. An empty list requires the RuntimeClassName field to be unset. */
-      allowedRuntimeClassNames: string[]
-      /** defaultRuntimeClassName is the default RuntimeClassName to set on the pod. The default MUST be allowed by the allowedRuntimeClassNames list. A value of nil does not mutate the Pod. */
-      defaultRuntimeClassName?: string
-    }
-    /**
      * SELinuxStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use SELinuxStrategyOptions from policy API Group instead.
      */
     export interface SELinuxStrategyOptions {
@@ -7464,7 +6946,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      * represents a scaling request for a resource.
      */
     export class Scale extends Resource implements IScale {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.ScaleSpec
       /**
        * represents a scaling request for a resource.
@@ -7477,7 +6959,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     }
     export interface IScale {
       /** Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status. */
       spec: extensions.v1beta1.ScaleSpec
     }
@@ -7486,14 +6968,14 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
      */
     export interface ScaleSpec {
       /** desired number of instances for the scaled object. */
-      replicas?: integer
+      replicas?: number
     }
     /**
      * represents the current status of a scale subresource.
      */
     export interface ScaleStatus {
       /** actual number of observed instances of the scaled object. */
-      replicas: integer
+      replicas: number
       /** label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors */
       selector?: { [k: string]: string }
       /** label selector for pods that should match the replicas count. This is a serializated version of both map-based and more expressive set-based selectors. This is done to avoid introspection in the clients. The string will be in the same format as the query-param syntax. If the target type only supports map-based selectors, both this field and map-based selector field are populated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors */
@@ -7525,7 +7007,7 @@ export namespace networking {
      * NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
     export class NetworkPolicy extends Resource implements INetworkPolicy {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: networking.v1.NetworkPolicySpec
       /**
        * NetworkPolicy describes what network traffic is allowed for a set of Pods
@@ -7538,7 +7020,7 @@ export namespace networking {
     }
     export interface INetworkPolicy {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior for this NetworkPolicy. */
       spec: networking.v1.NetworkPolicySpec
     }
@@ -7555,7 +7037,7 @@ export namespace networking {
      * NetworkPolicyIngressRule describes a particular set of traffic that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and from.
      */
     export interface NetworkPolicyIngressRule {
-      /** List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the from list. */
+      /** List of sources which should be able to access the pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all sources (traffic not restricted by source). If this field is present and contains at least on item, this rule allows traffic only if the traffic matches at least one item in the from list. */
       from?: networking.v1.NetworkPolicyPeer[]
       /** List of ports which should be made accessible on the pods selected for this rule. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list. */
       ports?: networking.v1.NetworkPolicyPort[]
@@ -7565,7 +7047,7 @@ export namespace networking {
      */
     export class NetworkPolicyList extends Resource implements INetworkPolicyList {
       items: networking.v1.NetworkPolicy[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * NetworkPolicyList is a list of NetworkPolicy objects.
        */
@@ -7579,7 +7061,7 @@ export namespace networking {
       /** Items is a list of schema objects. */
       items: networking.v1.NetworkPolicy[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * NetworkPolicyPeer describes a peer to allow traffic from. Only certain combinations of fields are allowed
@@ -7590,18 +7072,18 @@ export namespace networking {
       /** Selects Namespaces using cluster-scoped labels. This field follows standard label selector semantics; if present but empty, it selects all namespaces.
 
 If PodSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects all Pods in the Namespaces selected by NamespaceSelector. */
-      namespaceSelector?: apimachinery.v1.LabelSelector
+      namespaceSelector?: meta.v1.LabelSelector
       /** This is a label selector which selects Pods. This field follows standard label selector semantics; if present but empty, it selects all pods.
 
 If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects the Pods matching PodSelector in the Namespaces selected by NamespaceSelector. Otherwise it selects the Pods matching PodSelector in the policy's own Namespace. */
-      podSelector?: apimachinery.v1.LabelSelector
+      podSelector?: meta.v1.LabelSelector
     }
     /**
      * NetworkPolicyPort describes a port to allow traffic on
      */
     export interface NetworkPolicyPort {
       /** The port on the given protocol. This can either be a numerical or named port on a pod. If this field is not provided, this matches all port names and numbers. */
-      port?: apimachinery.misc.IntOrString
+      port?: misc.intstr.IntOrString
       /** The protocol (TCP, UDP, or SCTP) which traffic must match. If not specified, this field defaults to TCP. */
       protocol?: string
     }
@@ -7614,7 +7096,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
       /** List of ingress rules to be applied to the selected pods. Traffic is allowed to a pod if there are no NetworkPolicies selecting the pod (and cluster policy otherwise allows the traffic), OR if the traffic source is the pod's local node, OR if the traffic matches at least one ingress rule across all of the NetworkPolicy objects whose podSelector matches the pod. If this field is empty then this NetworkPolicy does not allow any traffic (and serves solely to ensure that the pods it selects are isolated by default) */
       ingress?: networking.v1.NetworkPolicyIngressRule[]
       /** Selects the pods to which this NetworkPolicy object applies. The array of ingress rules is applied to any pods selected by this field. Multiple network policies can select the same set of pods. In this case, the ingress rules for each are combined additively. This field is NOT optional and follows standard label selector semantics. An empty podSelector matches all pods in this namespace. */
-      podSelector: apimachinery.v1.LabelSelector
+      podSelector: meta.v1.LabelSelector
       /** List of rule types that the NetworkPolicy relates to. Valid options are "Ingress", "Egress", or "Ingress,Egress". If this field is not specified, it will default based on the existence of Ingress or Egress rules; policies that contain an Egress section are assumed to affect Egress, and all policies (whether or not they contain an Ingress section) are assumed to affect Ingress. If you want to write an egress-only policy, you must explicitly specify policyTypes [ "Egress" ]. Likewise, if you want to write a policy that specifies that no egress is allowed, you must specify a policyTypes value that include "Egress" (since such a policy would not include an Egress section and would otherwise default to just [ "Ingress" ]). This field is beta-level in 1.8 */
       policyTypes?: string[]
     }
@@ -7640,7 +7122,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
      */
     export class Ingress extends Resource implements IIngress {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: networking.v1beta1.IngressSpec
       /**
        * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
@@ -7653,7 +7135,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     }
     export interface IIngress {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec is the desired state of the Ingress. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: networking.v1beta1.IngressSpec
     }
@@ -7664,14 +7146,14 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
       /** Specifies the name of the referenced service. */
       serviceName: string
       /** Specifies the port of the referenced service. */
-      servicePort: apimachinery.misc.IntOrString
+      servicePort: misc.intstr.IntOrString
     }
     /**
      * IngressList is a collection of Ingress.
      */
     export class IngressList extends Resource implements IIngressList {
       items: networking.v1beta1.Ingress[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * IngressList is a collection of Ingress.
        */
@@ -7685,7 +7167,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
       /** Items is the list of Ingress. */
       items: networking.v1beta1.Ingress[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * IngressRule represents the rules mapping the paths under a specified host to the related backend services. Incoming requests are first evaluated for a host match, then routed to the backend associated with the matching IngressRuleValue.
@@ -7732,17 +7214,10 @@ Both these may change in the future. Incoming requests are matched against the h
 export namespace node {
   export namespace v1alpha1 {
     /**
-     * Overhead structure represents the resource overhead associated with running a pod.
-     */
-    export interface Overhead {
-      /** PodFixed represents the fixed resource overhead associated with running a pod. */
-      podFixed?: { [k: string]: apimachinery.misc.Quantity }
-    }
-    /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
     export class RuntimeClass extends Resource implements IRuntimeClass {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: node.v1alpha1.RuntimeClassSpec
       /**
        * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
@@ -7755,7 +7230,7 @@ export namespace node {
     }
     export interface IRuntimeClass {
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the RuntimeClass More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
       spec: node.v1alpha1.RuntimeClassSpec
     }
@@ -7764,7 +7239,7 @@ export namespace node {
      */
     export class RuntimeClassList extends Resource implements IRuntimeClassList {
       items: node.v1alpha1.RuntimeClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RuntimeClassList is a list of RuntimeClass objects.
        */
@@ -7778,33 +7253,23 @@ export namespace node {
       /** Items is a list of schema objects. */
       items: node.v1alpha1.RuntimeClass[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RuntimeClassSpec is a specification of a RuntimeClass. It contains parameters that are required to describe the RuntimeClass to the Container Runtime Interface (CRI) implementation, as well as any other components that need to understand how the pod will be run. The RuntimeClassSpec is immutable.
      */
     export interface RuntimeClassSpec {
-      /** Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.15, and is only honored by servers that enable the PodOverhead feature. */
-      overhead?: node.v1alpha1.Overhead
       /** RuntimeHandler specifies the underlying runtime and configuration that the CRI implementation will use to handle pods of this class. The possible values are specific to the node & CRI configuration.  It is assumed that all handlers are available on every node, and handlers of the same name are equivalent on every node. For example, a handler called "runc" might specify that the runc OCI runtime (using native Linux containers) will be used to run the containers in a pod. The RuntimeHandler must conform to the DNS Label (RFC 1123) requirements and is immutable. */
       runtimeHandler: string
     }
   }
   export namespace v1beta1 {
     /**
-     * Overhead structure represents the resource overhead associated with running a pod.
-     */
-    export interface Overhead {
-      /** PodFixed represents the fixed resource overhead associated with running a pod. */
-      podFixed?: { [k: string]: apimachinery.misc.Quantity }
-    }
-    /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
     export class RuntimeClass extends Resource implements IRuntimeClass {
       handler: string
-      metadata: apimachinery.v1.ObjectMeta
-      overhead?: node.v1beta1.Overhead
+      metadata: meta.v1.ObjectMeta
       /**
        * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
        */
@@ -7812,23 +7277,20 @@ export namespace node {
         super({ apiVersion: 'node.k8s.io/v1beta1', kind: 'RuntimeClass' })
         this.handler = properties.handler
         this.metadata = properties.metadata
-        this.overhead = properties.overhead
       }
     }
     export interface IRuntimeClass {
       /** Handler specifies the underlying runtime and configuration that the CRI implementation will use to handle pods of this class. The possible values are specific to the node & CRI configuration.  It is assumed that all handlers are available on every node, and handlers of the same name are equivalent on every node. For example, a handler called "runc" might specify that the runc OCI runtime (using native Linux containers) will be used to run the containers in a pod. The Handler must conform to the DNS Label (RFC 1123) requirements, and is immutable. */
       handler: string
       /** More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
-      /** Overhead represents the resource overhead associated with running a pod for a given RuntimeClass. For more details, see https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md This field is alpha-level as of Kubernetes v1.15, and is only honored by servers that enable the PodOverhead feature. */
-      overhead?: node.v1beta1.Overhead
+      metadata: meta.v1.ObjectMeta
     }
     /**
      * RuntimeClassList is a list of RuntimeClass objects.
      */
     export class RuntimeClassList extends Resource implements IRuntimeClassList {
       items: node.v1beta1.RuntimeClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RuntimeClassList is a list of RuntimeClass objects.
        */
@@ -7842,7 +7304,7 @@ export namespace node {
       /** Items is a list of schema objects. */
       items: node.v1beta1.RuntimeClass[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
   }
 }
@@ -7877,8 +7339,8 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      * Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
      */
     export class Eviction extends Resource implements IEviction {
-      deleteOptions?: apimachinery.v1.DeleteOptions
-      metadata: apimachinery.v1.ObjectMeta
+      deleteOptions?: meta.v1.DeleteOptions
+      metadata: meta.v1.ObjectMeta
       /**
        * Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
        */
@@ -7890,9 +7352,9 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IEviction {
       /** DeleteOptions may be provided */
-      deleteOptions?: apimachinery.v1.DeleteOptions
+      deleteOptions?: meta.v1.DeleteOptions
       /** ObjectMeta describes the pod that is being evicted. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
     }
     /**
      * FSGroupStrategyOptions defines the strategy type and options used to create the strategy.
@@ -7908,24 +7370,24 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export interface HostPortRange {
       /** max is the end of the range, inclusive. */
-      max: integer
+      max: number
       /** min is the start of the range, inclusive. */
-      min: integer
+      min: number
     }
     /**
      * IDRange provides a min/max of an allowed range of IDs.
      */
     export interface IDRange {
       /** max is the end of the range, inclusive. */
-      max: integer
+      max: number
       /** min is the start of the range, inclusive. */
-      min: integer
+      min: number
     }
     /**
      * PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
      */
     export class PodDisruptionBudget extends Resource implements IPodDisruptionBudget {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: policy.v1beta1.PodDisruptionBudgetSpec
       /**
        * PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
@@ -7937,7 +7399,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       }
     }
     export interface IPodDisruptionBudget {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired behavior of the PodDisruptionBudget. */
       spec: policy.v1beta1.PodDisruptionBudgetSpec
     }
@@ -7946,7 +7408,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export class PodDisruptionBudgetList extends Resource implements IPodDisruptionBudgetList {
       items: policy.v1beta1.PodDisruptionBudget[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodDisruptionBudgetList is a collection of PodDisruptionBudgets.
        */
@@ -7958,41 +7420,41 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IPodDisruptionBudgetList {
       items: policy.v1beta1.PodDisruptionBudget[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodDisruptionBudgetSpec is a description of a PodDisruptionBudget.
      */
     export interface PodDisruptionBudgetSpec {
       /** An eviction is allowed if at most "maxUnavailable" pods selected by "selector" are unavailable after the eviction, i.e. even in absence of the evicted pod. For example, one can prevent all voluntary evictions by specifying 0. This is a mutually exclusive setting with "minAvailable". */
-      maxUnavailable?: apimachinery.misc.IntOrString
+      maxUnavailable?: misc.intstr.IntOrString
       /** An eviction is allowed if at least "minAvailable" pods selected by "selector" will still be available after the eviction, i.e. even in the absence of the evicted pod.  So for example you can prevent all voluntary evictions by specifying "100%". */
-      minAvailable?: apimachinery.misc.IntOrString
+      minAvailable?: misc.intstr.IntOrString
       /** Label query over pods whose evictions are managed by the disruption budget. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
     }
     /**
      * PodDisruptionBudgetStatus represents information about the status of a PodDisruptionBudget. Status may trail the actual state of a system.
      */
     export interface PodDisruptionBudgetStatus {
       /** current number of healthy pods */
-      currentHealthy: integer
+      currentHealthy: number
       /** minimum desired number of healthy pods */
-      desiredHealthy: integer
+      desiredHealthy: number
       /** DisruptedPods contains information about pods whose eviction was processed by the API server eviction subresource handler but has not yet been observed by the PodDisruptionBudget controller. A pod will be in this map from the time when the API server processed the eviction request to the time when the pod is seen by PDB controller as having been marked for deletion (or after a timeout). The key in the map is the name of the pod and the value is the time when the API server processed the eviction request. If the deletion didn't occur and a pod is still there it will be removed from the list automatically by PodDisruptionBudget controller after some time. If everything goes smooth this map should be empty for the most of the time. Large number of entries in the map may indicate problems with pod deletions. */
-      disruptedPods?: { [k: string]: apimachinery.v1.Time }
+      disruptedPods?: { [k: string]: meta.v1.Time }
       /** Number of pod disruptions that are currently allowed. */
-      disruptionsAllowed: integer
+      disruptionsAllowed: number
       /** total number of pods counted by this disruption budget */
-      expectedPods: integer
+      expectedPods: number
       /** Most recent generation observed when updating this PDB status. PodDisruptionsAllowed and other status informatio is valid only if observedGeneration equals to PDB's object generation. */
-      observedGeneration?: integer
+      observedGeneration?: number
     }
     /**
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.
      */
     export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: policy.v1beta1.PodSecurityPolicySpec
       /**
        * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.
@@ -8005,7 +7467,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     }
     export interface IPodSecurityPolicy {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** spec defines the policy enforced. */
       spec: policy.v1beta1.PodSecurityPolicySpec
     }
@@ -8014,7 +7476,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
      */
     export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
       items: policy.v1beta1.PodSecurityPolicy[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodSecurityPolicyList is a list of PodSecurityPolicy objects.
        */
@@ -8028,7 +7490,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
       /** items is a list of schema objects. */
       items: policy.v1beta1.PodSecurityPolicy[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodSecurityPolicySpec defines the policy enforced.
@@ -8036,7 +7498,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     export interface PodSecurityPolicySpec {
       /** allowPrivilegeEscalation determines if a pod can request to allow privilege escalation. If unspecified, defaults to true. */
       allowPrivilegeEscalation?: boolean
-      /** AllowedCSIDrivers is a whitelist of inline CSI drivers that must be explicitly set to be embedded within a pod spec. An empty value indicates that any CSI driver can be used for inline ephemeral volumes. This is an alpha field, and is only honored if the API server enables the CSIInlineVolume feature gate. */
+      /** AllowedCSIDrivers is a whitelist of inline CSI drivers that must be explicitly set to be embedded within a pod spec. An empty value means no CSI drivers can run inline within a pod spec. */
       allowedCSIDrivers?: policy.v1beta1.AllowedCSIDriver[]
       /** allowedCapabilities is a list of capabilities that can be requested to add to the container. Capabilities in this field may be added at the pod author's discretion. You must not list a capability in both allowedCapabilities and requiredDropCapabilities. */
       allowedCapabilities?: string[]
@@ -8078,8 +7540,6 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
       runAsGroup?: policy.v1beta1.RunAsGroupStrategyOptions
       /** runAsUser is the strategy that will dictate the allowable RunAsUser values that may be set. */
       runAsUser: policy.v1beta1.RunAsUserStrategyOptions
-      /** runtimeClass is the strategy that will dictate the allowable RuntimeClasses for a pod. If this field is omitted, the pod's runtimeClassName field is unrestricted. Enforcement of this field depends on the RuntimeClass feature gate being enabled. */
-      runtimeClass?: policy.v1beta1.RuntimeClassStrategyOptions
       /** seLinux is the strategy that will dictate the allowable labels that may be set. */
       seLinux: policy.v1beta1.SELinuxStrategyOptions
       /** supplementalGroups is the strategy that will dictate what supplemental groups are used by the SecurityContext. */
@@ -8104,15 +7564,6 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
       ranges?: policy.v1beta1.IDRange[]
       /** rule is the strategy that will dictate the allowable RunAsUser values that may be set. */
       rule: string
-    }
-    /**
-     * RuntimeClassStrategyOptions define the strategy that will dictate the allowable RuntimeClasses for a pod.
-     */
-    export interface RuntimeClassStrategyOptions {
-      /** allowedRuntimeClassNames is a whitelist of RuntimeClass names that may be specified on a pod. A value of "*" means that any RuntimeClass name is allowed, and must be the only item in the list. An empty list requires the RuntimeClassName field to be unset. */
-      allowedRuntimeClassNames: string[]
-      /** defaultRuntimeClassName is the default RuntimeClassName to set on the pod. The default MUST be allowed by the allowedRuntimeClassNames list. A value of nil does not mutate the Pod. */
-      defaultRuntimeClassName?: string
     }
     /**
      * SELinuxStrategyOptions defines the strategy type and any options used to create the strategy.
@@ -8141,14 +7592,14 @@ export namespace rbac {
      */
     export interface AggregationRule {
       /** ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added */
-      clusterRoleSelectors?: apimachinery.v1.LabelSelector[]
+      clusterRoleSelectors?: meta.v1.LabelSelector[]
     }
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
     export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1.AggregationRule
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
       /**
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
@@ -8164,7 +7615,7 @@ export namespace rbac {
       /** AggregationRule is an optional field that describes how to build the Rules for this ClusterRole. If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be stomped by the controller. */
       aggregationRule?: rbac.v1.AggregationRule
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this ClusterRole */
       rules?: rbac.v1.PolicyRule[]
     }
@@ -8172,7 +7623,7 @@ export namespace rbac {
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
     export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
       /**
@@ -8187,7 +7638,7 @@ export namespace rbac {
     }
     export interface IClusterRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can only reference a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8198,7 +7649,7 @@ export namespace rbac {
      */
     export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1.ClusterRoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
@@ -8212,14 +7663,14 @@ export namespace rbac {
       /** Items is a list of ClusterRoleBindings */
       items: rbac.v1.ClusterRoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
     export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1.ClusterRole[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
@@ -8233,7 +7684,7 @@ export namespace rbac {
       /** Items is a list of ClusterRoles */
       items: rbac.v1.ClusterRole[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
@@ -8254,7 +7705,7 @@ export namespace rbac {
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
     export class Role extends Resource implements IRole {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
@@ -8267,7 +7718,7 @@ export namespace rbac {
     }
     export interface IRole {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this Role */
       rules?: rbac.v1.PolicyRule[]
     }
@@ -8275,7 +7726,7 @@ export namespace rbac {
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
     export class RoleBinding extends Resource implements IRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
       /**
@@ -8290,7 +7741,7 @@ export namespace rbac {
     }
     export interface IRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8301,7 +7752,7 @@ export namespace rbac {
      */
     export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1.RoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
@@ -8315,14 +7766,14 @@ export namespace rbac {
       /** Items is a list of RoleBindings */
       items: rbac.v1.RoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleList is a collection of Roles
      */
     export class RoleList extends Resource implements IRoleList {
       items: rbac.v1.Role[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
@@ -8336,7 +7787,7 @@ export namespace rbac {
       /** Items is a list of Roles */
       items: rbac.v1.Role[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleRef contains information that points to the role being used
@@ -8369,14 +7820,14 @@ export namespace rbac {
      */
     export interface AggregationRule {
       /** ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added */
-      clusterRoleSelectors?: apimachinery.v1.LabelSelector[]
+      clusterRoleSelectors?: meta.v1.LabelSelector[]
     }
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
     export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1alpha1.AggregationRule
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
       /**
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
@@ -8392,7 +7843,7 @@ export namespace rbac {
       /** AggregationRule is an optional field that describes how to build the Rules for this ClusterRole. If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be stomped by the controller. */
       aggregationRule?: rbac.v1alpha1.AggregationRule
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this ClusterRole */
       rules?: rbac.v1alpha1.PolicyRule[]
     }
@@ -8400,7 +7851,7 @@ export namespace rbac {
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
     export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
       /**
@@ -8415,7 +7866,7 @@ export namespace rbac {
     }
     export interface IClusterRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can only reference a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1alpha1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8426,7 +7877,7 @@ export namespace rbac {
      */
     export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1alpha1.ClusterRoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
@@ -8440,14 +7891,14 @@ export namespace rbac {
       /** Items is a list of ClusterRoleBindings */
       items: rbac.v1alpha1.ClusterRoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
     export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1alpha1.ClusterRole[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
@@ -8461,7 +7912,7 @@ export namespace rbac {
       /** Items is a list of ClusterRoles */
       items: rbac.v1alpha1.ClusterRole[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
@@ -8482,7 +7933,7 @@ export namespace rbac {
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
     export class Role extends Resource implements IRole {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
@@ -8495,7 +7946,7 @@ export namespace rbac {
     }
     export interface IRole {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this Role */
       rules?: rbac.v1alpha1.PolicyRule[]
     }
@@ -8503,7 +7954,7 @@ export namespace rbac {
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
     export class RoleBinding extends Resource implements IRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
       /**
@@ -8518,7 +7969,7 @@ export namespace rbac {
     }
     export interface IRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1alpha1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8529,7 +7980,7 @@ export namespace rbac {
      */
     export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1alpha1.RoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
@@ -8543,14 +7994,14 @@ export namespace rbac {
       /** Items is a list of RoleBindings */
       items: rbac.v1alpha1.RoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleList is a collection of Roles
      */
     export class RoleList extends Resource implements IRoleList {
       items: rbac.v1alpha1.Role[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
@@ -8564,7 +8015,7 @@ export namespace rbac {
       /** Items is a list of Roles */
       items: rbac.v1alpha1.Role[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleRef contains information that points to the role being used
@@ -8597,14 +8048,14 @@ export namespace rbac {
      */
     export interface AggregationRule {
       /** ClusterRoleSelectors holds a list of selectors which will be used to find ClusterRoles and create the rules. If any of the selectors match, then the ClusterRole's permissions will be added */
-      clusterRoleSelectors?: apimachinery.v1.LabelSelector[]
+      clusterRoleSelectors?: meta.v1.LabelSelector[]
     }
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
     export class ClusterRole extends Resource implements IClusterRole {
       aggregationRule?: rbac.v1beta1.AggregationRule
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
       /**
        * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
@@ -8620,7 +8071,7 @@ export namespace rbac {
       /** AggregationRule is an optional field that describes how to build the Rules for this ClusterRole. If AggregationRule is set, then the Rules are controller managed and direct changes to Rules will be stomped by the controller. */
       aggregationRule?: rbac.v1beta1.AggregationRule
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this ClusterRole */
       rules?: rbac.v1beta1.PolicyRule[]
     }
@@ -8628,7 +8079,7 @@ export namespace rbac {
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
     export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
       /**
@@ -8643,7 +8094,7 @@ export namespace rbac {
     }
     export interface IClusterRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can only reference a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1beta1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8654,7 +8105,7 @@ export namespace rbac {
      */
     export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
       items: rbac.v1beta1.ClusterRoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleBindingList is a collection of ClusterRoleBindings
        */
@@ -8668,14 +8119,14 @@ export namespace rbac {
       /** Items is a list of ClusterRoleBindings */
       items: rbac.v1beta1.ClusterRoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
     export class ClusterRoleList extends Resource implements IClusterRoleList {
       items: rbac.v1beta1.ClusterRole[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * ClusterRoleList is a collection of ClusterRoles
        */
@@ -8689,7 +8140,7 @@ export namespace rbac {
       /** Items is a list of ClusterRoles */
       items: rbac.v1beta1.ClusterRole[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
@@ -8710,7 +8161,7 @@ export namespace rbac {
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
     export class Role extends Resource implements IRole {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
       /**
        * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
@@ -8723,7 +8174,7 @@ export namespace rbac {
     }
     export interface IRole {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Rules holds all the PolicyRules for this Role */
       rules?: rbac.v1beta1.PolicyRule[]
     }
@@ -8731,7 +8182,7 @@ export namespace rbac {
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
     export class RoleBinding extends Resource implements IRoleBinding {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
       /**
@@ -8746,7 +8197,7 @@ export namespace rbac {
     }
     export interface IRoleBinding {
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** RoleRef can reference a Role in the current namespace or a ClusterRole in the global namespace. If the RoleRef cannot be resolved, the Authorizer must return an error. */
       roleRef: rbac.v1beta1.RoleRef
       /** Subjects holds references to the objects the role applies to. */
@@ -8757,7 +8208,7 @@ export namespace rbac {
      */
     export class RoleBindingList extends Resource implements IRoleBindingList {
       items: rbac.v1beta1.RoleBinding[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleBindingList is a collection of RoleBindings
        */
@@ -8771,14 +8222,14 @@ export namespace rbac {
       /** Items is a list of RoleBindings */
       items: rbac.v1beta1.RoleBinding[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleList is a collection of Roles
      */
     export class RoleList extends Resource implements IRoleList {
       items: rbac.v1beta1.Role[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * RoleList is a collection of Roles
        */
@@ -8792,7 +8243,7 @@ export namespace rbac {
       /** Items is a list of Roles */
       items: rbac.v1beta1.Role[]
       /** Standard object's metadata. */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * RoleRef contains information that points to the role being used
@@ -8828,9 +8279,8 @@ export namespace scheduling {
     export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
-      metadata: apimachinery.v1.ObjectMeta
-      preemptionPolicy?: string
-      value: integer
+      metadata: meta.v1.ObjectMeta
+      value: number
       /**
        * PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
@@ -8839,7 +8289,6 @@ export namespace scheduling {
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
-        this.preemptionPolicy = properties.preemptionPolicy
         this.value = properties.value
       }
     }
@@ -8849,18 +8298,16 @@ export namespace scheduling {
       /** globalDefault specifies whether this PriorityClass should be considered as the default priority for pods that do not have any priority class. Only one PriorityClass can be marked as `globalDefault`. However, if more than one PriorityClasses exists with their `globalDefault` field set to true, the smallest value of such global default PriorityClasses will be used as the default priority. */
       globalDefault?: boolean
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
-      /** PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset. This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature. */
-      preemptionPolicy?: string
+      metadata: meta.v1.ObjectMeta
       /** The value of this priority class. This is the actual priority that pods receive when they have the name of this class in their pod spec. */
-      value: integer
+      value: number
     }
     /**
      * PriorityClassList is a collection of priority classes.
      */
     export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1.PriorityClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
@@ -8874,7 +8321,7 @@ export namespace scheduling {
       /** items is the list of PriorityClasses */
       items: scheduling.v1.PriorityClass[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
   }
   export namespace v1alpha1 {
@@ -8884,9 +8331,8 @@ export namespace scheduling {
     export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
-      metadata: apimachinery.v1.ObjectMeta
-      preemptionPolicy?: string
-      value: integer
+      metadata: meta.v1.ObjectMeta
+      value: number
       /**
        * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
@@ -8895,7 +8341,6 @@ export namespace scheduling {
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
-        this.preemptionPolicy = properties.preemptionPolicy
         this.value = properties.value
       }
     }
@@ -8905,18 +8350,16 @@ export namespace scheduling {
       /** globalDefault specifies whether this PriorityClass should be considered as the default priority for pods that do not have any priority class. Only one PriorityClass can be marked as `globalDefault`. However, if more than one PriorityClasses exists with their `globalDefault` field set to true, the smallest value of such global default PriorityClasses will be used as the default priority. */
       globalDefault?: boolean
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
-      /** PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset. This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature. */
-      preemptionPolicy?: string
+      metadata: meta.v1.ObjectMeta
       /** The value of this priority class. This is the actual priority that pods receive when they have the name of this class in their pod spec. */
-      value: integer
+      value: number
     }
     /**
      * PriorityClassList is a collection of priority classes.
      */
     export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1alpha1.PriorityClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
@@ -8930,7 +8373,7 @@ export namespace scheduling {
       /** items is the list of PriorityClasses */
       items: scheduling.v1alpha1.PriorityClass[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
   }
   export namespace v1beta1 {
@@ -8940,9 +8383,8 @@ export namespace scheduling {
     export class PriorityClass extends Resource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
-      metadata: apimachinery.v1.ObjectMeta
-      preemptionPolicy?: string
-      value: integer
+      metadata: meta.v1.ObjectMeta
+      value: number
       /**
        * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
        */
@@ -8951,7 +8393,6 @@ export namespace scheduling {
         this.description = properties.description
         this.globalDefault = properties.globalDefault
         this.metadata = properties.metadata
-        this.preemptionPolicy = properties.preemptionPolicy
         this.value = properties.value
       }
     }
@@ -8961,18 +8402,16 @@ export namespace scheduling {
       /** globalDefault specifies whether this PriorityClass should be considered as the default priority for pods that do not have any priority class. Only one PriorityClass can be marked as `globalDefault`. However, if more than one PriorityClasses exists with their `globalDefault` field set to true, the smallest value of such global default PriorityClasses will be used as the default priority. */
       globalDefault?: boolean
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
-      /** PreemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset. This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature. */
-      preemptionPolicy?: string
+      metadata: meta.v1.ObjectMeta
       /** The value of this priority class. This is the actual priority that pods receive when they have the name of this class in their pod spec. */
-      value: integer
+      value: number
     }
     /**
      * PriorityClassList is a collection of priority classes.
      */
     export class PriorityClassList extends Resource implements IPriorityClassList {
       items: scheduling.v1beta1.PriorityClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PriorityClassList is a collection of priority classes.
        */
@@ -8986,7 +8425,7 @@ export namespace scheduling {
       /** items is the list of PriorityClasses */
       items: scheduling.v1beta1.PriorityClass[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
   }
 }
@@ -8996,7 +8435,7 @@ export namespace settings {
      * PodPreset is a policy resource that defines additional runtime requirements for a Pod.
      */
     export class PodPreset extends Resource implements IPodPreset {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: settings.v1alpha1.PodPresetSpec
       /**
        * PodPreset is a policy resource that defines additional runtime requirements for a Pod.
@@ -9008,7 +8447,7 @@ export namespace settings {
       }
     }
     export interface IPodPreset {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: settings.v1alpha1.PodPresetSpec
     }
     /**
@@ -9016,7 +8455,7 @@ export namespace settings {
      */
     export class PodPresetList extends Resource implements IPodPresetList {
       items: settings.v1alpha1.PodPreset[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * PodPresetList is a list of PodPreset objects.
        */
@@ -9030,7 +8469,7 @@ export namespace settings {
       /** Items is a list of schema objects. */
       items: settings.v1alpha1.PodPreset[]
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * PodPresetSpec is a description of a pod preset.
@@ -9041,7 +8480,7 @@ export namespace settings {
       /** EnvFrom defines the collection of EnvFromSource to inject into containers. */
       envFrom?: core.v1.EnvFromSource[]
       /** Selector is a label query over a set of resources, in this case pods. Required. */
-      selector?: apimachinery.v1.LabelSelector
+      selector?: meta.v1.LabelSelector
       /** VolumeMounts defines the collection of VolumeMount to inject into containers. */
       volumeMounts?: core.v1.VolumeMount[]
       /** Volumes defines the collection of Volume to inject into the pod. */
@@ -9059,7 +8498,7 @@ export namespace storage {
     export class StorageClass extends Resource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       mountOptions?: string[]
       parameters?: { [k: string]: string }
       provisioner: string
@@ -9088,7 +8527,7 @@ export namespace storage {
       /** Restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature. */
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Dynamically provisioned PersistentVolumes of this storage class are created with these mountOptions, e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid. */
       mountOptions?: string[]
       /** Parameters holds the parameters for the provisioner that should create volumes of this storage class. */
@@ -9105,7 +8544,7 @@ export namespace storage {
      */
     export class StorageClassList extends Resource implements IStorageClassList {
       items: storage.v1.StorageClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * StorageClassList is a collection of storage classes.
        */
@@ -9119,7 +8558,7 @@ export namespace storage {
       /** Items is the list of StorageClasses */
       items: storage.v1.StorageClass[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
@@ -9127,7 +8566,7 @@ export namespace storage {
      * VolumeAttachment objects are non-namespaced.
      */
     export class VolumeAttachment extends Resource implements IVolumeAttachment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: storage.v1.VolumeAttachmentSpec
       /**
        * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
@@ -9142,7 +8581,7 @@ export namespace storage {
     }
     export interface IVolumeAttachment {
       /** Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired attach/detach volume behavior. Populated by the Kubernetes system. */
       spec: storage.v1.VolumeAttachmentSpec
     }
@@ -9151,7 +8590,7 @@ export namespace storage {
      */
     export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1.VolumeAttachment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
@@ -9165,14 +8604,12 @@ export namespace storage {
       /** Items is the list of VolumeAttachments */
       items: storage.v1.VolumeAttachment[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * VolumeAttachmentSource represents a volume that should be attached. Right now only PersistenVolumes can be attached via external attacher, in future we may allow also inline volumes in pods. Exactly one member can be set.
      */
     export interface VolumeAttachmentSource {
-      /** inlineVolumeSpec contains all the information necessary to attach a persistent volume defined by a pod's inline VolumeSource. This field is populated only for the CSIMigration feature. It contains translated fields from a pod's inline VolumeSource to a PersistentVolumeSpec. This field is alpha-level and is only honored by servers that enabled the CSIMigration feature. */
-      inlineVolumeSpec?: core.v1.PersistentVolumeSpec
       /** Name of the persistent volume to attach. */
       persistentVolumeName?: string
     }
@@ -9207,7 +8644,7 @@ export namespace storage {
       /** String detailing the error encountered during Attach or Detach operation. This string may be logged, so it should not contain sensitive information. */
       message?: string
       /** Time the error was encountered. */
-      time?: apimachinery.v1.Time
+      time?: meta.v1.Time
     }
   }
   export namespace v1alpha1 {
@@ -9217,7 +8654,7 @@ export namespace storage {
      * VolumeAttachment objects are non-namespaced.
      */
     export class VolumeAttachment extends Resource implements IVolumeAttachment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: storage.v1alpha1.VolumeAttachmentSpec
       /**
        * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
@@ -9232,7 +8669,7 @@ export namespace storage {
     }
     export interface IVolumeAttachment {
       /** Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired attach/detach volume behavior. Populated by the Kubernetes system. */
       spec: storage.v1alpha1.VolumeAttachmentSpec
     }
@@ -9241,7 +8678,7 @@ export namespace storage {
      */
     export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1alpha1.VolumeAttachment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
@@ -9255,14 +8692,12 @@ export namespace storage {
       /** Items is the list of VolumeAttachments */
       items: storage.v1alpha1.VolumeAttachment[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * VolumeAttachmentSource represents a volume that should be attached. Right now only PersistenVolumes can be attached via external attacher, in future we may allow also inline volumes in pods. Exactly one member can be set.
      */
     export interface VolumeAttachmentSource {
-      /** inlineVolumeSpec contains all the information necessary to attach a persistent volume defined by a pod's inline VolumeSource. This field is populated only for the CSIMigration feature. It contains translated fields from a pod's inline VolumeSource to a PersistentVolumeSpec. This field is alpha-level and is only honored by servers that enabled the CSIMigration feature. */
-      inlineVolumeSpec?: core.v1.PersistentVolumeSpec
       /** Name of the persistent volume to attach. */
       persistentVolumeName?: string
     }
@@ -9297,7 +8732,7 @@ export namespace storage {
       /** String detailing the error encountered during Attach or Detach operation. This string maybe logged, so it should not contain sensitive information. */
       message?: string
       /** Time the error was encountered. */
-      time?: apimachinery.v1.Time
+      time?: meta.v1.Time
     }
   }
   export namespace v1beta1 {
@@ -9305,7 +8740,7 @@ export namespace storage {
      * CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
      */
     export class CSIDriver extends Resource implements ICSIDriver {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.CSIDriverSpec
       /**
        * CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
@@ -9318,7 +8753,7 @@ export namespace storage {
     }
     export interface ICSIDriver {
       /** Standard object metadata. metadata.Name indicates the name of the CSI driver that this object refers to; it MUST be the same name returned by the CSI GetPluginName() call for that driver. The driver name must be 63 characters or less, beginning and ending with an alphanumeric character ([a-z0-9A-Z]) with dashes (-), dots (.), and alphanumerics between. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the CSI Driver. */
       spec: storage.v1beta1.CSIDriverSpec
     }
@@ -9327,7 +8762,7 @@ export namespace storage {
      */
     export class CSIDriverList extends Resource implements ICSIDriverList {
       items: storage.v1beta1.CSIDriver[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * CSIDriverList is a collection of CSIDriver objects.
        */
@@ -9341,7 +8776,7 @@ export namespace storage {
       /** items is the list of CSIDriver */
       items: storage.v1beta1.CSIDriver[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * CSIDriverSpec is the specification of a CSIDriver.
@@ -9356,7 +8791,7 @@ export namespace storage {
      * CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
      */
     export class CSINode extends Resource implements ICSINode {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.CSINodeSpec
       /**
        * CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
@@ -9369,7 +8804,7 @@ export namespace storage {
     }
     export interface ICSINode {
       /** metadata.name must be the Kubernetes node name. */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** spec is the specification of CSINode */
       spec: storage.v1beta1.CSINodeSpec
     }
@@ -9377,8 +8812,6 @@ export namespace storage {
      * CSINodeDriver holds information about the specification of one CSI driver installed on a node
      */
     export interface CSINodeDriver {
-      /** allocatable represents the volume resources of a node that are available for scheduling. */
-      allocatable?: storage.v1beta1.VolumeNodeResources
       /** This is the name of the CSI driver that this object refers to. This MUST be the same name returned by the CSI GetPluginName() call for that driver. */
       name: string
       /** nodeID of the node from the driver point of view. This field enables Kubernetes to communicate with storage systems that do not share the same nomenclature for nodes. For example, Kubernetes may refer to a given node as "node1", but the storage system may refer to the same node as "nodeA". When Kubernetes issues a command to the storage system to attach a volume to a specific node, it can use this field to refer to the node name using the ID that the storage system will understand, e.g. "nodeA" instead of "node1". This field is required. */
@@ -9391,7 +8824,7 @@ export namespace storage {
      */
     export class CSINodeList extends Resource implements ICSINodeList {
       items: storage.v1beta1.CSINode[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * CSINodeList is a collection of CSINode objects.
        */
@@ -9405,7 +8838,7 @@ export namespace storage {
       /** items is the list of CSINode */
       items: storage.v1beta1.CSINode[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * CSINodeSpec holds information about the specification of all CSI drivers installed on a node
@@ -9422,7 +8855,7 @@ export namespace storage {
     export class StorageClass extends Resource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       mountOptions?: string[]
       parameters?: { [k: string]: string }
       provisioner: string
@@ -9451,7 +8884,7 @@ export namespace storage {
       /** Restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature. */
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Dynamically provisioned PersistentVolumes of this storage class are created with these mountOptions, e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid. */
       mountOptions?: string[]
       /** Parameters holds the parameters for the provisioner that should create volumes of this storage class. */
@@ -9468,7 +8901,7 @@ export namespace storage {
      */
     export class StorageClassList extends Resource implements IStorageClassList {
       items: storage.v1beta1.StorageClass[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * StorageClassList is a collection of storage classes.
        */
@@ -9482,7 +8915,7 @@ export namespace storage {
       /** Items is the list of StorageClasses */
       items: storage.v1beta1.StorageClass[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
@@ -9490,7 +8923,7 @@ export namespace storage {
      * VolumeAttachment objects are non-namespaced.
      */
     export class VolumeAttachment extends Resource implements IVolumeAttachment {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.VolumeAttachmentSpec
       /**
        * VolumeAttachment captures the intent to attach or detach the specified volume to/from the specified node.
@@ -9505,7 +8938,7 @@ export namespace storage {
     }
     export interface IVolumeAttachment {
       /** Standard object metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Specification of the desired attach/detach volume behavior. Populated by the Kubernetes system. */
       spec: storage.v1beta1.VolumeAttachmentSpec
     }
@@ -9514,7 +8947,7 @@ export namespace storage {
      */
     export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
       items: storage.v1beta1.VolumeAttachment[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * VolumeAttachmentList is a collection of VolumeAttachment objects.
        */
@@ -9528,14 +8961,12 @@ export namespace storage {
       /** Items is the list of VolumeAttachments */
       items: storage.v1beta1.VolumeAttachment[]
       /** Standard list metadata More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * VolumeAttachmentSource represents a volume that should be attached. Right now only PersistenVolumes can be attached via external attacher, in future we may allow also inline volumes in pods. Exactly one member can be set.
      */
     export interface VolumeAttachmentSource {
-      /** inlineVolumeSpec contains all the information necessary to attach a persistent volume defined by a pod's inline VolumeSource. This field is populated only for the CSIMigration feature. It contains translated fields from a pod's inline VolumeSource to a PersistentVolumeSpec. This field is alpha-level and is only honored by servers that enabled the CSIMigration feature. */
-      inlineVolumeSpec?: core.v1.PersistentVolumeSpec
       /** Name of the persistent volume to attach. */
       persistentVolumeName?: string
     }
@@ -9570,14 +9001,7 @@ export namespace storage {
       /** String detailing the error encountered during Attach or Detach operation. This string may be logged, so it should not contain sensitive information. */
       message?: string
       /** Time the error was encountered. */
-      time?: apimachinery.v1.Time
-    }
-    /**
-     * VolumeNodeResources is a set of resource limits for scheduling of volumes.
-     */
-    export interface VolumeNodeResources {
-      /** Maximum number of unique volumes managed by the CSI driver that can be used on a node. A volume that is both attached and mounted on a node is considered to be used once, not twice. The same rule applies for a unique volume that is shared among multiple pods on the same node. If this field is nil, then the supported number of volumes on this node is unbounded. */
-      count?: integer
+      time?: meta.v1.Time
     }
   }
 }
@@ -9596,7 +9020,7 @@ export namespace apiextensions {
       /** name is a human readable name for the column. */
       name: string
       /** priority is an integer defining the relative importance of this column compared to others. Lower numbers are considered higher priority. Columns that may be omitted in limited space scenarios should be given a higher priority. */
-      priority?: integer
+      priority?: number
       /** type is an OpenAPI type definition for this column. See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#data-types for more. */
       type: string
     }
@@ -9606,8 +9030,7 @@ export namespace apiextensions {
     export interface CustomResourceConversion {
       /** ConversionReviewVersions is an ordered list of preferred `ConversionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, conversion will fail for this object. If a persisted Webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail. Default to `['v1beta1']`. */
       conversionReviewVersions?: string[]
-      /** `strategy` specifies the conversion strategy. Allowed values are: - `None`: The converter only change the apiVersion and would not touch any other field in the CR. - `Webhook`: API Server will call to an external webhook to do the conversion. Additional information
-  is needed for this option. This requires spec.preserveUnknownFields to be false. */
+      /** `strategy` specifies the conversion strategy. Allowed values are: - `None`: The converter only change the apiVersion and would not touch any other field in the CR. - `Webhook`: API Server will call to an external webhook to do the conversion. Additional information is needed for this option. */
       strategy: string
       /** `webhookClientConfig` is the instructions for how to call the webhook if strategy is `Webhook`. This field is alpha-level and is only honored by servers that enable the CustomResourceWebhookConversion feature. */
       webhookClientConfig?: apiextensions.v1beta1.WebhookClientConfig
@@ -9616,7 +9039,7 @@ export namespace apiextensions {
      * CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
      */
     export class CustomResourceDefinition extends Resource implements ICustomResourceDefinition {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apiextensions.v1beta1.CustomResourceDefinitionSpec
       /**
        * CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
@@ -9628,7 +9051,7 @@ export namespace apiextensions {
       }
     }
     export interface ICustomResourceDefinition {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec describes how the user wants the resources to appear */
       spec: apiextensions.v1beta1.CustomResourceDefinitionSpec
     }
@@ -9637,14 +9060,14 @@ export namespace apiextensions {
      */
     export interface CustomResourceDefinitionCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human-readable message indicating details about last transition. */
       message?: string
       /** Unique, one-word, CamelCase reason for the condition's last transition. */
       reason?: string
       /** Status is the status of the condition. Can be True, False, Unknown. */
       status: string
-      /** Type is the type of the condition. Types include Established, NamesAccepted and Terminating. */
+      /** Type is the type of the condition. */
       type: string
     }
     /**
@@ -9652,7 +9075,7 @@ export namespace apiextensions {
      */
     export class CustomResourceDefinitionList extends Resource implements ICustomResourceDefinitionList {
       items: apiextensions.v1beta1.CustomResourceDefinition[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * CustomResourceDefinitionList is a list of CustomResourceDefinition objects.
        */
@@ -9665,7 +9088,7 @@ export namespace apiextensions {
     export interface ICustomResourceDefinitionList {
       /** Items individual CustomResourceDefinitions */
       items: apiextensions.v1beta1.CustomResourceDefinition[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * CustomResourceDefinitionNames indicates the names to serve this CustomResourceDefinition
@@ -9696,8 +9119,6 @@ export namespace apiextensions {
       group: string
       /** Names are the names used to describe this custom resource */
       names: apiextensions.v1beta1.CustomResourceDefinitionNames
-      /** preserveUnknownFields disables pruning of object fields which are not specified in the OpenAPI schema. apiVersion, kind, metadata and known fields inside metadata are always preserved. Defaults to true in v1beta and will default to false in v1. */
-      preserveUnknownFields?: boolean
       /** Scope indicates whether this resource is cluster or namespace scoped.  Default is namespaced */
       scope: string
       /** Subresources describes the subresources for CustomResource Optional, the global subresources for all versions. Top-level and per-version subresources are mutually exclusive. */
@@ -9741,7 +9162,7 @@ export namespace apiextensions {
      * CustomResourceSubresourceScale defines how to serve the scale subresource for CustomResources.
      */
     export interface CustomResourceSubresourceScale {
-      /** LabelSelectorPath defines the JSON path inside of a CustomResource that corresponds to Scale.Status.Selector. Only JSON paths without the array notation are allowed. Must be a JSON Path under .status or .spec. Must be set to work with HPA. The field pointed by this JSON path must be a string field (not a complex selector struct) which contains a serialized label selector in string form. More info: https://kubernetes.io/docs/tasks/access-kubernetes-api/custom-resources/custom-resource-definitions#scale-subresource If there is no value under the given path in the CustomResource, the status label selector value in the /scale subresource will default to the empty string. */
+      /** LabelSelectorPath defines the JSON path inside of a CustomResource that corresponds to Scale.Status.Selector. Only JSON paths without the array notation are allowed. Must be a JSON Path under .status. Must be set to work with HPA. If there is no value under the given path in the CustomResource, the status label selector value in the /scale subresource will default to the empty string. */
       labelSelectorPath?: string
       /** SpecReplicasPath defines the JSON path inside of a CustomResource that corresponds to Scale.Spec.Replicas. Only JSON paths without the array notation are allowed. Must be a JSON Path under .spec. If there is no value under the given path in the CustomResource, the /scale subresource will return an error on GET. */
       specReplicasPath: string
@@ -9789,7 +9210,6 @@ export namespace apiextensions {
       additionalProperties?: apiextensions.v1beta1.JSONSchemaPropsOrBool
       allOf?: apiextensions.v1beta1.JSONSchemaProps[]
       anyOf?: apiextensions.v1beta1.JSONSchemaProps[]
-      /** default is a default value for undefined object fields. Defaulting is an alpha feature under the CustomResourceDefaulting feature gate. Defaulting requires spec.preserveUnknownFields to be false. */
       default?: apiextensions.v1beta1.JSON
       definitions?: { [k: string]: apiextensions.v1beta1.JSONSchemaProps }
       dependencies?: { [k: string]: apiextensions.v1beta1.JSONSchemaPropsOrStringArray }
@@ -9802,13 +9222,13 @@ export namespace apiextensions {
       format?: string
       id?: string
       items?: apiextensions.v1beta1.JSONSchemaPropsOrArray
-      maxItems?: integer
-      maxLength?: integer
-      maxProperties?: integer
+      maxItems?: number
+      maxLength?: number
+      maxProperties?: number
       maximum?: number
-      minItems?: integer
-      minLength?: integer
-      minProperties?: integer
+      minItems?: number
+      minLength?: number
+      minProperties?: number
       minimum?: number
       multipleOf?: number
       not?: apiextensions.v1beta1.JSONSchemaProps
@@ -9844,8 +9264,6 @@ export namespace apiextensions {
       namespace: string
       /** `path` is an optional URL path which will be sent in any request to this service. */
       path?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
     }
     /**
      * WebhookClientConfig contains the information to make a TLS connection with the webhook. It has the same field as admissionregistration.v1beta1.WebhookClientConfig.
@@ -9855,7 +9273,9 @@ export namespace apiextensions {
       caBundle?: string
       /** `service` is a reference to the service for this webhook. Either `service` or `url` must be specified.
 
-If the webhook is running within the cluster, then you should use `service`. */
+If the webhook is running within the cluster, then you should use `service`.
+
+Port 443 will be used if it is open, otherwise it is an error. */
       service?: apiextensions.v1beta1.ServiceReference
       /** `url` gives the location of the webhook, in standard URL form (`scheme://host:port/path`). Exactly one of `url` or `service` must be specified.
 
@@ -9872,8 +9292,8 @@ Attempting to use a user or basic auth e.g. "user:password@" is not allowed. Fra
     }
   }
 }
-export namespace apimachinery {
-  export namespace misc {
+export namespace misc {
+  export namespace resource {
     /**
      * Quantity is a fixed-point representation of a number. It provides convenient marshaling/unmarshaling in JSON and YAML, in addition to String() and Int64() accessors.
      *
@@ -9908,6 +9328,8 @@ export namespace apimachinery {
      * This format is intended to make it difficult to use these numbers without writing some sort of special handling code in the hopes that that will cause implementors to also use a fixed point implementation.
      */
     export type Quantity = string
+  }
+  export namespace runtime {
     /**
      * RawExtension is used to hold extensions in external versions.
      *
@@ -9942,20 +9364,40 @@ export namespace apimachinery {
       /** Raw is the underlying serialization of this object. */
       Raw: string
     }
+  }
+  export namespace intstr {
     /**
      * IntOrString is a type that can hold an int32 or a string.  When used in JSON or YAML marshalling and unmarshalling, it produces or consumes the inner type.  This allows you to have, for example, a JSON field that can accept a name or number.
      */
     export type IntOrString = number | string
   }
+  export namespace version {
+    /**
+     * Info contains versioning information. how we'll want to distribute that information.
+     */
+    export interface Info {
+      buildDate: string
+      compiler: string
+      gitCommit: string
+      gitTreeState: string
+      gitVersion: string
+      goVersion: string
+      major: string
+      minor: string
+      platform: string
+    }
+  }
+}
+export namespace meta {
   export namespace v1 {
     /**
      * APIGroup contains the name, the supported versions, and the preferred version of a group.
      */
     export class APIGroup extends Resource implements IAPIGroup {
       name: string
-      preferredVersion?: apimachinery.v1.GroupVersionForDiscovery
-      serverAddressByClientCIDRs?: apimachinery.v1.ServerAddressByClientCIDR[]
-      versions: apimachinery.v1.GroupVersionForDiscovery[]
+      preferredVersion?: meta.v1.GroupVersionForDiscovery
+      serverAddressByClientCIDRs?: meta.v1.ServerAddressByClientCIDR[]
+      versions: meta.v1.GroupVersionForDiscovery[]
       /**
        * APIGroup contains the name, the supported versions, and the preferred version of a group.
        */
@@ -9971,17 +9413,17 @@ export namespace apimachinery {
       /** name is the name of the group. */
       name: string
       /** preferredVersion is the version preferred by the API server, which probably is the storage version. */
-      preferredVersion?: apimachinery.v1.GroupVersionForDiscovery
+      preferredVersion?: meta.v1.GroupVersionForDiscovery
       /** a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP. */
-      serverAddressByClientCIDRs?: apimachinery.v1.ServerAddressByClientCIDR[]
+      serverAddressByClientCIDRs?: meta.v1.ServerAddressByClientCIDR[]
       /** versions are the versions supported in this group. */
-      versions: apimachinery.v1.GroupVersionForDiscovery[]
+      versions: meta.v1.GroupVersionForDiscovery[]
     }
     /**
      * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
      */
     export class APIGroupList extends Resource implements IAPIGroupList {
-      groups: apimachinery.v1.APIGroup[]
+      groups: meta.v1.APIGroup[]
       /**
        * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
        */
@@ -9992,7 +9434,7 @@ export namespace apimachinery {
     }
     export interface IAPIGroupList {
       /** groups is a list of APIGroup. */
-      groups: apimachinery.v1.APIGroup[]
+      groups: meta.v1.APIGroup[]
     }
     /**
      * APIResource specifies the name of a resource and whether it is namespaced.
@@ -10024,7 +9466,7 @@ export namespace apimachinery {
      */
     export class APIResourceList extends Resource implements IAPIResourceList {
       groupVersion: string
-      resources: apimachinery.v1.APIResource[]
+      resources: meta.v1.APIResource[]
       /**
        * APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.
        */
@@ -10038,13 +9480,13 @@ export namespace apimachinery {
       /** groupVersion is the group and version this APIResourceList is for. */
       groupVersion: string
       /** resources contains the name of the resources and if they are namespaced. */
-      resources: apimachinery.v1.APIResource[]
+      resources: meta.v1.APIResource[]
     }
     /**
      * APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.
      */
     export class APIVersions extends Resource implements IAPIVersions {
-      serverAddressByClientCIDRs: apimachinery.v1.ServerAddressByClientCIDR[]
+      serverAddressByClientCIDRs: meta.v1.ServerAddressByClientCIDR[]
       versions: string[]
       /**
        * APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.
@@ -10057,7 +9499,7 @@ export namespace apimachinery {
     }
     export interface IAPIVersions {
       /** a map of client CIDR to server address that is serving this group. This is to help clients reach servers in the most network-efficient way possible. Clients can use the appropriate server address as per the CIDR that they match. In case of multiple matches, clients should use the longest matching CIDR. The server returns only those CIDRs that it thinks that the client can match. For example: the master will return an internal IP CIDR only, if the client reaches the server using an internal IP. Server looks at X-Forwarded-For header or X-Real-Ip header or request.RemoteAddr (in that order) to get the client IP. */
-      serverAddressByClientCIDRs: apimachinery.v1.ServerAddressByClientCIDR[]
+      serverAddressByClientCIDRs: meta.v1.ServerAddressByClientCIDR[]
       /** versions are the api versions that are available. */
       versions: string[]
     }
@@ -10066,9 +9508,9 @@ export namespace apimachinery {
      */
     export class DeleteOptions extends Resource implements IDeleteOptions {
       dryRun?: string[]
-      gracePeriodSeconds?: integer
+      gracePeriodSeconds?: number
       orphanDependents?: boolean
-      preconditions?: apimachinery.v1.Preconditions
+      preconditions?: meta.v1.Preconditions
       propagationPolicy?: string
       /**
        * DeleteOptions may be provided when deleting an API object.
@@ -10086,11 +9528,11 @@ export namespace apimachinery {
       /** When present, indicates that modifications should not be persisted. An invalid or unrecognized dryRun directive will result in an error response and no further processing of the request. Valid values are: - All: all dry run stages will be processed */
       dryRun?: string[]
       /** The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately. */
-      gracePeriodSeconds?: integer
+      gracePeriodSeconds?: number
       /** Deprecated: please use the PropagationPolicy, this field will be deprecated in 1.7. Should the dependent objects be orphaned. If true/false, the "orphan" finalizer will be added to/removed from the object's finalizers list. Either this field or PropagationPolicy may be set, but not both. */
       orphanDependents?: boolean
       /** Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be returned. */
-      preconditions?: apimachinery.v1.Preconditions
+      preconditions?: meta.v1.Preconditions
       /** Whether and how garbage collection will be performed. Either this field or OrphanDependents may be set, but not both. The default policy is decided by the existing finalizer set in the metadata.finalizers and the resource-specific default policy. Acceptable values are: 'Orphan' - orphan the dependents; 'Background' - allow the garbage collector to delete the dependents in the background; 'Foreground' - a cascading policy that deletes all dependents in the foreground. */
       propagationPolicy?: string
     }
@@ -10108,11 +9550,27 @@ export namespace apimachinery {
       version: string
     }
     /**
+     * Initializer is information about an initializer that has not yet completed.
+     */
+    export interface Initializer {
+      /** name of the process that is responsible for initializing this object. */
+      name: string
+    }
+    /**
+     * Initializers tracks the progress of initialization.
+     */
+    export interface Initializers {
+      /** Pending is a list of initializers that must execute in order before this object is visible. When the last pending initializer is removed, and no failing result is set, the initializers struct will be set to nil and the object is considered as initialized and visible to all clients. */
+      pending: meta.v1.Initializer[]
+      /** If result is set with the Failure field, the object will be persisted to storage and then deleted, ensuring that other clients can observe the deletion. */
+      result?: meta.v1.Status
+    }
+    /**
      * A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
      */
     export interface LabelSelector {
       /** matchExpressions is a list of label selector requirements. The requirements are ANDed. */
-      matchExpressions?: apimachinery.v1.LabelSelectorRequirement[]
+      matchExpressions?: meta.v1.LabelSelectorRequirement[]
       /** matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed. */
       matchLabels?: { [k: string]: string }
     }
@@ -10133,10 +9591,6 @@ export namespace apimachinery {
     export interface ListMeta {
       /** continue may be set if the user set a limit on the number of items returned, and indicates that the server has more data available. The value is opaque and may be used to issue another request to the endpoint that served this list to retrieve the next set of available objects. Continuing a consistent list may not be possible if the server configuration has changed or more than a few minutes have passed. The resourceVersion field returned when using this continue value will be identical to the value in the first response, unless you have received this token from an error message. */
       continue?: string
-      /** remainingItemCount is the number of subsequent items in the list which are not included in this list response. If the list request contained label or field selectors, then the number of remaining items is unknown and the field will be left unset and omitted during serialization. If the list is complete (either because it is not chunking or because this is the last chunk), then there are no more remaining items and this field will be left unset and omitted during serialization. Servers older than v1.15 do not set this field. The intended use of the remainingItemCount is *estimating* the size of a collection. Clients should not rely on the remainingItemCount to be set or to be exact.
-
-This field is alpha and can be changed or removed without notice. */
-      remainingItemCount?: integer
       /** String that identifies the server's internal version of this object that can be used by clients to determine when objects have changed. Value must be treated as opaque by clients and passed unmodified back to the server. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency */
       resourceVersion?: string
       /** selfLink is a URL representing this object. Populated by the system. Read-only. */
@@ -10149,13 +9603,13 @@ This field is alpha and can be changed or removed without notice. */
       /** APIVersion defines the version of this resource that this field set applies to. The format is "group/version" just like the top-level APIVersion field. It is necessary to track the version of a field set because it cannot be automatically converted. */
       apiVersion?: string
       /** Fields identifies a set of fields. */
-      fields?: apimachinery.v1.Fields
+      fields?: meta.v1.Fields
       /** Manager is an identifier of the workflow managing these fields. */
       manager?: string
       /** Operation is the type of operation which lead to this ManagedFieldsEntry being created. The only valid values for this field are 'Apply' and 'Update'. */
       operation?: string
       /** Time is timestamp of when these fields were set. It should always be empty if Operation is 'Apply' */
-      time?: apimachinery.v1.Time
+      time?: meta.v1.Time
     }
     /**
      * MicroTime is version of Time with microsecond level precision.
@@ -10172,13 +9626,13 @@ This field is alpha and can be changed or removed without notice. */
       /** CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
 
 Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      creationTimestamp?: apimachinery.v1.Time
+      creationTimestamp?: meta.v1.Time
       /** Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only. */
-      deletionGracePeriodSeconds?: integer
+      deletionGracePeriodSeconds?: number
       /** DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested.
 
 Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
-      deletionTimestamp?: apimachinery.v1.Time
+      deletionTimestamp?: meta.v1.Time
       /** Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. */
       finalizers?: string[]
       /** GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.
@@ -10188,13 +9642,19 @@ If this field is specified and the generated name exists, the server will NOT re
 Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency */
       generateName?: string
       /** A sequence number representing a specific generation of the desired state. Populated by the system. Read-only. */
-      generation?: integer
+      generation?: number
+      /** An initializer is a controller which enforces some system invariant at object creation time. This field is a list of initializers that have not yet acted on this object. If nil or empty, this object has been completely initialized. Otherwise, the object is considered uninitialized and is hidden (in list/watch and get calls) from clients that haven't explicitly asked to observe uninitialized objects.
+
+When an object is created, the system will populate this list with the current set of initializers. Only privileged users may set or modify this list. Once it is empty, it may not be modified further by any user.
+
+DEPRECATED - initializers are an alpha field and will be removed in v1.15. */
+      initializers?: meta.v1.Initializers
       /** Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://kubernetes.io/docs/user-guide/labels */
       labels?: { [k: string]: string }
       /** ManagedFields maps workflow-id and version to the set of fields that are managed by that workflow. This is mostly for internal housekeeping, and users typically shouldn't need to set or understand this field. A workflow can be the user's name, a controller's name, or the name of a specific apply path like "ci-cd". The set of fields is always in the version that the workflow used when modifying the object.
 
 This field is alpha and can be changed or removed without notice. */
-      managedFields?: apimachinery.v1.ManagedFieldsEntry[]
+      managedFields?: meta.v1.ManagedFieldsEntry[]
       /** Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names */
       name?: string
       /** Namespace defines the space within each name must be unique. An empty namespace is equivalent to the "default" namespace, but "default" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.
@@ -10202,7 +9662,7 @@ This field is alpha and can be changed or removed without notice. */
 Must be a DNS_LABEL. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/namespaces */
       namespace?: string
       /** List of objects depended by this object. If ALL objects in the list have been deleted, this object will be garbage collected. If this object is managed by a controller, then an entry in this list will point to this controller, with the controller field set to true. There cannot be more than one managing controller. */
-      ownerReferences?: apimachinery.v1.OwnerReference[]
+      ownerReferences?: meta.v1.OwnerReference[]
       /** An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.
 
 Populated by the system. Read-only. Value must be treated as opaque by clients and . More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency */
@@ -10257,10 +9717,10 @@ Populated by the system. Read-only. More info: http://kubernetes.io/docs/user-gu
      * Status is a return value for calls that don't return other objects.
      */
     export class Status extends Resource implements IStatus {
-      code?: integer
-      details?: apimachinery.v1.StatusDetails
+      code?: number
+      details?: meta.v1.StatusDetails
       message?: string
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       reason?: string
       /**
        * Status is a return value for calls that don't return other objects.
@@ -10276,13 +9736,13 @@ Populated by the system. Read-only. More info: http://kubernetes.io/docs/user-gu
     }
     export interface IStatus {
       /** Suggested HTTP return code for this status, 0 if not set. */
-      code?: integer
+      code?: number
       /** Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type. */
-      details?: apimachinery.v1.StatusDetails
+      details?: meta.v1.StatusDetails
       /** A human-readable description of the status of this operation. */
       message?: string
       /** Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /** A machine-readable description of why this operation is in the "Failure" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it. */
       reason?: string
     }
@@ -10306,7 +9766,7 @@ Examples:
      */
     export interface StatusDetails {
       /** The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes. */
-      causes?: apimachinery.v1.StatusCause[]
+      causes?: meta.v1.StatusCause[]
       /** The group attribute of the resource associated with the status StatusReason. */
       group?: string
       /** The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds */
@@ -10314,7 +9774,7 @@ Examples:
       /** The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described). */
       name?: string
       /** If specified, the time in seconds before the operation should be retried. Some errors may indicate the client must take an alternate action - for those errors this field may indicate how long to wait before taking the alternate action. */
-      retryAfterSeconds?: integer
+      retryAfterSeconds?: number
       /** UID of the resource. (when there is a single resource which can be described). More info: http://kubernetes.io/docs/user-guide/identifiers#uids */
       uid?: string
     }
@@ -10326,7 +9786,7 @@ Examples:
      * Event represents a single event to a watched resource.
      */
     export class WatchEvent extends Resource implements IWatchEvent {
-      object: apimachinery.misc.RawExtension
+      object: misc.runtime.RawExtension
       type: string
       /**
        * Event represents a single event to a watched resource.
@@ -10343,24 +9803,8 @@ Examples:
  * If Type is Deleted: the state of the object immediately before deletion.
  * If Type is Error: *Status is recommended; other types may make sense
    depending on context. */
-      object: apimachinery.misc.RawExtension
+      object: misc.runtime.RawExtension
       type: string
-    }
-  }
-  export namespace version {
-    /**
-     * Info contains versioning information. how we'll want to distribute that information.
-     */
-    export interface Info {
-      buildDate: string
-      compiler: string
-      gitCommit: string
-      gitTreeState: string
-      gitVersion: string
-      goVersion: string
-      major: string
-      minor: string
-      platform: string
     }
   }
 }
@@ -10370,7 +9814,7 @@ export namespace apiregistration {
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
     export class APIService extends Resource implements IAPIService {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apiregistration.v1.APIServiceSpec
       /**
        * APIService represents a server for a particular GroupVersion. Name must be "version.group".
@@ -10382,7 +9826,7 @@ export namespace apiregistration {
       }
     }
     export interface IAPIService {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec contains information for locating and communicating with a server */
       spec: apiregistration.v1.APIServiceSpec
     }
@@ -10391,7 +9835,7 @@ export namespace apiregistration {
      */
     export interface APIServiceCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human-readable message indicating details about last transition. */
       message?: string
       /** Unique, one-word, CamelCase reason for the condition's last transition. */
@@ -10406,7 +9850,7 @@ export namespace apiregistration {
      */
     export class APIServiceList extends Resource implements IAPIServiceList {
       items: apiregistration.v1.APIService[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * APIServiceList is a list of APIService objects.
        */
@@ -10418,7 +9862,7 @@ export namespace apiregistration {
     }
     export interface IAPIServiceList {
       items: apiregistration.v1.APIService[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * APIServiceSpec contains information for locating and communicating with a server. Only https is supported, though you are able to disable certificate verification.
@@ -10429,7 +9873,7 @@ export namespace apiregistration {
       /** Group is the API group name this server hosts */
       group?: string
       /** GroupPriorityMininum is the priority this group should have at least. Higher priority means that the group is preferred by clients over lower priority ones. Note that other versions of this group might specify even higher GroupPriorityMininum values such that the whole group gets a higher priority. The primary sort is based on GroupPriorityMinimum, ordered highest number to lowest (20 before 10). The secondary sort is based on the alphabetical comparison of the name of the object.  (v1.bar before v1.foo) We'd recommend something like: *.k8s.io (except extensions) at 18000 and PaaSes (OpenShift, Deis) are recommended to be in the 2000s */
-      groupPriorityMinimum: integer
+      groupPriorityMinimum: number
       /** InsecureSkipTLSVerify disables TLS certificate verification when communicating with this server. This is strongly discouraged.  You should use the CABundle instead. */
       insecureSkipTLSVerify?: boolean
       /** Service is a reference to the service for this API server.  It must communicate on port 443 If the Service is nil, that means the handling for the API groupversion is handled locally on this server. The call will simply delegate to the normal handler chain to be fulfilled. */
@@ -10437,7 +9881,7 @@ export namespace apiregistration {
       /** Version is the API version this server hosts.  For example, "v1" */
       version?: string
       /** VersionPriority controls the ordering of this API version inside of its group.  Must be greater than zero. The primary sort is based on VersionPriority, ordered highest to lowest (20 before 10). Since it's inside of a group, the number can be small, probably in the 10s. In case of equal version priorities, the version string will be used to compute the order inside a group. If the version string is "kube-like", it will sort above non "kube-like" version strings, which are ordered lexicographically. "Kube-like" versions start with a "v", then are followed by a number (the major version), then optionally the string "alpha" or "beta" and another number (the minor version). These are sorted first by GA > beta > alpha (where GA is a version with no suffix such as beta or alpha), and then by comparing major version, then minor version. An example sorted list of versions: v10, v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. */
-      versionPriority: integer
+      versionPriority: number
     }
     /**
      * APIServiceStatus contains derived information about an API server
@@ -10454,8 +9898,6 @@ export namespace apiregistration {
       name?: string
       /** Namespace is the namespace of the service */
       namespace?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
     }
   }
   export namespace v1beta1 {
@@ -10463,7 +9905,7 @@ export namespace apiregistration {
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
     export class APIService extends Resource implements IAPIService {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       spec: apiregistration.v1beta1.APIServiceSpec
       /**
        * APIService represents a server for a particular GroupVersion. Name must be "version.group".
@@ -10475,7 +9917,7 @@ export namespace apiregistration {
       }
     }
     export interface IAPIService {
-      metadata: apimachinery.v1.ObjectMeta
+      metadata: meta.v1.ObjectMeta
       /** Spec contains information for locating and communicating with a server */
       spec: apiregistration.v1beta1.APIServiceSpec
     }
@@ -10484,7 +9926,7 @@ export namespace apiregistration {
      */
     export interface APIServiceCondition {
       /** Last time the condition transitioned from one status to another. */
-      lastTransitionTime?: apimachinery.v1.Time
+      lastTransitionTime?: meta.v1.Time
       /** Human-readable message indicating details about last transition. */
       message?: string
       /** Unique, one-word, CamelCase reason for the condition's last transition. */
@@ -10499,7 +9941,7 @@ export namespace apiregistration {
      */
     export class APIServiceList extends Resource implements IAPIServiceList {
       items: apiregistration.v1beta1.APIService[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
       /**
        * APIServiceList is a list of APIService objects.
        */
@@ -10511,7 +9953,7 @@ export namespace apiregistration {
     }
     export interface IAPIServiceList {
       items: apiregistration.v1beta1.APIService[]
-      metadata: apimachinery.v1.ListMeta
+      metadata: meta.v1.ListMeta
     }
     /**
      * APIServiceSpec contains information for locating and communicating with a server. Only https is supported, though you are able to disable certificate verification.
@@ -10522,7 +9964,7 @@ export namespace apiregistration {
       /** Group is the API group name this server hosts */
       group?: string
       /** GroupPriorityMininum is the priority this group should have at least. Higher priority means that the group is preferred by clients over lower priority ones. Note that other versions of this group might specify even higher GroupPriorityMininum values such that the whole group gets a higher priority. The primary sort is based on GroupPriorityMinimum, ordered highest number to lowest (20 before 10). The secondary sort is based on the alphabetical comparison of the name of the object.  (v1.bar before v1.foo) We'd recommend something like: *.k8s.io (except extensions) at 18000 and PaaSes (OpenShift, Deis) are recommended to be in the 2000s */
-      groupPriorityMinimum: integer
+      groupPriorityMinimum: number
       /** InsecureSkipTLSVerify disables TLS certificate verification when communicating with this server. This is strongly discouraged.  You should use the CABundle instead. */
       insecureSkipTLSVerify?: boolean
       /** Service is a reference to the service for this API server.  It must communicate on port 443 If the Service is nil, that means the handling for the API groupversion is handled locally on this server. The call will simply delegate to the normal handler chain to be fulfilled. */
@@ -10530,7 +9972,7 @@ export namespace apiregistration {
       /** Version is the API version this server hosts.  For example, "v1" */
       version?: string
       /** VersionPriority controls the ordering of this API version inside of its group.  Must be greater than zero. The primary sort is based on VersionPriority, ordered highest to lowest (20 before 10). Since it's inside of a group, the number can be small, probably in the 10s. In case of equal version priorities, the version string will be used to compute the order inside a group. If the version string is "kube-like", it will sort above non "kube-like" version strings, which are ordered lexicographically. "Kube-like" versions start with a "v", then are followed by a number (the major version), then optionally the string "alpha" or "beta" and another number (the minor version). These are sorted first by GA > beta > alpha (where GA is a version with no suffix such as beta or alpha), and then by comparing major version, then minor version. An example sorted list of versions: v10, v2, v1, v11beta2, v10beta3, v3beta1, v12alpha1, v11alpha2, foo1, foo10. */
-      versionPriority: integer
+      versionPriority: number
     }
     /**
      * APIServiceStatus contains derived information about an API server
@@ -10547,8 +9989,6 @@ export namespace apiregistration {
       name?: string
       /** Namespace is the namespace of the service */
       namespace?: string
-      /** If specified, the port on the service that hosting webhook. Default to 443 for backward compatibility. `port` should be a valid port number (1-65535, inclusive). */
-      port?: integer
     }
   }
 }
