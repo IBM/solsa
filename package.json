@@ -8,6 +8,9 @@
   },
   "scripts": {
     "build": "tsc && chmod a+x dist/bin/solsa.js",
+    "clean": "rm -Rf dist || true",
+    "codegen": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/master/api/openapi-spec/swagger.json | node dist/codegen.js > src/synthetic.ts",
+    "testgen": "node test/test.js",
     "test": "standard && tslint -p . && mocha"
   },
   "dependencies": {
