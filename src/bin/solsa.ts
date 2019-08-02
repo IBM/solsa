@@ -401,7 +401,7 @@ function pushCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
-  const images = loadApp()._solsa.getImages()
+  const images = loadApp()._solsa.getImages().filter(image => image.build)
 
   const config = loadConfig(true)
   const context = config.clusters.find(({ name }: any) => name === config.targetCluster)
