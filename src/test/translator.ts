@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-const solsa = require('solsa')
-const bundle = new solsa.Bundle()
-module.exports = bundle
+import * as solsa from '..'
+let bundle = new solsa.Bundle()
+export = bundle
 
 bundle.translator = new solsa.LanguageTranslator({ name: 'translator', plan: 'lite' })
 
