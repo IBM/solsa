@@ -8,20 +8,19 @@ event sources.
 
 SolSA leverages Kubernetes operators to define and configure these resources
 whether they run inside or outside of a Kubernetes cluster. SolSA relies on the
-[composable operator](https://github.ibm.com/seed/composable) to encode dynamic
+[Composable operator](https://github.com/IBM/composable) to encode dynamic
 dependencies between resource configurations.
 
-SolSA can synthesize all the yaml needed to deploy a solution. But it
-does not have to do so. SolSA supports easy configuration to select
-which resources should be unique to a solution instance and which
-resources should be shared across multiple instances.  The generated
-yaml can be deployed at once, i.e., with a single `kubectl apply`
-or `oc apply` command.  Optionally, SolSA leverages
-[Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit
-targeting multiple environments, e.g., local development cluster, a Red Hat OpenShift on IBM Cloud cluster,
-or an IBM Cloud Kubernetes Service cluster.
-SolSA automatically tailors resources such as
-ingresses to the specifics of each targeted environment.
+SolSA can synthesize all the yaml needed to deploy a solution. But it does not
+have to do so. SolSA supports easy configuration to select which resources
+should be unique to a solution instance and which resources should be shared
+across multiple instances.  The generated yaml can be deployed at once, i.e.,
+with a single `kubectl apply` or `oc apply` command.  Optionally, SolSA
+leverages [Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit
+targeting multiple environments, e.g., local development cluster, a Red Hat
+OpenShift on IBM Cloud cluster, or an IBM Cloud Kubernetes Service cluster.
+SolSA automatically tailors resources such as ingresses to the specifics of each
+targeted environment.
 
 The SolSA code is much more compact and much less error-prone than the yaml it
 produces. SolSA enables the specification of repeatable architectural patterns
@@ -51,49 +50,66 @@ SolSA supports Node.js 8 and above.
 
 ## Setup
 
-Install SolSA:
+Install SolSA (preferably in your home directory):
 ```shell
-npm -g install git+ssh://git@github.ibm.com:solsa/solsa.git#prebuilt
+npm install solsa
 ```
+Try the CLI:
+```shell
+./node_modules/.bin/solsa
+```
+```
+Usage:
+  solsa <command> [flags]
+
+Available commands:
+  build <solution.js>        build container images
+  push <solution.js>         push container images to registries for current kubernetes context
+  yaml <solution.js>         synthesize yaml for current kubernetes context
+
+Global flags:
+      --cluster <cluster>    use <cluster> instead of current kubernetes cluster
+      --config <config>      use <config> file instead of default
+  -c, --context <context>    use <context> instead of current kubernetes context
+
+Flags for "yaml" command:
+  -o, --output <file>        output base yaml and context overlays to <file>.tgz
+```
+We recommend adding the `solsa` CLI to your PATH.
 
 ### Kubernetes Cluster Setup
 
-We assume that you have already configured `kubectl` or `oc` to be able to access each
-Kubernetes cluster you will be using with SolSA.
-
-Note: If you are installing SolSA on an IKS cluster, we assume your cluster is
-already properly configured to enable you to pull images from the IBM Container
-Registry. If it is not, please see the instructions at
-https://cloud.ibm.com/docs/containers?topic=containers-images.
+We assume that you have already configured `kubectl` or `oc` to be able to
+access each Kubernetes cluster you will be using with SolSA.
 
 On each cluster:
-1. Install the IBM Cloud Operator from https://github.com/ibm/cloud-operators.
+1. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
 
-2. Install the Composable Operator from https://github.com/ibm/composable.
+2. Install the Composable Operator from https://github.com/IBM/composable.
 
-3. Install the Event Streams Topic operator from https://github.ibm.com/seed/event-streams-topic.
+3. Install the Event Streams Topic operator from
+   https://github.com/IBM/event-streams-topic.
 
-4. Optionally install the IBM Cloud Functions Operator from https://github.com/IBM/cloud-functions-operator.
+4. Optionally install the Cloud Functions Operator from
+   https://github.com/IBM/cloud-functions-operator.
 
 5. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
 
 ### Additional Setup for OpenShift
 
-1. Many docker images will not run correctly using non-root UIDs.
-   You can optionally configure OpenShift to allow images that
-   are build from Dockerfiles that do not specifiy USER 
-   to run as as the root UID with the command
-   `oc adm policy add-scc-to-group anyuid system:authenticated`.
-   
+1. Many docker images will not run correctly using non-root UIDs. You can
+   optionally configure OpenShift to allow images that are build from
+   Dockerfiles that do not specifiy USER to run as as the root UID with the
+   command `oc adm policy add-scc-to-group anyuid system:authenticated`.
 
 ### Local Configuration File
 
 Optionally create a `.solsa.yaml` file in your home directory that describes
 each Kubernetes context for which you want SolSA to generate a Kustomize
-overlay. Just like `kubectl`, `solsa` supports both cluster-level and context-level
-specification.
-Appended is an example that illustrates some of the options:
+overlay. Just like `kubectl`, `solsa` supports both cluster-level and
+context-level specification. Appended is an example that illustrates some of the
+options:
 ```yaml
 clusters:
 - name: 'docker-for-desktop-cluster'
@@ -123,13 +139,13 @@ contexts:
     - name: my-library-ratings
       port: 32124
 ```
-The NodePort ingress used in `localdev` specifies fixed port assignments based on service names.
-Any additional exposed services not named here will be given dynamic port numbers.
-The `mycluster` definition demonstrates how to instruct SolSA to generate a
-Kustomize overlay that will rename docker images so that instead of being pulled
-from the local registry on the dev machine, the images will instead be pulled
-from a specific namespace in the IBM Container Registry. Rules for specific
-images can also be specified using Kustomize syntax.
+The NodePort ingress used in `localdev` specifies fixed port assignments based
+on service names. Any additional exposed services not named here will be given
+dynamic port numbers. The `mycluster` definition demonstrates how to instruct
+SolSA to generate a Kustomize overlay that will rename docker images so that
+instead of being pulled from the local registry on the dev machine, the images
+will instead be pulled from a specific namespace in the IBM Container Registry.
+Rules for specific images can also be specified using Kustomize syntax.
 
 ## A First Example
 
@@ -147,15 +163,17 @@ It consists of a single containerized service and an ingress for this service.
 This solution can be deployed to the current Kubernetes context using the
 `solsa` CLI and either `kubectl` or `oc` as follows.
 ```shell
-solsa yaml helloWorld.js | [kubectl|oc] apply -f -
+solsa yaml helloWorld.js | kubectl apply -f -
 ```
+Always replace `kubectl` with `oc` for an OpenShift cluster.
+
 After a few seconds, we can query the deployed service using command:
 ```shell
 curl $(kubectl get ingress hello-world -o jsonpath={.spec.rules[0].host})
 ```
 To undeploy the solution, use the command:
 ```shell
-solsa yaml helloWorld.js | [kubectl|oc] delete -f -
+solsa yaml helloWorld.js | kubectl delete -f -
 ```
 The yaml synthesized by SolSA for context `mycluster` is provided in
 [helloWorld.yaml](samples/helloWorld.yaml). In this yaml, the image name has
@@ -164,9 +182,9 @@ according to the specification of cluster `mycluster` in the configuration file.
 
 ## More Examples
 
-The [solsa-examples](https://github.ibm.com/solsa/solsa-examples) repository
-contains other examples of cloud-native applications, services, and
-architectural patterns defined using SolSA.
+The [solsa-examples](https://github.com/IBM/solsa-examples) repository contains
+other examples of cloud-native applications, services, and architectural
+patterns defined using SolSA.
 
 ## Building SolSA-defined Services
 
@@ -174,7 +192,7 @@ In order to build and deploy solutions that include SolSA-defined services, run:
 ```shell
 solsa build mySolution.js
 solsa push mySolution.js
-solsa yaml mySolution.js | [kubectl|oc] apply -f -
+solsa yaml mySolution.js | kubectl apply -f -
 ```
 The `build` command builds images for the SolSA-defined services. The `push`
 command tags and pushes these images according to the SolSA configuration for
@@ -182,12 +200,12 @@ the current Kubernetes context.
 
 ## Development
 
-To contribute to the development of SolSA, you will to clone, build, and link this repository:
+To contribute to the development of SolSA, you will need to clone, build, and
+link this repository:
 ```shell
-git clone https://github.ibm.com/solsa/solsa.git
+git clone https://github.com/IBM/solsa/solsa.git
 cd solsa
 npm install
 npm run build
-npm link
 ```
-This will ensure the `solsa` CLI uses the local checkout.
+Make sure to use the `solsa` CLI from your clone.
