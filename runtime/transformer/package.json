@@ -5,12 +5,5 @@
   "dependencies": {
     "minimist": "^1.2.0",
     "@kubernetes/client-node": "^0.8.2"
-  },
-  "scripts": {
-    "test": "standard"
-  },
-  "devDependencies": {
-    "pre-commit": "^1.2.2",
-    "standard": "^12.0.1"
   }
 }
