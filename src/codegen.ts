@@ -35,7 +35,7 @@ const tree: { [k: string]: { [k: string]: { [k: string]: string } } } = {} // [g
 // split key into [group, version, kind]
 function split (key: string) {
   let [group, version, kind] = `pkg.${key}`.split('.').slice(-3) // runtime -> pkg.runtime hack for ibm cloud functions operator
-  if (group === process.argv[2]) group = process.argv[3] // hack to rename group
+  if (group === process.argv[3]) group = process.argv[4] // hack to rename group
   if (misc.includes(group)) group = 'misc'
   return [group, version, kind]
 }
@@ -90,7 +90,7 @@ function propertiesOf (resource: Definition): [string, any, boolean][] {
 
 // copyright and license
 console.log(`/*
- * Copyright 2019 IBM Corporation
+ * Copyright 2019 IBM Corporation${process.argv[2]}
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

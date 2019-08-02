@@ -209,3 +209,9 @@ This product bundles a script to install kustomize which is based on
 code snippets from https://github.com/kubernetes-sigs/kustomize
 which are distributed under the Apache License, Version 2.0.
 For details see ./travis/install-kustomize.sh
+
+This product bundles code which is automatically derived from Kubernetes's
+OpenAPI Specification
+https://github.com/kubernetes/kubernetes/tree/master/api/openapi-spec
+which is distributed under the Apache License, Version 2.0.
+For details see ./src/core.ts
