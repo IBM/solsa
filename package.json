@@ -3,6 +3,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "version": "0.1.0",
+  "description": "Solution Service Architecture",
+  "homepage": "https://github.com/IBM/solsa",
   "bin": {
     "solsa": "./dist/bin/solsa.js"
   },
@@ -32,9 +34,27 @@
     "tslint": "^5.18.0",
     "tslint-config-standard": "^8.0.1"
   },
+  "files": [
+    "CONTRIBUTING.md",
+    "dist/*.js",
+    "dist/*.d.ts",
+    "dist/bin/*.js",
+    "dist/bin/*.d.ts"
+  ],
   "standard": {
     "ignore": [
       "dist/**/*.js"
     ]
-  }
+  },
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Olivier Tardieu",
+      "email": "tardieu@us.ibm.com"
+    },
+    {
+      "name": "Dave Grove",
+      "email": "groved@us.ibm.com"
+    }
+  ]
 }
