@@ -26,7 +26,7 @@ Javascript or Typescript code instead of YAML, relying on SolSA to translate
 their source code to YAML. SolSA integrates with IDEs such as [Visual Studio
 Code](https://code.visualstudio.com) to provide online validation, code
 completion, and documentation of the various resources and configuration
-parameters. SolSA enables the definition architectural patterns (bundles of
+parameters. SolSA enables the definition of architectural patterns (bundles of
 resources) that can be used across many applications.
 
 Thanks to Kubernetes operators, Kubernetes applications can include not only
@@ -46,7 +46,7 @@ welcome [contributions](CONTRIBUTIONS.md)!
 
 ## Motivation and Capabilities
 
-Kubernetes is becoming the de facto standard to manage applications in the cloud
+Kubernetes is becoming the de facto standard for managing applications in the cloud
 (public, private, multi, hybrid, etc.). While YAML is a fine language to setup a
 few things, we believe application developers need to reason about applications
 at a higher-level of abstraction using the languages and tools they are familiar
@@ -54,8 +54,8 @@ with.
 
 Developers can use SolSA to configure Kubernetes resources using Javascript or
 Typescript instead of YAML. But SolSA is not just a syntax. SolSA supports
-bundling together resources to into reusable abstractions exposing curated
-configuration parameters. For instance, SolSA offers `ContainerizedService`
+bundling together resources into reusable abstractions that expose curated
+configuration parameters. For instance, SolSA offers a `ContainerizedService`
 bundle that combines a `Deployment` and a `Service`, automatically bridging the
 two by means of auto-generated labels and selectors.
 
