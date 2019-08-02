@@ -17,41 +17,79 @@
 
 # SolSA
 
-The SolSA library for Node.js makes it possible to specify the architecture of
-cloud-native solutions as programs. Using SolSA, a developer can enumerate and
-configure all the components of a solution including resources such as managed
-cloud services, cloud functions, containerized services, Knative services and
-event sources.
+The SolSA library for [Node.js](https://nodejs.org) makes it possible to specify
+the architecture of [Kubernetes](https://kubernetes.io) applications as
+programs.
 
-SolSA leverages Kubernetes operators to define and configure these resources
-whether they run inside or outside of a Kubernetes cluster. SolSA relies on the
-[Composable operator](https://github.com/IBM/composable) to encode dynamic
-dependencies between resource configurations.
+With SolSA, developers can configure Kubernetes-managed resources by writing
+Javascript or Typescript code instead of Yaml, relying on SolSA to translate
+their source code to Yaml. SolSA integrates with IDEs such as [Visual Studio
+Code](https://code.visualstudio.com) to provide online validation, code
+completion, and documentation of the various resources and configuration
+parameters. SolSA enables the definition architectural patterns (bundle of
+resources) that can be used across many applications.
 
-SolSA can synthesize all the yaml needed to deploy a solution. But it does not
-have to do so. SolSA supports easy configuration to select which resources
-should be unique to a solution instance and which resources should be shared
-across multiple instances.  The generated yaml can be deployed at once, i.e.,
-with a single `kubectl apply` or `oc apply` command.  Optionally, SolSA
-leverages [Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit
-targeting multiple environments, e.g., local development cluster, a Red Hat
-OpenShift on IBM Cloud cluster, or an IBM Cloud Kubernetes Service cluster.
-SolSA automatically tailors resources such as ingresses to the specifics of each
-targeted environment.
+Thanks to Kubernetes operators, Kubernetes applications can include not only
+containerized services but also managed cloud services (using for instance the
+[IBM Cloud Operator](https://github.com/IBM/cloud-operators)), cloud functions
+(using the [Cloud Functions
+operator](https://github.com/IBM/cloud-functions-operator)),
+[Knative](https://knative.dev) services and events, etc.
 
-The SolSA code is much more compact and much less error-prone than the yaml it
-produces. SolSA enables the specification of repeatable architectural patterns
-that can be reused across many solutions. SolSA simplifies the configuration of
-related resources such as a Kafka instance, a Kafka topic, and a Knative Kafka
-event source. 
+While SolSA is meant to facilitate application development and deployment on the
+IBM Cloud and supports a few IBM-specific services out of the box, the SolSA
+programming model and code is intended to work with any Kubernetes cluster and
+any cloud. No IBM Cloud account required.
+
+SolSA is an open-source project with an [Apache 2.0 license](LICENSE.txt). We
+welcome [contributions](CONTRIBUTIONS.md)!
+
+## Motivation and Capabilities
+
+Kubernetes is becoming the de facto standard to manage applications in the cloud
+(public, private, multi, hybrid, etc.). While Yaml is a fine language to setup a
+few things, we believe application developers need to reason about applications
+at a higher-level of abstraction using the languages and tools they are familiar
+with.
+
+Developers can use SolSA to configure Kubernetes resources using Javascript or
+Typescript instead of Yaml. But SolSA is not just a syntax. SolSA supports
+bundling together resources to into reusable abstractions exposing curated
+configuration parameters. For instance, SolSA offers `ContainerizedService`
+bundle that combines a `Deployment` and a `Service`, automatically bridging the
+two by means of auto-generated labels and selectors.
+
+SolSA bundles can be smart and vary their content based on context. In
+particular, SolSA leverages
+[Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit targeting
+multiple environments, e.g., local development cluster, a Red Hat OpenShift on
+IBM Cloud cluster, or an IBM Cloud Kubernetes Service cluster. SolSA
+automatically tailors resource bundles such as ingresses to the specifics of
+each targeted environment.
+
+SolSA can synthesize all the Yaml needed to deploy an application. But it does
+not have to do so. SolSA supports easy configuration to select which resources
+should be unique to an application instance and which resources should be shared
+across multiple instances.
+
+SolSA facilitates the configuration of related resouces for instance a Kafka
+instance, a Kafka topic, and a Knative Kafka event source, by automatically
+reusing relevant configuration information. SolSA can not only inject
+configuration information from one resource into another during Yaml generation
+but also, if necessary, at deployment time using the [Composable
+operator](https://github.com/IBM/composable).
+
+SolSA generates pure Kubernetes Yaml that be deployed at once, i.e., with a
+single `kubectl apply` or `oc apply` command. SolSA does not need a server-side
+component.
 
 SolSA includes an optional capability to containerize Node.js code. This
 facilitates the integration of components that require a little bit of glue code
 to interface properly, e.g., to align schemas or match protocols. This glue code
-can leverage portable Node.js frameworks such as
-[Express](https://expressjs.com) or [KafkaJS](https://kafka.js.org). SolSA
-builds and pushes the container image in addition to synthesizing the yaml to
-instantiate the image with the proper configuration.
+can leverage Node.js frameworks such as [Express](https://expressjs.com) or
+[KafkaJS](https://kafka.js.org). SolSA builds and pushes the container image in
+addition to synthesizing the Yaml to instantiate the image with the proper
+configuration.
 
 ## Components
 
