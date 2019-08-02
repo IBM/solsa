@@ -42,7 +42,7 @@ programming model and code is intended to work with any Kubernetes cluster and
 any cloud. No IBM Cloud account required.
 
 SolSA is an open-source project with an [Apache 2.0 license](LICENSE.txt). We
-welcome [contributions](CONTRIBUTIONS.md)!
+welcome [contributions](CONTRIBUTING.md)!
 
 ## Motivation and Capabilities
 
