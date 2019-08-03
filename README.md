@@ -137,7 +137,8 @@ We recommend adding the `solsa` CLI to your PATH.
 ### Kubernetes Cluster Setup
 
 We assume that you have already configured `kubectl` or `oc` to be able to
-access each Kubernetes cluster you will be using with SolSA.
+access each Kubernetes cluster you will be using with SolSA. We also assume
+`kustomize` is in the PATH.
 
 On each cluster:
 1. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
@@ -152,13 +153,6 @@ On each cluster:
 
 5. Optionally install Knative. For IKS, follow the instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
-
-### Additional Setup for OpenShift
-
-1. Many docker images will not run correctly using non-root UIDs. You can
-   optionally configure OpenShift to allow images that are build from
-   Dockerfiles that do not specifiy USER to run as as the root UID with the
-   command `oc adm policy add-scc-to-group anyuid system:authenticated`.
 
 ### Local Configuration File
 
