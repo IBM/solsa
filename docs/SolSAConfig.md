@@ -141,7 +141,7 @@ supported operations.
 
 The example configuration file belows shows how the various supported features may
 be combinaed in a single SolSA configuration file.
-``yaml
+```yaml
 clusters:
 - name: 'docker-desktop'
   ingress:
