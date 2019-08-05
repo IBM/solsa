@@ -24,7 +24,9 @@ This file documents the supported configuration options.
 ## Specifying the configuration file
 
 If the environment variable `SOLSA_CONFIG` is set, then its value specifies the
-configuration file to be loaded.  If `SOLSA_CONFIG` is not set, the `solsa` cli
+configuration file to be loaded.  The command line argument `--config <file>` may
+also be used to specify the configuration file to be loaded.  If there is no
+explicit setting, the `solsa` cli
 will look for a file called `.solsa.yaml` in your home directory.
 
 If a configuration file is not specified, is not found, or contains invalid YAML,
