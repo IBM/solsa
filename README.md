@@ -141,11 +141,24 @@ We recommend adding the `solsa` CLI to your PATH.
 
 ### Kubernetes Cluster Setup
 
-We assume that you have already configured `kubectl` or `oc` to be able to
-access each Kubernetes cluster you will be using with SolSA. We also assume
-`kustomize` is in your PATH.
+#### Minimal install
 
-On each cluster:
+We assume that you have already configured `kubectl` or `oc` to be able to
+access each Kubernetes cluster you will be using with SolSA.
+
+We assume that you have already installed `kustomize` and it is in your PATH. If not, please
+install it per Kustomize's [install instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
+and adjust your PATH to include it.
+
+Proper configuration of `kubectl`/`oc` and `kustomize` is sufficient to enable
+you to use SolSA to generate YAML for all core Kubernetes resource types.
+
+#### Optional install: Operators
+
+If you intend to use SolSA to define solutions that include advanced features
+such as configuring cloud services or Knative resources, you will need to install
+the necessary Operators.  On each cluster, do the following:
+cl Services or other advanced features
 1. Install the Composable Operator from https://github.com/IBM/composable.
 
 2. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
@@ -156,8 +169,12 @@ On each cluster:
 4. Optionally install the IBM Cloud Functions Operator from
    https://github.com/IBM/cloud-functions-operator.
 
-5. Optionally install Knative. For IBM Cloud Kubernetes Service, follow the
-   instructions at https://knative.dev/docs/install/knative-with-iks.
+#### Optional install: Knative
+
+If you intend to use SolSA to define solutions that include Knative resources,
+you will need a cluster with Knative installed.  For example, if you are using
+a cluster provisioned via the IBM Cloud Kubernetes Service, follow the
+instructions at https://knative.dev/docs/install/knative-with-iks.
 
 ### Local Configuration File
 
@@ -259,7 +276,7 @@ the current Kubernetes context.
 To contribute to the development of SolSA, you will need to clone this
 repository and install and build SolSA:
 ```shell
-git clone https://github.com/IBM/solsa/solsa.git
+git clone https://github.com/IBM/solsa.git
 cd solsa
 npm install
 npm run build
