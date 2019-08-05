@@ -165,7 +165,7 @@ the necessary Operators.  On each cluster, do the following:
 3. Install the IBM Event Streams Topic Operator from
    https://github.com/IBM/event-streams-topic.
 
-4. Optionally install the IBM Cloud Functions Operator from
+4. Install the IBM Cloud Functions Operator from
    https://github.com/IBM/cloud-functions-operator.
 
 #### Optional install: Knative
