@@ -1,3 +1,2 @@
 /dist
-/node_modules
-swagger.json
+node_modules

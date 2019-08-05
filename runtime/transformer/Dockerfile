@@ -18,7 +18,8 @@ WORKDIR /solsa
 
 COPY transformer.js .
 COPY package.json .
+COPY package-lock.json .
 
-RUN npm install --prod --no-save
+RUN npm install
 
 CMD ["node", "/solsa/transformer.js"]
