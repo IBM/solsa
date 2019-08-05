@@ -142,7 +142,7 @@ supported image renaming operations.
 ## Example
 
 The example configuration file belows shows how the various supported features may
-be combinaed in a single SolSA configuration file.
+be combined in a single SolSA configuration file.
 ```yaml
 clusters:
 - name: 'docker-desktop'
