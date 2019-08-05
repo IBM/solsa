@@ -158,7 +158,6 @@ you to use SolSA to generate YAML for all core Kubernetes resource types.
 If you intend to use SolSA to define solutions that include advanced features
 such as configuring cloud services or Knative resources, you will need to install
 the necessary Operators.  On each cluster, do the following:
-cl Services or other advanced features
 1. Install the Composable Operator from https://github.com/IBM/composable.
 
 2. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
