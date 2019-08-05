@@ -81,7 +81,7 @@ Operator](https://github.com/IBM/composable). Using this operator, SolSA can for
 example configure a Kafka source to dynamically obtain a list of broker urls
 from a Kafka instance deployed at the same time.
 
-SolSA generates pure Kubernetes YAML that be deployed at once, i.e., with a
+SolSA generates pure Kubernetes YAML that can be deployed at once, i.e., with a
 single `kubectl apply` or `oc apply` command. SolSA does not need a server-side
 component.
 
@@ -156,8 +156,7 @@ On each cluster:
    https://github.com/IBM/cloud-functions-operator.
 
 5. Optionally install Knative. For IBM Cloud Kubernetes Service, follow the
-   instructions at
-   https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
+   instructions at https://knative.dev/docs/install/knative-with-iks.
 
 ### Local Configuration File
 
@@ -256,7 +255,8 @@ the current Kubernetes context.
 
 ## Development
 
-To contribute to the development of SolSA, you will need to clone this repository:
+To contribute to the development of SolSA, you will need to clone this
+repository:
 ```shell
 git clone https://github.com/IBM/solsa/solsa.git
 cd solsa
