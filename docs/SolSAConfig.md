@@ -15,45 +15,124 @@
 # limitations under the License.
 -->
 
+# SolSA Configuration File
 
-Optionally create a `.solsa.yaml` file in your home directory that describes
-each Kubernetes context for which you want SolSA to generate a Kustomize
-overlay. Just like `kubectl`, `solsa` supports both cluster-level and
-context-level specification. Appended is an example that illustrates some of the
-options:
+The `solsa` cli supports an optional configuration file that can enable
+cluster and/or context level specialization of the YAML files it generates.
+This YAML file documents the capabilities that can be configured.
+
+## Specifying the configuration file
+
+If the environment variable `SOLSA_CONFIG` is set, then its value specifies the
+configuration file to be loaded.  If `SOLSA_CONFIG` is not set, the `solsa` cli
+will look for a file called `.solsa.yaml` in your home directory.
+
+If a configuration file is not specified, is not found, or contains invalid YAML,
+`solsa` will report a warning and only generate a `base` layer of YAML
+that could be applied to any Kubernetes cluster.
+
+## Clusters and Contexts
+
+The primary stanzas in the SolSA configuration file are a list of `clusters` and an optional
+list of `contexts`.  Every cluster must specify a `name` and may specify additional
+attributes as described in subsequent sections.  Every context must specify a `name` and
+a `cluster` and may specify additional attributes as described in subsequent sections.
 ```yaml
 clusters:
-- name: 'docker-for-desktop-cluster'
+- name: 'docker-desktop'
+  ...
+- name: 'mycluster1'
+  ...
+
+contexts:
+- name: 'local'
+  cluster: 'docker-desktop'
+  ...
+```
+
+## Ingress
+
+### NodePort
+
+The simplest type of `Ingress` is a `NodePort` with dynamically assigned port numbers.
+This style of ingress can be used with any Kubernetes cluster.
+It is specified by adding the stanza below to either a `cluster` or `context`:
+```yaml
   ingress:
     nodePort: true
-- name: 'mycluster'
+```
+
+It is also possible to specify that particular services should be assigned to
+fixed port numbers.  Any service not explicitly assigned will continue to receive
+a dynamic port assignment.
+```yaml
   ingress:
-    iks:
-      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-      tlssecret: 'mycluster123'
-  registry: 'us.icr.io/tardieu'
+    nodePort:
+    - name: my-service-one
+      port: 32123
+    - name: my-service-two
+      port: 32124
+```
+
+### IBM Cloud Kubernetes Service Standard Cluster
+
+An IBM Cloud Kubernetes Service Standard Cluster includes an Ingress controller and
+Application Load Balancer that support TLS termination.  To enable `solsa` to generate
+YAML for this style of Ingress you must provide the Ingress Subdomain and Ingress Secret
+of your cluster.  First, get this information using the command: `ibmcloud ks cluster-get --cluster <cluster-name>`
+Then fill in the values of `Ingress Subdomain` and `Ingress Secret` from the output of `cluster-get`
+into the YAML stanza below.
+```yaml
+  ingress:
+     iks:
+       subdomain: <Ingress Subdomain>
+       tlssecret: <Ingress Secret>
+```
+
+### IBM Cloud RedHat OpenShift Cluster
+
+An IBM Cloud RedHat OpenShift Cluster supports defining `Routes` that support TLS termination.
+To enable `solsa` to generate YAML for this style of Ingress you must provide the subdomain
+that was assigned to your cluster. This subdomain will have the format `<cluster_name>-<random_ID>.<region>.containers.appdomain.cloud`
+and can mostly easily be deploying a service to your cluster, exposing it via a route by `oc create route edge --service=<SOME_SERVICE>`
+and then using `oc get route`.
+Once you have determined your cluster's subdomain, create a YAML stanza as shown below containing its actual value:
+```yaml
+  ingress:
+    os:
+      subdomain: '<cluster_name>-<random_ID>.<region>.containers.appdomain.cloud'
+
+```
+
+## Image Renames
+
+The SolSA configuration file can also be used to specify a variety of image renaming operations.
+
+### Default container registry
+
+You can specify a default container registry to use for all container images that do
+not explicitly specify their registry by adding the YAML below to a `cluster` or `context`:
+```yaml
+  registry: 'registry.name/org'
+```
+
+### Default image tag
+
+You can specify a default image tag to use for all container images that do
+not explicitly specify an image tag by adding the YAML below to a `cluster` or `context`:
+```yaml
+  defaultTag: 'myDefaultImageTag'
+```
+
+### Kustomize-style image renamings
+
+SolSA support the full range of Kustomize image renaming operations for
+specific images via a list of renaming operations under the `images` element.
+For example,
+```yaml
   images:
   - name: 'kn-helloworld'
     newName: 'docker.io/ibmcom/kn-helloworld'
-- name: 'myrhoscluster'
-  ingress:
-    os:
-      subdomain: 'myrhoscluster456.us-east.containers.appdomain.cloud'
-contexts:
-- name: localdev
-  cluster: 'docker-for-desktop-cluster'
-  defaultTag: dev
-  ingress:
-    nodePort:
-    - name: my-library-productpage
-      port: 32123
-    - name: my-library-ratings
-      port: 32124
 ```
-The NodePort ingress used in `localdev` specifies fixed port assignments based
-on service names. Any additional exposed services not named here will be given
-dynamic port numbers. The `mycluster` definition demonstrates how to instruct
-SolSA to generate a Kustomize overlay that will rename docker images so that
-instead of being pulled from the local registry on the dev machine, the images
-will instead be pulled from a specific namespace in the IBM Container Registry.
-Rules for specific images can also be specified using Kustomize syntax.
+Please consult the Kustomize documentation for detailed documentation of the
+supported operations.
