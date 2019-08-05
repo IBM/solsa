@@ -21,9 +21,10 @@ The SolSA library for [Node.js](https://nodejs.org) makes it possible to specify
 the architecture of [Kubernetes](https://kubernetes.io) applications as
 programs.
 
-With SolSA, developers can configure Kubernetes-managed resources by writing
-Javascript or Typescript code instead of YAML, relying on SolSA to translate
-their source code to YAML. SolSA integrates with IDEs such as [Visual Studio
+SolSA enables developers to configure Kubernetes-managed resources by writing
+Javascript or Typescript code instead of YAML. SolSA automatically translates
+the developer written code to the required lower-level YAML.
+SolSA integrates with IDEs such as [Visual Studio
 Code](https://code.visualstudio.com) to provide online validation, code
 completion, and documentation of the various resources and configuration
 parameters. SolSA enables the definition of architectural patterns (bundles of
@@ -38,7 +39,7 @@ Operator](https://github.com/IBM/cloud-functions-operator)),
 
 While SolSA is meant to facilitate application development and deployment on the
 IBM Cloud and supports a few IBM-specific services out of the box, the SolSA
-programming model and code is intended to work with any Kubernetes cluster and
+programming model and library implementation is intended to work with any Kubernetes cluster and
 any cloud. No IBM Cloud account required.
 
 SolSA is an open-source project with an [Apache 2.0 license](LICENSE.txt). We
@@ -48,7 +49,7 @@ welcome [contributions](CONTRIBUTING.md)!
 
 Kubernetes is becoming the de facto standard for managing applications in the
 cloud (public, private, multi, hybrid, etc.). While YAML is a fine language to
-setup a few things, we believe application developers need to reason about
+perform some basic configuration, we believe application developers need to reason about
 applications at a higher-level of abstraction using the languages and tools they
 are familiar with.
 
@@ -62,7 +63,7 @@ two by means of auto-generated labels and selectors.
 SolSA bundles can be smart and vary their content based on context. In
 particular, SolSA leverages
 [Kustomize](https://github.com/kubernetes-sigs/kustomize) to permit targeting
-multiple environments, e.g., local development cluster, a Red Hat OpenShift on
+multiple environments, e.g., a local development cluster, a Red Hat OpenShift on
 IBM Cloud cluster, or an IBM Cloud Kubernetes Service cluster. SolSA
 automatically tailors resource bundles such as `Ingress` to the specifics of
 each targeted environment.
@@ -256,11 +257,11 @@ the current Kubernetes context.
 ## Development
 
 To contribute to the development of SolSA, you will need to clone this
-repository:
+repository and install and build SolSA:
 ```shell
 git clone https://github.com/IBM/solsa/solsa.git
 cd solsa
 npm install
 npm run build
 ```
-Make sure to use the `solsa` CLI from your clone.
+Make sure to use the `solsa` CLI from your clone (for example by adjusting your path).
