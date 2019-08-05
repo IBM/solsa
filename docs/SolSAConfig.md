@@ -136,3 +136,37 @@ For example,
 ```
 Please consult the Kustomize documentation for detailed documentation of the
 supported operations.
+
+## Example
+
+The example configuration file belows shows how the various supported features may
+be combinaed in a single SolSA configuration file.
+``yaml
+clusters:
+- name: 'docker-desktop'
+  ingress:
+    nodePort: true
+- name: 'mycluster'
+  ingress:
+    iks:
+      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
+      tlssecret: 'mycluster123'
+  registry: 'us.icr.io/tardieu'
+  images:
+  - name: 'kn-helloworld'
+    newName: 'docker.io/ibmcom/kn-helloworld'
+- name: 'myrhoscluster'
+  ingress:
+    os:
+      subdomain: 'myrhoscluster456-0139ae49851705507802c3fbbaa73a82-0001.us-east.containers.appdomain.cloud'
+contexts:
+- name: localdev
+  cluster: 'docker-desktop'
+  defaultTag: dev
+  ingress:
+    nodePort:
+    - name: my-library-productpage
+      port: 32123
+    - name: my-library-ratings
+      port: 32124
+```
