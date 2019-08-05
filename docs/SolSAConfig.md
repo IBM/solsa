@@ -17,9 +17,9 @@
 
 # SolSA Configuration File
 
-The `solsa` cli supports an optional configuration file that can enable
-cluster and/or context level specialization of the YAML files it generates.
-This YAML file documents the capabilities that can be configured.
+The `solsa` cli supports an optional YAML configuration file that can enable
+cluster and/or context level specialization of the output of `solsa yaml`.
+This file documents the supported configuration options.
 
 ## Specifying the configuration file
 
