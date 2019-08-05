@@ -158,7 +158,7 @@ clusters:
 - name: 'myrhoscluster'
   ingress:
     os:
-      subdomain: 'myrhoscluster456-0139ae49851705507802c3fbbaa73a82-0001.us-east.containers.appdomain.cloud'
+      subdomain: 'myrhoscluster-0139ae49851705507802c3fbbaa73a82-0001.us-east.containers.appdomain.cloud'
 contexts:
 - name: localdev
   cluster: 'docker-desktop'
