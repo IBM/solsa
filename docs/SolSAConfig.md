@@ -134,8 +134,8 @@ For example,
   - name: 'kn-helloworld'
     newName: 'docker.io/ibmcom/kn-helloworld'
 ```
-Please consult the Kustomize documentation for detailed documentation of the
-supported operations.
+Please consult the Kustomize documentation for a detailed description of the
+supported image renaming operations.
 
 ## Example
 
