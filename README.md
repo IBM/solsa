@@ -33,7 +33,7 @@ Thanks to Kubernetes operators, Kubernetes applications can include not only
 containerized services but also managed cloud services (using for instance the
 [IBM Cloud Operator](https://github.com/IBM/cloud-operators)), cloud functions
 (using the [IBM Cloud Functions
-operator](https://github.com/IBM/cloud-functions-operator)),
+Operator](https://github.com/IBM/cloud-functions-operator)),
 [Knative](https://knative.dev) services and events, etc.
 
 While SolSA is meant to facilitate application development and deployment on the
@@ -46,11 +46,11 @@ welcome [contributions](CONTRIBUTING.md)!
 
 ## Motivation and Capabilities
 
-Kubernetes is becoming the de facto standard for managing applications in the cloud
-(public, private, multi, hybrid, etc.). While YAML is a fine language to setup a
-few things, we believe application developers need to reason about applications
-at a higher-level of abstraction using the languages and tools they are familiar
-with.
+Kubernetes is becoming the de facto standard for managing applications in the
+cloud (public, private, multi, hybrid, etc.). While YAML is a fine language to
+setup a few things, we believe application developers need to reason about
+applications at a higher-level of abstraction using the languages and tools they
+are familiar with.
 
 Developers can use SolSA to configure Kubernetes resources using Javascript or
 Typescript instead of YAML. But SolSA is not just a syntax. SolSA supports
@@ -77,7 +77,7 @@ instance, a Kafka topic, and a Knative Kafka event source, by automatically
 reusing relevant configuration information. SolSA can not only inject
 configuration information from one resource into another during YAML generation
 but also, if necessary, during deployment using the [Composable
-operator](https://github.com/IBM/composable). Using this operator, SolSA can for
+Operator](https://github.com/IBM/composable). Using this operator, SolSA can for
 example configure a Kafka source to dynamically obtain a list of broker urls
 from a Kafka instance deployed at the same time.
 
@@ -96,12 +96,16 @@ configuration.
 ## Components
 
 SolSA consists of:
-- A main `solsa` Node.js module that provides a library of high-level
-  abstractions for defining the software architecture of a solution.
+- A `solsa` Node.js module that makes it possible to configure using Javascript
+  or Typescript:
+  - all the standard Kubernetes resources,
+  - custom resources supported by a growing set of operators,
+  - resource bundles that provide high-level abstractions of key architectural
+    patterns.
 - A `solsa` command-line interface (CLI):
   - `solsa build` builds container images for SolSA-defined services (if any).
   - `solsa push` pushes container images for SolSA-defined services (if any).
-  - `solsa yaml` synthesizes yaml for deploying SolSA solutions on Kubernetes.
+  - `solsa yaml` synthesizes YAML for deploying SolSA solutions on Kubernetes.
 
 SolSA supports Node.js 8 and above.
 
@@ -138,20 +142,21 @@ We recommend adding the `solsa` CLI to your PATH.
 
 We assume that you have already configured `kubectl` or `oc` to be able to
 access each Kubernetes cluster you will be using with SolSA. We also assume
-`kustomize` is in the PATH.
+`kustomize` is in your PATH.
 
 On each cluster:
-1. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
+1. Install the Composable Operator from https://github.com/IBM/composable.
 
-2. Install the Composable Operator from https://github.com/IBM/composable.
+2. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
 
-3. Install the Event Streams Topic operator from
+3. Install the IBM Event Streams Topic Operator from
    https://github.com/IBM/event-streams-topic.
 
-4. Optionally install the Cloud Functions Operator from
+4. Optionally install the IBM Cloud Functions Operator from
    https://github.com/IBM/cloud-functions-operator.
 
-5. Optionally install Knative. For IKS, follow the instructions at
+5. Optionally install Knative. For IBM Cloud Kubernetes Service, follow the
+   instructions at
    https://cloud.ibm.com/docs/containers?topic=containers-serverless-apps-knative.
 
 ### Local Configuration File
@@ -226,8 +231,8 @@ To undeploy the solution, use the command:
 ```shell
 solsa yaml helloWorld.js | kubectl delete -f -
 ```
-The yaml synthesized by SolSA for context `mycluster` is provided in
-[helloWorld.yaml](samples/helloWorld.yaml). In this yaml, the image name has
+The YAML synthesized by SolSA for context `mycluster` is provided in
+[helloWorld.yaml](samples/helloWorld.yaml). In this YAML, the image name has
 been replaced with the fully qualified name and the ingress has been generated
 according to the specification of cluster `mycluster` in the configuration file.
 
@@ -251,8 +256,7 @@ the current Kubernetes context.
 
 ## Development
 
-To contribute to the development of SolSA, you will need to clone, build, and
-link this repository:
+To contribute to the development of SolSA, you will need to clone this repository:
 ```shell
 git clone https://github.com/IBM/solsa/solsa.git
 cd solsa
