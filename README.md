@@ -175,49 +175,27 @@ you will need a cluster with Knative installed.  For example, if you are using
 a cluster provisioned via the IBM Cloud Kubernetes Service, follow the
 instructions at https://knative.dev/docs/install/knative-with-iks.
 
-### Local Configuration File
+### SolSA Local Configuration File
 
-Optionally create a `.solsa.yaml` file in your home directory that describes
-each Kubernetes context for which you want SolSA to generate a Kustomize
-overlay. Just like `kubectl`, `solsa` supports both cluster-level and
-context-level specification. Appended is an example that illustrates some of the
-options:
+You can optionally create a `.solsa.yaml` file in your home directory that
+describes each Kubernetes context for which you want SolSA to generate a specialized
+Kustomize overlay. Just like `kubectl`, `solsa` supports both cluster-level and
+context-level specification.
+
+The configuration information in `sosla.yaml` enables
+cluster-specific and/or context-specific generation of `Ingress` resources
+and container image rewrites such as switching default registries or image tags.
+
+Please refer to the [full documentation](docs/SolSAConfig.md) of `.solsa.yaml`
+for full details, including ingress specifications for a variety of kinds of Kubernetes clusters.
+Shown below is a basic `.solsa.yaml` file that enables `sosla` to target the
+Kubernetes v1.14 cluster included in Docker Desktop v2.1.
 ```yaml
 clusters:
-- name: 'docker-for-desktop-cluster'
+- name: 'docker-desktop'
   ingress:
     nodePort: true
-- name: 'mycluster'
-  ingress:
-    iks:
-      subdomain: 'mycluster123.us-east.containers.appdomain.cloud'
-      tlssecret: 'mycluster123'
-  registry: 'us.icr.io/tardieu'
-  images:
-  - name: 'kn-helloworld'
-    newName: 'docker.io/ibmcom/kn-helloworld'
-- name: 'myrhoscluster'
-  ingress:
-    os:
-      subdomain: 'myrhoscluster456.us-east.containers.appdomain.cloud'
-contexts:
-- name: localdev
-  cluster: 'docker-for-desktop-cluster'
-  defaultTag: dev
-  ingress:
-    nodePort:
-    - name: my-library-productpage
-      port: 32123
-    - name: my-library-ratings
-      port: 32124
 ```
-The NodePort ingress used in `localdev` specifies fixed port assignments based
-on service names. Any additional exposed services not named here will be given
-dynamic port numbers. The `mycluster` definition demonstrates how to instruct
-SolSA to generate a Kustomize overlay that will rename docker images so that
-instead of being pulled from the local registry on the dev machine, the images
-will instead be pulled from a specific namespace in the IBM Container Registry.
-Rules for specific images can also be specified using Kustomize syntax.
 
 ## A First Example
 
