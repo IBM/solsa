@@ -118,7 +118,7 @@ npm install solsa
 ```
 Try the CLI:
 ```shell
-./node_modules/.bin/solsa
+$(npm bin)/solsa
 ```
 ```
 Usage:
@@ -251,11 +251,11 @@ the current Kubernetes context.
 ## Development
 
 To contribute to the development of SolSA, you will need to clone this
-repository and install and build SolSA:
+repository, install, build, and link SolSA:
 ```shell
 git clone https://github.com/IBM/solsa.git
 cd solsa
 npm install
 npm run build
+npm link
 ```
-Make sure to use the `solsa` CLI from your clone (for example by adjusting your path).
