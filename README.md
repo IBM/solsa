@@ -23,12 +23,11 @@ programs.
 
 SolSA enables developers to configure Kubernetes-managed resources by writing
 JavaScript or TypeScript code instead of YAML. SolSA automatically translates
-the developer written code to the required lower-level YAML.
-SolSA integrates with IDEs such as [Visual Studio
-Code](https://code.visualstudio.com) to provide online validation, code
-completion, and documentation of the various resources and configuration
-parameters. SolSA enables the definition of architectural patterns (bundles of
-resources) that can be used across many applications.
+the developer written code to the required lower-level YAML. SolSA integrates
+with IDEs such as [Visual Studio Code](https://code.visualstudio.com) to provide
+online validation, code completion, and documentation of the various resources
+and configuration parameters. SolSA enables the definition of architectural
+patterns (bundles of resources) that can be used across many applications.
 
 Thanks to Kubernetes operators, Kubernetes applications can include not only
 containerized services but also managed cloud services (using for instance the
@@ -39,19 +38,20 @@ Operator](https://github.com/IBM/cloud-functions-operator)),
 
 While SolSA is meant to facilitate application development and deployment on the
 IBM Cloud and supports a few IBM-specific services out of the box, the SolSA
-programming model and library implementation is intended to work with any Kubernetes cluster and
-any cloud. No IBM Cloud account required.
+programming model and library implementation is intended to work with any
+Kubernetes cluster and any cloud. No IBM Cloud account required.
 
-SolSA is an open-source project with an [Apache 2.0 license](LICENSE.txt). We
-welcome [contributions](CONTRIBUTING.md)!
+SolSA is an open-source project with an [Apache 2.0
+license](https://github.com/IBM/solsa/blob/master/LICENSE.txt). We welcome
+[contributions](https://github.com/IBM/solsa/blob/master/CONTRIBUTING.md)!
 
 ## Motivation and Capabilities
 
 Kubernetes is becoming the de facto standard for managing applications in the
-cloud (public, private, multi, hybrid, etc.). While YAML is a fine language to
-perform some basic configuration, we believe application developers need to reason about
-applications at a higher-level of abstraction using the languages and tools they
-are familiar with.
+cloud. While YAML is a fine language to perform some basic configuration, we
+believe application developers need to reason about applications at a
+higher-level of abstraction using the languages and tools they are familiar
+with.
 
 Developers can use SolSA to configure Kubernetes resources using JavaScript or
 TypeScript instead of YAML. But SolSA is not just a syntax. SolSA supports
@@ -112,13 +112,13 @@ SolSA supports Node.js 8 and above.
 
 ## Setup
 
-Install SolSA (preferably in your home directory):
+Install SolSA globally:
 ```shell
-npm install solsa
+npm install -g solsa
 ```
-Try the CLI:
+This will add the SolSA CLI to you PATH. Try the CLI:
 ```shell
-$(npm bin)/solsa
+solsa
 ```
 ```
 Usage:
@@ -137,7 +137,15 @@ Global flags:
 Flags for "yaml" command:
   -o, --output <file>        output base yaml and context overlays to <file>.tgz
 ```
-We recommend adding the `solsa` CLI to your PATH.
+While a global NPM install is enough to use the SolSA CLI, we recommend you also
+link SolSA from your home directory:
+```shell
+cd
+npm link solsa
+```
+This will ensure that IDEs such as Visual Studio Code can locate the SolSA
+module and provide an optimal developer experience with code completion and
+hover help.
 
 ### Kubernetes Cluster Setup
 
@@ -146,8 +154,9 @@ We recommend adding the `solsa` CLI to your PATH.
 We assume that you have already configured `kubectl` or `oc` to be able to
 access each Kubernetes cluster you will be using with SolSA.
 
-We assume that you have already installed `kustomize` and it is in your PATH. If not, please
-install it per Kustomize's [install instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
+We assume that you have already installed `kustomize` and it is in your PATH. If
+not, please install it per Kustomize's [install
+instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
 and adjust your PATH to include it.
 
 Proper configuration of `kubectl`/`oc` and `kustomize` is sufficient to enable
@@ -156,8 +165,8 @@ you to use SolSA to generate YAML for all core Kubernetes resource types.
 #### Optional install: Operators
 
 If you intend to use SolSA to define solutions that include advanced features
-such as configuring cloud services or Knative resources, you will need to install
-the necessary Operators.  On each cluster, do the following:
+such as configuring cloud services or Knative resources, you will need to
+install the necessary Operators.  On each cluster, do the following:
 1. Install the Composable Operator from https://github.com/IBM/composable.
 
 2. Install the IBM Cloud Operator from https://github.com/IBM/cloud-operators.
@@ -171,25 +180,27 @@ the necessary Operators.  On each cluster, do the following:
 #### Optional install: Knative
 
 If you intend to use SolSA to define solutions that include Knative resources,
-you will need a cluster with Knative installed.  For example, if you are using
-a cluster provisioned via the IBM Cloud Kubernetes Service, follow the
+you will need a cluster with Knative installed.  For example, if you are using a
+cluster provisioned via the IBM Cloud Kubernetes Service, follow the
 instructions at https://knative.dev/docs/install/knative-with-iks.
 
 ### SolSA Local Configuration File
 
 You can optionally create a `.solsa.yaml` file in your home directory that
-describes each Kubernetes context for which you want SolSA to generate a specialized
-Kustomize overlay. Just like `kubectl`, `solsa` supports both cluster-level and
-context-level specification.
+describes each Kubernetes context for which you want SolSA to generate a
+specialized Kustomize overlay. Just like `kubectl`, `solsa` supports both
+cluster-level and context-level specification.
 
-The configuration information in `sosla.yaml` enables
-cluster-specific and/or context-specific generation of `Ingress` resources
-and container image rewrites such as switching default registries or image tags.
+The configuration information in `sosla.yaml` enables cluster-specific and/or
+context-specific generation of `Ingress` resources and container image rewrites
+such as switching default registries or image tags.
 
-Please refer to the [full documentation](docs/SolSAConfig.md) of `.solsa.yaml`
-for full details, including ingress specifications for a variety of kinds of Kubernetes clusters.
-Shown below is a basic `.solsa.yaml` file that enables `sosla` to target the
-Kubernetes v1.14 cluster included in Docker Desktop v2.1.
+Please refer to the [full
+documentation](https://github.com/IBM/solsa/blob/master/docs/SolSAConfig.md) of
+`.solsa.yaml` for full details, including ingress specifications for a variety
+of kinds of Kubernetes clusters. Shown below is a basic `.solsa.yaml` file that
+enables `sosla` to target the Kubernetes v1.14 cluster included in Docker
+Desktop v2.1.
 ```yaml
 clusters:
 - name: 'docker-desktop'
@@ -199,7 +210,8 @@ clusters:
 
 ## A First Example
 
-A sample SolSA solution is provided in [helloWorld.js](samples/helloWorld.js).
+A sample SolSA solution is provided in
+[helloWorld.js](https://github.com/IBM/solsa/blob/master/samples/helloWorld.js).
 ```javascript
 const solsa = require('solsa')
 const bundle = new solsa.Bundle()
@@ -226,9 +238,10 @@ To undeploy the solution, use the command:
 solsa yaml helloWorld.js | kubectl delete -f -
 ```
 The YAML synthesized by SolSA for context `mycluster` is provided in
-[helloWorld.yaml](samples/helloWorld.yaml). In this YAML, the image name has
-been replaced with the fully qualified name and the ingress has been generated
-according to the specification of cluster `mycluster` in the configuration file.
+[helloWorld.yaml](https://github.com/IBM/solsa/blob/master/samples/helloWorld.yaml).
+In this YAML, the image name has been replaced with the fully qualified name and
+the ingress has been generated according to the specification of cluster
+`mycluster` in the configuration file.
 
 ## More Examples
 
