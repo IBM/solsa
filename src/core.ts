@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* GENERATED FILE; DO NOT EDIT */
+
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format */
 
 import { Resource } from './bundle'
