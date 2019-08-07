@@ -22,7 +22,7 @@ the architecture of [Kubernetes](https://kubernetes.io) applications as
 programs.
 
 SolSA enables developers to configure Kubernetes-managed resources by writing
-Javascript or Typescript code instead of YAML. SolSA automatically translates
+JavaScript or TypeScript code instead of YAML. SolSA automatically translates
 the developer written code to the required lower-level YAML.
 SolSA integrates with IDEs such as [Visual Studio
 Code](https://code.visualstudio.com) to provide online validation, code
@@ -53,8 +53,8 @@ perform some basic configuration, we believe application developers need to reas
 applications at a higher-level of abstraction using the languages and tools they
 are familiar with.
 
-Developers can use SolSA to configure Kubernetes resources using Javascript or
-Typescript instead of YAML. But SolSA is not just a syntax. SolSA supports
+Developers can use SolSA to configure Kubernetes resources using JavaScript or
+TypeScript instead of YAML. But SolSA is not just a syntax. SolSA supports
 bundling together resources into reusable abstractions that expose curated
 configuration parameters. For instance, SolSA offers a `ContainerizedService`
 bundle that combines a `Deployment` and a `Service`, automatically bridging the
@@ -97,8 +97,8 @@ configuration.
 ## Components
 
 SolSA consists of:
-- A `solsa` Node.js module that makes it possible to configure using Javascript
-  or Typescript:
+- A `solsa` Node.js module that makes it possible to configure using JavaScript
+  or TypeScript:
   - all the standard Kubernetes resources,
   - custom resources supported by a growing set of operators,
   - resource bundles that provide high-level abstractions of key architectural
