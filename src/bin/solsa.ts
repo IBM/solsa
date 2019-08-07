@@ -377,10 +377,9 @@ function buildCommand () {
     dir.removeCallback()
   }
 
-  const images = loadApp()._solsa.getImages()
+  const images = loadApp().getImages()
 
-  images.forEach(build)
-  // new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name))) TODO
+  new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name) || { name: 'never' }))
 }
 
 // solsa push
