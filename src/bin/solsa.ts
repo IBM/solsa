@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Bundle } from '../bundle'
+import { Solsa } from '../bundle'
 import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as minimist from 'minimist'
@@ -154,7 +154,7 @@ function loadConfig (fatal?: boolean) {
 
 // load solution file
 
-function loadApp (): Bundle {
+function loadApp (): Solsa {
   // resolve module even if not in default path
   const _resolveFilename = Module._resolveFilename
   Module._resolveFilename = function (request: string, parent: string) {
@@ -171,10 +171,10 @@ function loadApp (): Bundle {
 
   try {
     const app = require(path.resolve(argv.file))
-    if (!(app instanceof Bundle)) {
+    if (!(app._solsa)) {
       reportError(`No bundle exported by "${argv.file}"`, true)
     }
-    return app
+    return app._solsa
   } finally {
     Module._resolveFilename = _resolveFilename
   }
@@ -235,9 +235,9 @@ function yamlCommand () {
       this.getLayer(layer).patchesJSON[path] = { patch, target: Object.assign({ path }, target) }
     }
 
-    finalizeImageRenames (context: any, app: Bundle) {
+    finalizeImageRenames (context: any, app: Solsa) {
       const images: any[] = []
-      for (let name of app._solsa.getImages().map(image => image.name)) {
+      for (let name of app.getImages().map(image => image.name)) {
         const pos = name.indexOf(':', name.indexOf('/'))
         let newName = pos === -1 ? name : name.substring(0, pos)
         let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -255,7 +255,7 @@ function yamlCommand () {
       return (context.images || []).concat(images)
     }
 
-    finalize (config: any, app: Bundle) {
+    finalize (config: any, app: Solsa) {
       for (const cluster of config.clusters) {
         const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
         clusterLayer.bases.push('./../../base')
@@ -314,7 +314,7 @@ function yamlCommand () {
   const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
   const sa = new SolsaArchiver(outputRoot)
-  for (let item of app._solsa.getResources({ config })) {
+  for (let item of app.getResources({ config })) {
     if (item.obj) {
       sa.addResource(item.obj, item.layer)
     } else if (item.JSONPatch) {
@@ -401,7 +401,7 @@ function pushCommand () {
     return newTag ? newName + ':' + newTag : newName
   }
 
-  const images = loadApp()._solsa.getImages().filter(image => image.build)
+  const images = loadApp().getImages().filter(image => image.build)
 
   const config = loadConfig(true)
   const context = config.clusters.find(({ name }: any) => name === config.targetCluster)
