@@ -106,6 +106,10 @@ console.log(`/*
  */
 `)
 
+// warning
+console.log(`/* GENERATED FILE; DO NOT EDIT */`)
+console.log()
+
 // tslint config
 console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format */`)
 console.log()
