@@ -108,7 +108,7 @@ SolSA consists of:
   - `solsa push` pushes container images for SolSA-defined services (if any).
   - `solsa yaml` synthesizes YAML for deploying SolSA solutions on Kubernetes.
 
-SolSA supports Node.js 8 and above.
+SolSA supports Node.js 8 and above, Kubernetes 1.14 and above.
 
 ## Setup
 
@@ -207,6 +207,7 @@ clusters:
   ingress:
     nodePort: true
 ```
+We will assume this configuration file in the following example.
 
 ## A First Example
 
@@ -217,7 +218,7 @@ const solsa = require('solsa')
 const bundle = new solsa.Bundle()
 module.exports = bundle
 
-bundle.helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'kn-helloworld', port: 8080 })
+bundle.helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
 bundle.ingress = new bundle.helloWorld.Ingress()
 ```
 It consists of a single containerized service and an ingress for this service.
@@ -229,19 +230,35 @@ solsa yaml helloWorld.js | kubectl apply -f -
 ```
 Always replace `kubectl` with `oc` for an OpenShift cluster.
 
-After a few seconds, we can query the deployed service using command:
+The YAML synthesized by SolSA for this example depends on the SolSA
+configuration file used. If no configuration file is used, the ingress
+definition is ignored and the CLI outputs a warning message.
+
+Assuming the configuration file provided in the previous section, the YAML
+synthesized when targeting cluster `docker-desktop` is
+[helloWorld.yaml](https://github.com/IBM/solsa/blob/master/samples/helloWorld.yaml).
+In this configuration, SolSA synthesizes `Service` objects with type `NodePort`
+for all the exposed service. Moreover, port numbers are assigned dynamically. We
+can obtain the port number for the deployed `hello-world` service using command:
 ```shell
-curl $(kubectl get ingress hello-world -o jsonpath={.spec.rules[0].host})
+kubectl get service hello-world -o jsonpath={.spec.ports[0].nodePort}
+```
+```
+31509
+```
+Assuming `1.2.3.4` is the public IP of one of the worker node of the targeted
+Kubernetes cluster, we can then query the deployed containerized service using
+`curl`:
+```shell
+curl 1.2.3.4:31509
+```
+```
+Hello World!
 ```
 To undeploy the solution, use the command:
 ```shell
 solsa yaml helloWorld.js | kubectl delete -f -
 ```
-The YAML synthesized by SolSA for context `mycluster` is provided in
-[helloWorld.yaml](https://github.com/IBM/solsa/blob/master/samples/helloWorld.yaml).
-In this YAML, the image name has been replaced with the fully qualified name and
-the ingress has been generated according to the specification of cluster
-`mycluster` in the configuration file.
 
 ## More Examples
 
