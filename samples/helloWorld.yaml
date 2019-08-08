@@ -8,7 +8,7 @@ spec:
     targetPort: 8080
   selector:
     solsa.ibm.com/pod: hello-world
-  type: ClusterIP
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -38,21 +38,3 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 8080
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: hello-world
-spec:
-  rules:
-  - host: hello-world.mycluster123.us-east.containers.appdomain.cloud
-    http:
-      paths:
-      - backend:
-          serviceName: hello-world
-          servicePort: 8080
-        path: /
-  tls:
-  - hosts:
-    - hello-world.mycluster123.us-east.containers.appdomain.cloud
-    secretName: mycluster123
