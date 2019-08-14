@@ -25,6 +25,7 @@ import * as path from 'path'
 import * as tmp from 'tmp'
 import * as util from 'util'
 import * as yaml from 'js-yaml'
+import { dynamic } from '../helpers'
 
 const Module = require('module') // TODO
 
@@ -35,8 +36,8 @@ const commands: { [key: string]: () => void } = { yaml: yamlCommand, build: buil
 // process command line arguments
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['cluster', 'config', 'context', 'output'],
-  alias: { context: 'c', output: 'o' }
+  string: ['cluster', 'config', 'context', 'output', 'appname'],
+  alias: { context: 'c', output: 'o', appname: 'a' }
 })
 
 argv.command = argv._[0]
@@ -58,6 +59,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error()
   console.error(`Flags for "yaml" command:`)
   console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
+  console.error('  -a, --appname <name>       add the label solsa.ibm.com/app=<name> to all generated resources')
   console.error()
   process.exit(1)
 }
@@ -281,7 +283,7 @@ function yamlCommand () {
         for (let fname of Object.keys(layer.patchesJSON)) {
           this.writeToFile(layer.patchesJSON[fname].patch, fname, layer.name)
         }
-        const kustom = {
+        let kustom: dynamic = {
           apiVersion: 'kustomize.config.k8s.io/v1beta1',
           kind: 'Kustomization',
           bases: layer.bases,
@@ -290,7 +292,7 @@ function yamlCommand () {
           patchesJson6902: Object.keys(layer.patchesJSON).map(k => layer.patchesJSON[k].target),
           images: layer.images
         }
-        // if (app.name) kustom.commonAnnotations = { 'solsa.ibm.com/app': app.name }
+        if (argv.appname) kustom.commonLabels = { 'solsa.ibm.com/app': argv.appname }
         this.writeToFile(kustom, 'kustomization.yaml', layer.name)
       }
     }
