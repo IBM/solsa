@@ -55,16 +55,12 @@ export class KnativeService extends Bundle {
         labels: this.ingress ? undefined : { 'serving.knative.dev/visibility': 'cluster-local' }
       },
       spec: {
-        runLatest: {
-          configuration: {
-            revisionTemplate: {
-              spec: {
-                container: {
-                  image: this.image,
-                  env: enumerate(this.env)
-                }
-              }
-            }
+        template: {
+          spec: {
+            containers: [{
+              image: this.image,
+              env: enumerate(this.env)
+            }]
           }
         }
       }
