@@ -5,12 +5,10 @@ metadata:
     serving.knative.dev/visibility: cluster-local
   name: sink
 spec:
-  runLatest:
-    configuration:
-      revisionTemplate:
-        spec:
-          container:
-            image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display
+  template:
+    spec:
+      containers:
+      - image: gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display
 ---
 apiVersion: ibmcloud.ibm.com/v1alpha1
 kind: Composable
