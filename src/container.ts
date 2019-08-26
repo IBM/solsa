@@ -18,7 +18,12 @@ import { Bundle } from './bundle'
 import { enumerate, dynamic, dictionary, either } from './helpers'
 import { Ingress } from './ingress'
 
-export class ContainerizedService extends Bundle {
+/**
+ * A ContainerizedService is a higher-level abstraction for generating matched
+ * Kubernetes `Deployment` and `Service` resources. A typical usage is to specify
+ * a containerized microservice that is deployed as part of an overall Solution.
+ */
+export class ContainerizedService extends Bundle implements IContainerizedService {
   name: string
   image: string
   env: dynamic
@@ -37,8 +42,10 @@ export class ContainerizedService extends Bundle {
   get readinessProbe () { return either(this._solsa._readinessProbe, this.livenessProbe) }
   set readinessProbe (val) { this._solsa._readinessProbe = val }
 
-  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }:
-    { name: string, image: string, env?: dynamic, port?: number, ports?: { name: string, port: number }[], replicas?: number, labels?: dictionary, annotations?: dictionary, build?: string, main?: string, livenessProbe?: any, readinessProbe?: any, pv?: any }) {
+  /**
+   * Create a ContainerizedService. The properties `name` and `image` are mandatory.
+   */
+  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }: IContainerizedService) {
     super()
     this.name = name
     this.image = image
@@ -177,4 +184,33 @@ export class ContainerizedService extends Bundle {
   getImages () {
     return [{ name: this.image, build: this.build, main: this.main }]
   }
+}
+
+export interface IContainerizedService {
+  /** The name of the microservice */
+  name: string
+  /** The container image that implements the service */
+  image: string
+  /** The environment variable bindings to be defined for the executing container  */
+  env?: dynamic
+  /** If the service exports a single port, its port number. */
+  port?: number
+  /** If the service exports multiple ports, an array of their names and port numbers. */
+  ports?: { name: string, port: number }[]
+  /** The desired number of replicas of the container. */
+  replicas?: number
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources */
+  labels?: dictionary
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources */
+  annotations?: dictionary
+  /** The path to the NodeJS package that implements the service */
+  build?: string
+  /** The name of the entry point to be executed */
+  main?: string
+  /** The readiness probe for the service */
+  readinessProbe?: any // FIXME: Define a more precise type here (complex record).
+  /** The liveness probe for the service */
+  livenessProbe?: any // FIXME: Define a more precise type here (complex record).
+  /** A persistent volume to be created for each replica of the service */
+  pv?: any   // FIXME: Define a more precise type here (complex record).
 }
