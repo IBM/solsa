@@ -119,7 +119,7 @@ function loadConfig (fatal?: boolean) {
       reportError(`No clusters or contexts defined in "${name}"; will only generate base kustomization layer`, fatal)
     }
   } catch (err) {
-    reportError(`Unable to load configuration file "${name}"`, fatal)
+    reportError(`Unable to load solsa configuration file "${name}"`, fatal)
     config = { contexts: [], clusters: [] }
   }
 
@@ -302,13 +302,17 @@ function yamlCommand () {
 
   const config = loadConfig()
 
+  const noKustomizeMsg =
+  `Generating YAML without clutser or context specific layers:
+           Unable to generate Ingress
+           Unable to generate image name rewriting directives`
   if (argv.output) {
     if (config.contexts.length === 0 && config.clusters.length === 0) {
-      reportError('Generating base yaml without kustomization layers')
+      reportError(noKustomizeMsg)
     }
   } else {
     if (!(config.targetContext || config.targetCluster)) {
-      reportError('Generating base yaml without kustomization layer')
+      reportError(noKustomizeMsg)
     }
   }
 
