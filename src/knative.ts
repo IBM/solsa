@@ -125,6 +125,10 @@ export class KnativeSubscription extends Bundle implements IKnativeSubscription 
   subscriber?: IKnativeService
   reply?: IKnativeChannel
 
+  /**
+   * Create a KnativeSubscription. The properties `name` and `channel` and mandatory.
+   * At least one of `subscriber` or `reply` must also be provided.
+   */
   constructor ({ name, channel, subscriber, reply }: IKnativeSubscription) {
     super()
     this.name = name
@@ -189,6 +193,7 @@ export class KafkaSource extends Bundle implements IKafkaSource {
   password: dynamic
   sink: { name: string } & dynamic
 
+  /** Create a KafkaSource. The properties `name`, `bootstrapServers`, `user`, `password` and `sink` and mandatory */
   constructor ({ name, consumerGroup = name, bootstrapServers, topics = name, user, password, sink }: IKafkaSource) {
     super()
     this.name = name
@@ -253,5 +258,6 @@ export interface IKafkaSource {
   user: dynamic
   /** Authentication: password */
   password: dynamic
+  /** Event sink */
   sink: { name: string } & dynamic
 }
