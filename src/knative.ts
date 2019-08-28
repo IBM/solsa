@@ -17,7 +17,10 @@
 import { Bundle } from './bundle'
 import { dynamic, enumerate } from './helpers'
 
-export class KnativeService extends Bundle {
+/**
+ * A Knative Service
+ */
+export class KnativeService extends Bundle implements IKnativeService {
   name: string
   image: string
   env: dynamic
@@ -25,7 +28,10 @@ export class KnativeService extends Bundle {
   main?: string
   ingress: boolean
 
-  constructor ({ name, image, env = {}, build, main, ingress }: { name: string, image: string, env?: dynamic, build?: string, main?: string, ingress?: boolean }) {
+  /**
+   * Create a KnativeService. The properties `name` and `image` are mandatory.
+   */
+  constructor ({ name, image, env = {}, build, main, ingress }: IKnativeService) {
     super()
     this.name = name
     this.image = image
@@ -73,7 +79,108 @@ export class KnativeService extends Bundle {
   }
 }
 
-export class KafkaSource extends Bundle {
+export interface IKnativeService {
+  /** The name of the service */
+  name: string
+  /** The container image that implements the service */
+  image: string
+  /** The environment variable bindings to be defined for the executing container  */
+  env?: dynamic
+  /** The path to the NodeJS package that implements the service */
+  build?: string
+  /** The name of the entry point to be executed */
+  main?: string
+  /** Should external access to the service be provided by defining an Ingress for it? */
+  ingress?: boolean
+}
+
+export class KnativeChannel extends Bundle implements IKnativeChannel {
+  name: String
+
+  /** Create a KNative Channel.  The property `name` is mandatory. */
+  constructor ({ name }: IKnativeChannel) {
+    super()
+    this.name = name
+  }
+
+  getResources () {
+    const obj = {
+      apiVersion: 'eventing.knative.dev/v1alpha1',
+      kind: 'Channel',
+      metadata: {
+        name: this.name
+      }
+    }
+    return [{ obj }]
+  }
+}
+export interface IKnativeChannel {
+  /** The name of the Channel */
+  name: String
+}
+
+export class KnativeSubscription extends Bundle implements IKnativeSubscription {
+  name: String
+  channel: IKnativeChannel
+  subscriber?: IKnativeService
+  reply?: IKnativeChannel
+
+  constructor ({ name, channel, subscriber, reply }: IKnativeSubscription) {
+    super()
+    this.name = name
+    this.channel = channel
+    this.subscriber = subscriber
+    this.reply = reply
+  }
+
+  getResources () {
+    const obj: dynamic = {
+      apiVersion: 'eventing.knative.dev/v1alpha1',
+      kind: 'Subscription',
+      metadata: {
+        name: this.name
+      },
+      spec: {
+        channel: {
+          apiVersion: 'eventing.knative.dev/v1alpha1',
+          kind: 'Channel',
+          name: this.channel.name
+        }
+      }
+    }
+    if (this.subscriber) {
+      obj.spec.subscriber = {
+        ref: {
+          apiVersion: 'serving.knative.dev/v1alpha1',
+          kind: 'Service',
+          name: this.subscriber.name
+        }
+      }
+    }
+    if (this.reply) {
+      obj.spec.reply = {
+        channel: {
+          apiVersion: 'eventing.knative.dev/v1alpha1',
+          kind: 'Channel',
+          name: this.reply.name
+        }
+      }
+    }
+    return [{ obj }]
+  }
+}
+export interface IKnativeSubscription {
+  /** The name of the Subscription */
+  name: String
+  /** The subscribed Channel */
+  channel: IKnativeChannel
+  /** An optional Service to process events on the subscribed Channel */
+  subscriber?: IKnativeService
+  /** An optional output Channel */
+  reply?: IKnativeChannel
+}
+
+export class KafkaSource extends Bundle implements IKafkaSource {
   name: string
   consumerGroup: string
   bootstrapServers: dynamic
@@ -82,7 +189,7 @@ export class KafkaSource extends Bundle {
   password: dynamic
   sink: { name: string } & dynamic
 
-  constructor ({ name, consumerGroup = name, bootstrapServers, topics = name, user, password, sink }: { name: string, consumerGroup?: string, bootstrapServers: dynamic, topics?: string, user: dynamic, password: dynamic, sink: { name: string } & dynamic }) {
+  constructor ({ name, consumerGroup = name, bootstrapServers, topics = name, user, password, sink }: IKafkaSource) {
     super()
     this.name = name
     this.consumerGroup = consumerGroup
@@ -132,4 +239,19 @@ export class KafkaSource extends Bundle {
     }
     return [{ obj }]
   }
+}
+export interface IKafkaSource {
+  /** The name of the Kafka Source */
+  name: string
+  /** The consumer group (optional) */
+  consumerGroup?: string
+  /** The bootstrap servers to connect to */
+  bootstrapServers: dynamic
+  /** The topics to conntect to */
+  topics?: string
+  /** Authentication: username */
+  user: dynamic
+  /** Authentication: password */
+  password: dynamic
+  sink: { name: string } & dynamic
 }
