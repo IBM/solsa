@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Bundle, Resource } from './solution'
 import { KafkaSource } from './knative'
 import { dynamic } from './helpers'
 
 export namespace ibmcloud {
   export namespace v1alpha1 {
-    export class Service extends Bundle {
+    export class Service extends Resource {
       name: string
       serviceClass: string
       plan: string
@@ -61,7 +61,7 @@ export namespace ibmcloud {
       }
     }
 
-    export class Binding extends Bundle {
+    export class Binding extends Resource {
       name: string
       serviceName: string
 
@@ -90,7 +90,7 @@ export namespace ibmcloud {
       }
     }
 
-    export class Topic extends Bundle {
+    export class Topic extends Resource {
       name: string
       bindingFrom: Binding
       topicName: string
@@ -158,7 +158,7 @@ export class CloudService extends Bundle {
   }
 }
 
-class EventStreamsSecret extends Bundle {
+class EventStreamsSecret extends Resource {
   name: String
 
   constructor (name: string) {

@@ -15,4 +15,4 @@
  */
 
 import * as solsa from '..'
-export = new solsa.Resource({ apiVersion: 'v1', kind: 'ThisKind', metadata: { name: 'test' } })
+export = new solsa.KubernetesResource({ apiVersion: 'v1', kind: 'ThisKind', metadata: { name: 'test' } })

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Solsa } from '../bundle'
+import { Solsa } from '../solution'
 import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as minimist from 'minimist'
@@ -174,7 +174,7 @@ function loadApp (): Solsa {
   try {
     const app = require(path.resolve(argv.file))
     if (!(app._solsa)) {
-      reportError(`No bundle exported by "${argv.file}"`, true)
+      reportError(`No solution exported by "${argv.file}"`, true)
     }
     return app._solsa
   } finally {

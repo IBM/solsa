@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Bundle, Resource } from './solution'
 import { dynamic, enumerate } from './helpers'
 
 /**
  * A Knative Service
  */
-export class KnativeService extends Bundle implements IKnativeService {
+export class KnativeService extends Resource implements IKnativeService {
   name: string
   image: string
   env: dynamic
@@ -94,7 +94,7 @@ export interface IKnativeService {
   ingress?: boolean
 }
 
-export class KnativeChannel extends Bundle implements IKnativeChannel {
+export class KnativeChannel extends Resource implements IKnativeChannel {
   name: String
 
   /** Create a KNative Channel.  The property `name` is mandatory. */
@@ -119,7 +119,7 @@ export interface IKnativeChannel {
   name: String
 }
 
-export class KnativeSubscription extends Bundle implements IKnativeSubscription {
+export class KnativeSubscription extends Resource implements IKnativeSubscription {
   name: String
   channel: IKnativeChannel
   subscriber?: IKnativeService
@@ -184,7 +184,7 @@ export interface IKnativeSubscription {
   reply?: IKnativeChannel
 }
 
-export class KafkaSource extends Bundle implements IKafkaSource {
+export class KafkaSource extends Resource implements IKafkaSource {
   name: string
   consumerGroup: string
   bootstrapServers: dynamic

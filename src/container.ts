@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Resource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
 import { Ingress } from './ingress'
 
 /**
  * A ContainerizedService is a higher-level abstraction for generating matched
  * Kubernetes `Deployment` and `Service` resources. A typical usage is to specify
- * a containerized microservice that is deployed as part of an overall Solution.
+ * a containerized microservice that is deployed as part of an overall solution.
  */
-export class ContainerizedService extends Bundle implements IContainerizedService {
+export class ContainerizedService extends Resource implements IContainerizedService {
   name: string
   image: string
   env: dynamic

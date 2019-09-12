@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Resource } from './solution'
 import { either } from './helpers'
 
-export class Ingress extends Bundle {
+export class Ingress extends Resource {
   name: string
   port?: number
 

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Resource } from './solution'
 import { dynamic, enumerate } from './helpers'
 
-export class SchemaTransformer extends Bundle {
+export class SchemaTransformer extends Resource {
   name: string
   code: any
   env: dynamic

@@ -18,14 +18,14 @@
 
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format */
 
-import { Resource } from './bundle'
+import { KubernetesResource } from './solution'
 
 export namespace admissionregistration {
   export namespace v1beta1 {
     /**
      * MutatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and may change the object.
      */
-    export class MutatingWebhookConfiguration extends Resource implements IMutatingWebhookConfiguration {
+    export class MutatingWebhookConfiguration extends KubernetesResource implements IMutatingWebhookConfiguration {
       metadata: meta.v1.ObjectMeta
       webhooks?: admissionregistration.v1beta1.Webhook[]
       /**
@@ -46,7 +46,7 @@ export namespace admissionregistration {
     /**
      * MutatingWebhookConfigurationList is a list of MutatingWebhookConfiguration.
      */
-    export class MutatingWebhookConfigurationList extends Resource implements IMutatingWebhookConfigurationList {
+    export class MutatingWebhookConfigurationList extends KubernetesResource implements IMutatingWebhookConfigurationList {
       items: admissionregistration.v1beta1.MutatingWebhookConfiguration[]
       metadata: meta.v1.ListMeta
       /**
@@ -99,7 +99,7 @@ Depending on the enclosing object, subresources might not be allowed. Required. 
     /**
      * ValidatingWebhookConfiguration describes the configuration of and admission webhook that accept or reject and object without changing it.
      */
-    export class ValidatingWebhookConfiguration extends Resource implements IValidatingWebhookConfiguration {
+    export class ValidatingWebhookConfiguration extends KubernetesResource implements IValidatingWebhookConfiguration {
       metadata: meta.v1.ObjectMeta
       webhooks?: admissionregistration.v1beta1.Webhook[]
       /**
@@ -120,7 +120,7 @@ Depending on the enclosing object, subresources might not be allowed. Required. 
     /**
      * ValidatingWebhookConfigurationList is a list of ValidatingWebhookConfiguration.
      */
-    export class ValidatingWebhookConfigurationList extends Resource implements IValidatingWebhookConfigurationList {
+    export class ValidatingWebhookConfigurationList extends KubernetesResource implements IValidatingWebhookConfigurationList {
       items: admissionregistration.v1beta1.ValidatingWebhookConfiguration[]
       metadata: meta.v1.ListMeta
       /**
@@ -221,7 +221,7 @@ export namespace apps {
     /**
      * ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Resource implements IControllerRevision {
+    export class ControllerRevision extends KubernetesResource implements IControllerRevision {
       data?: misc.runtime.RawExtension
       metadata: meta.v1.ObjectMeta
       revision: number
@@ -246,7 +246,7 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
+    export class ControllerRevisionList extends KubernetesResource implements IControllerRevisionList {
       items: apps.v1.ControllerRevision[]
       metadata: meta.v1.ListMeta
       /**
@@ -267,7 +267,7 @@ export namespace apps {
     /**
      * DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Resource implements IDaemonSet {
+    export class DaemonSet extends KubernetesResource implements IDaemonSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1.DaemonSetSpec
       /**
@@ -303,7 +303,7 @@ export namespace apps {
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Resource implements IDaemonSetList {
+    export class DaemonSetList extends KubernetesResource implements IDaemonSetList {
       items: apps.v1.DaemonSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -373,7 +373,7 @@ export namespace apps {
     /**
      * Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Resource implements IDeployment {
+    export class Deployment extends KubernetesResource implements IDeployment {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1.DeploymentSpec
       /**
@@ -411,7 +411,7 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Resource implements IDeploymentList {
+    export class DeploymentList extends KubernetesResource implements IDeploymentList {
       items: apps.v1.Deployment[]
       metadata: meta.v1.ListMeta
       /**
@@ -483,7 +483,7 @@ export namespace apps {
     /**
      * ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Resource implements IReplicaSet {
+    export class ReplicaSet extends KubernetesResource implements IReplicaSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1.ReplicaSetSpec
       /**
@@ -519,7 +519,7 @@ export namespace apps {
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Resource implements IReplicaSetList {
+    export class ReplicaSetList extends KubernetesResource implements IReplicaSetList {
       items: apps.v1.ReplicaSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -596,7 +596,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Resource implements IStatefulSet {
+    export class StatefulSet extends KubernetesResource implements IStatefulSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1.StatefulSetSpec
       /**
@@ -634,7 +634,7 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Resource implements IStatefulSetList {
+    export class StatefulSetList extends KubernetesResource implements IStatefulSetList {
       items: apps.v1.StatefulSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -708,7 +708,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1beta2/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Resource implements IControllerRevision {
+    export class ControllerRevision extends KubernetesResource implements IControllerRevision {
       data?: misc.runtime.RawExtension
       metadata: meta.v1.ObjectMeta
       revision: number
@@ -733,7 +733,7 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
+    export class ControllerRevisionList extends KubernetesResource implements IControllerRevisionList {
       items: apps.v1beta1.ControllerRevision[]
       metadata: meta.v1.ListMeta
       /**
@@ -754,7 +754,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Resource implements IDeployment {
+    export class Deployment extends KubernetesResource implements IDeployment {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.DeploymentSpec
       /**
@@ -792,7 +792,7 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Resource implements IDeploymentList {
+    export class DeploymentList extends KubernetesResource implements IDeploymentList {
       items: apps.v1beta1.Deployment[]
       metadata: meta.v1.ListMeta
       /**
@@ -813,7 +813,7 @@ export namespace apps {
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
      */
-    export class DeploymentRollback extends Resource implements IDeploymentRollback {
+    export class DeploymentRollback extends KubernetesResource implements IDeploymentRollback {
       name: string
       rollbackTo: apps.v1beta1.RollbackConfig
       updatedAnnotations?: { [k: string]: string }
@@ -914,7 +914,7 @@ export namespace apps {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Resource implements IScale {
+    export class Scale extends KubernetesResource implements IScale {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.ScaleSpec
       /**
@@ -956,7 +956,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Resource implements IStatefulSet {
+    export class StatefulSet extends KubernetesResource implements IStatefulSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta1.StatefulSetSpec
       /**
@@ -994,7 +994,7 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Resource implements IStatefulSetList {
+    export class StatefulSetList extends KubernetesResource implements IStatefulSetList {
       items: apps.v1beta1.StatefulSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -1068,7 +1068,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ControllerRevision is deprecated by apps/v1/ControllerRevision. See the release notes for more information. ControllerRevision implements an immutable snapshot of state data. Clients are responsible for serializing and deserializing the objects that contain their internal state. Once a ControllerRevision has been successfully created, it can not be updated. The API Server will fail validation of all requests that attempt to mutate the Data field. ControllerRevisions may, however, be deleted. Note that, due to its use by both the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However, it may be subject to name and representation changes in future releases, and clients should not depend on its stability. It is primarily for internal use by controllers.
      */
-    export class ControllerRevision extends Resource implements IControllerRevision {
+    export class ControllerRevision extends KubernetesResource implements IControllerRevision {
       data?: misc.runtime.RawExtension
       metadata: meta.v1.ObjectMeta
       revision: number
@@ -1093,7 +1093,7 @@ export namespace apps {
     /**
      * ControllerRevisionList is a resource containing a list of ControllerRevision objects.
      */
-    export class ControllerRevisionList extends Resource implements IControllerRevisionList {
+    export class ControllerRevisionList extends KubernetesResource implements IControllerRevisionList {
       items: apps.v1beta2.ControllerRevision[]
       metadata: meta.v1.ListMeta
       /**
@@ -1114,7 +1114,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Resource implements IDaemonSet {
+    export class DaemonSet extends KubernetesResource implements IDaemonSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.DaemonSetSpec
       /**
@@ -1150,7 +1150,7 @@ export namespace apps {
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Resource implements IDaemonSetList {
+    export class DaemonSetList extends KubernetesResource implements IDaemonSetList {
       items: apps.v1beta2.DaemonSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -1220,7 +1220,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Resource implements IDeployment {
+    export class Deployment extends KubernetesResource implements IDeployment {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.DeploymentSpec
       /**
@@ -1258,7 +1258,7 @@ export namespace apps {
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Resource implements IDeploymentList {
+    export class DeploymentList extends KubernetesResource implements IDeploymentList {
       items: apps.v1beta2.Deployment[]
       metadata: meta.v1.ListMeta
       /**
@@ -1330,7 +1330,7 @@ export namespace apps {
     /**
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Resource implements IReplicaSet {
+    export class ReplicaSet extends KubernetesResource implements IReplicaSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.ReplicaSetSpec
       /**
@@ -1366,7 +1366,7 @@ export namespace apps {
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Resource implements IReplicaSetList {
+    export class ReplicaSetList extends KubernetesResource implements IReplicaSetList {
       items: apps.v1beta2.ReplicaSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -1440,7 +1440,7 @@ export namespace apps {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Resource implements IScale {
+    export class Scale extends KubernetesResource implements IScale {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.ScaleSpec
       /**
@@ -1482,7 +1482,7 @@ export namespace apps {
      *  - Storage: As many VolumeClaims as requested.
      * The StatefulSet guarantees that a given network identity will always map to the same storage identity.
      */
-    export class StatefulSet extends Resource implements IStatefulSet {
+    export class StatefulSet extends KubernetesResource implements IStatefulSet {
       metadata: meta.v1.ObjectMeta
       spec: apps.v1beta2.StatefulSetSpec
       /**
@@ -1520,7 +1520,7 @@ export namespace apps {
     /**
      * StatefulSetList is a collection of StatefulSets.
      */
-    export class StatefulSetList extends Resource implements IStatefulSetList {
+    export class StatefulSetList extends KubernetesResource implements IStatefulSetList {
       items: apps.v1beta2.StatefulSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -1596,7 +1596,7 @@ export namespace auditregistration {
     /**
      * AuditSink represents a cluster level audit sink
      */
-    export class AuditSink extends Resource implements IAuditSink {
+    export class AuditSink extends KubernetesResource implements IAuditSink {
       metadata: meta.v1.ObjectMeta
       spec: auditregistration.v1alpha1.AuditSinkSpec
       /**
@@ -1616,7 +1616,7 @@ export namespace auditregistration {
     /**
      * AuditSinkList is a list of AuditSink items.
      */
-    export class AuditSinkList extends Resource implements IAuditSinkList {
+    export class AuditSinkList extends KubernetesResource implements IAuditSinkList {
       items: auditregistration.v1alpha1.AuditSink[]
       metadata: meta.v1.ListMeta
       /**
@@ -1712,7 +1712,7 @@ export namespace authentication {
     /**
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
-    export class TokenReview extends Resource implements ITokenReview {
+    export class TokenReview extends KubernetesResource implements ITokenReview {
       metadata: meta.v1.ObjectMeta
       spec: authentication.v1.TokenReviewSpec
       /**
@@ -1769,7 +1769,7 @@ export namespace authentication {
     /**
      * TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
      */
-    export class TokenReview extends Resource implements ITokenReview {
+    export class TokenReview extends KubernetesResource implements ITokenReview {
       metadata: meta.v1.ObjectMeta
       spec: authentication.v1beta1.TokenReviewSpec
       /**
@@ -1828,7 +1828,7 @@ export namespace authorization {
     /**
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
-    export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
+    export class LocalSubjectAccessReview extends KubernetesResource implements ILocalSubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
@@ -1899,7 +1899,7 @@ export namespace authorization {
     /**
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
-    export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
+    export class SelfSubjectAccessReview extends KubernetesResource implements ISelfSubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectAccessReviewSpec
       /**
@@ -1928,7 +1928,7 @@ export namespace authorization {
     /**
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
-    export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
+    export class SelfSubjectRulesReview extends KubernetesResource implements ISelfSubjectRulesReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SelfSubjectRulesReviewSpec
       /**
@@ -1952,7 +1952,7 @@ export namespace authorization {
     /**
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
-    export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
+    export class SubjectAccessReview extends KubernetesResource implements ISubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1.SubjectAccessReviewSpec
       /**
@@ -2017,7 +2017,7 @@ export namespace authorization {
     /**
      * LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
      */
-    export class LocalSubjectAccessReview extends Resource implements ILocalSubjectAccessReview {
+    export class LocalSubjectAccessReview extends KubernetesResource implements ILocalSubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
@@ -2088,7 +2088,7 @@ export namespace authorization {
     /**
      * SelfSubjectAccessReview checks whether or the current user can perform an action.  Not filling in a spec.namespace means "in all namespaces".  Self is a special case, because users should always be able to check whether they can perform an action
      */
-    export class SelfSubjectAccessReview extends Resource implements ISelfSubjectAccessReview {
+    export class SelfSubjectAccessReview extends KubernetesResource implements ISelfSubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectAccessReviewSpec
       /**
@@ -2117,7 +2117,7 @@ export namespace authorization {
     /**
      * SelfSubjectRulesReview enumerates the set of actions the current user can perform within a namespace. The returned list of actions may be incomplete depending on the server's authorization mode, and any errors experienced during the evaluation. SelfSubjectRulesReview should be used by UIs to show/hide actions, or to quickly let an end user reason about their permissions. It should NOT Be used by external systems to drive authorization decisions as this raises confused deputy, cache lifetime/revocation, and correctness concerns. SubjectAccessReview, and LocalAccessReview are the correct way to defer authorization decisions to the API server.
      */
-    export class SelfSubjectRulesReview extends Resource implements ISelfSubjectRulesReview {
+    export class SelfSubjectRulesReview extends KubernetesResource implements ISelfSubjectRulesReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SelfSubjectRulesReviewSpec
       /**
@@ -2141,7 +2141,7 @@ export namespace authorization {
     /**
      * SubjectAccessReview checks whether or not a user or group can perform an action.
      */
-    export class SubjectAccessReview extends Resource implements ISubjectAccessReview {
+    export class SubjectAccessReview extends KubernetesResource implements ISubjectAccessReview {
       metadata: meta.v1.ObjectMeta
       spec: authorization.v1beta1.SubjectAccessReviewSpec
       /**
@@ -2219,7 +2219,7 @@ export namespace autoscaling {
     /**
      * configuration of a horizontal pod autoscaler.
      */
-    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends KubernetesResource implements IHorizontalPodAutoscaler {
       metadata: meta.v1.ObjectMeta
       spec: autoscaling.v1.HorizontalPodAutoscalerSpec
       /**
@@ -2240,7 +2240,7 @@ export namespace autoscaling {
     /**
      * list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends KubernetesResource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v1.HorizontalPodAutoscaler[]
       metadata: meta.v1.ListMeta
       /**
@@ -2289,7 +2289,7 @@ export namespace autoscaling {
     /**
      * Scale represents a scaling request for a resource.
      */
-    export class Scale extends Resource implements IScale {
+    export class Scale extends KubernetesResource implements IScale {
       metadata: meta.v1.ObjectMeta
       spec: autoscaling.v1.ScaleSpec
       /**
@@ -2365,7 +2365,7 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
-    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends KubernetesResource implements IHorizontalPodAutoscaler {
       metadata: meta.v1.ObjectMeta
       spec: autoscaling.v2beta1.HorizontalPodAutoscalerSpec
       /**
@@ -2401,7 +2401,7 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is a list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends KubernetesResource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta1.HorizontalPodAutoscaler[]
       metadata: meta.v1.ListMeta
       /**
@@ -2587,7 +2587,7 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscaler is the configuration for a horizontal pod autoscaler, which automatically manages the replica count of any resource implementing the scale subresource based on the metrics specified.
      */
-    export class HorizontalPodAutoscaler extends Resource implements IHorizontalPodAutoscaler {
+    export class HorizontalPodAutoscaler extends KubernetesResource implements IHorizontalPodAutoscaler {
       metadata: meta.v1.ObjectMeta
       spec: autoscaling.v2beta2.HorizontalPodAutoscalerSpec
       /**
@@ -2623,7 +2623,7 @@ export namespace autoscaling {
     /**
      * HorizontalPodAutoscalerList is a list of horizontal pod autoscaler objects.
      */
-    export class HorizontalPodAutoscalerList extends Resource implements IHorizontalPodAutoscalerList {
+    export class HorizontalPodAutoscalerList extends KubernetesResource implements IHorizontalPodAutoscalerList {
       items: autoscaling.v2beta2.HorizontalPodAutoscaler[]
       metadata: meta.v1.ListMeta
       /**
@@ -2797,7 +2797,7 @@ export namespace batch {
     /**
      * Job represents the configuration of a single job.
      */
-    export class Job extends Resource implements IJob {
+    export class Job extends KubernetesResource implements IJob {
       metadata: meta.v1.ObjectMeta
       spec: batch.v1.JobSpec
       /**
@@ -2835,7 +2835,7 @@ export namespace batch {
     /**
      * JobList is a collection of jobs.
      */
-    export class JobList extends Resource implements IJobList {
+    export class JobList extends KubernetesResource implements IJobList {
       items: batch.v1.Job[]
       metadata: meta.v1.ListMeta
       /**
@@ -2896,7 +2896,7 @@ export namespace batch {
     /**
      * CronJob represents the configuration of a single cron job.
      */
-    export class CronJob extends Resource implements ICronJob {
+    export class CronJob extends KubernetesResource implements ICronJob {
       metadata: meta.v1.ObjectMeta
       spec: batch.v1beta1.CronJobSpec
       /**
@@ -2917,7 +2917,7 @@ export namespace batch {
     /**
      * CronJobList is a collection of cron jobs.
      */
-    export class CronJobList extends Resource implements ICronJobList {
+    export class CronJobList extends KubernetesResource implements ICronJobList {
       items: batch.v1beta1.CronJob[]
       metadata: meta.v1.ListMeta
       /**
@@ -2977,7 +2977,7 @@ export namespace batch {
     /**
      * CronJob represents the configuration of a single cron job.
      */
-    export class CronJob extends Resource implements ICronJob {
+    export class CronJob extends KubernetesResource implements ICronJob {
       metadata: meta.v1.ObjectMeta
       spec: batch.v2alpha1.CronJobSpec
       /**
@@ -2998,7 +2998,7 @@ export namespace batch {
     /**
      * CronJobList is a collection of cron jobs.
      */
-    export class CronJobList extends Resource implements ICronJobList {
+    export class CronJobList extends KubernetesResource implements ICronJobList {
       items: batch.v2alpha1.CronJob[]
       metadata: meta.v1.ListMeta
       /**
@@ -3060,7 +3060,7 @@ export namespace certificates {
     /**
      * Describes a certificate signing request
      */
-    export class CertificateSigningRequest extends Resource implements ICertificateSigningRequest {
+    export class CertificateSigningRequest extends KubernetesResource implements ICertificateSigningRequest {
       metadata: meta.v1.ObjectMeta
       spec: certificates.v1beta1.CertificateSigningRequestSpec
       /**
@@ -3087,7 +3087,7 @@ export namespace certificates {
       /** request approval state, currently Approved or Denied. */
       type: string
     }
-    export class CertificateSigningRequestList extends Resource implements ICertificateSigningRequestList {
+    export class CertificateSigningRequestList extends KubernetesResource implements ICertificateSigningRequestList {
       items: certificates.v1beta1.CertificateSigningRequest[]
       metadata: meta.v1.ListMeta
       constructor (properties: ICertificateSigningRequestList) {
@@ -3131,7 +3131,7 @@ export namespace coordination {
     /**
      * Lease defines a lease concept.
      */
-    export class Lease extends Resource implements ILease {
+    export class Lease extends KubernetesResource implements ILease {
       metadata: meta.v1.ObjectMeta
       spec: coordination.v1.LeaseSpec
       /**
@@ -3152,7 +3152,7 @@ export namespace coordination {
     /**
      * LeaseList is a list of Lease objects.
      */
-    export class LeaseList extends Resource implements ILeaseList {
+    export class LeaseList extends KubernetesResource implements ILeaseList {
       items: coordination.v1.Lease[]
       metadata: meta.v1.ListMeta
       /**
@@ -3190,7 +3190,7 @@ export namespace coordination {
     /**
      * Lease defines a lease concept.
      */
-    export class Lease extends Resource implements ILease {
+    export class Lease extends KubernetesResource implements ILease {
       metadata: meta.v1.ObjectMeta
       spec: coordination.v1beta1.LeaseSpec
       /**
@@ -3211,7 +3211,7 @@ export namespace coordination {
     /**
      * LeaseList is a list of Lease objects.
      */
-    export class LeaseList extends Resource implements ILeaseList {
+    export class LeaseList extends KubernetesResource implements ILeaseList {
       items: coordination.v1beta1.Lease[]
       metadata: meta.v1.ListMeta
       /**
@@ -3327,7 +3327,7 @@ export namespace core {
     /**
      * Binding ties one object to another; for example, a pod is bound to a node by a scheduler. Deprecated in 1.7, please use the bindings subresource of pods instead.
      */
-    export class Binding extends Resource implements IBinding {
+    export class Binding extends KubernetesResource implements IBinding {
       metadata: meta.v1.ObjectMeta
       target: core.v1.ObjectReference
       /**
@@ -3473,7 +3473,7 @@ export namespace core {
     /**
      * ComponentStatus (and ComponentStatusList) holds the cluster validation info.
      */
-    export class ComponentStatus extends Resource implements IComponentStatus {
+    export class ComponentStatus extends KubernetesResource implements IComponentStatus {
       conditions?: core.v1.ComponentCondition[]
       metadata: meta.v1.ObjectMeta
       /**
@@ -3494,7 +3494,7 @@ export namespace core {
     /**
      * Status of all the conditions for the component as a list of ComponentStatus objects.
      */
-    export class ComponentStatusList extends Resource implements IComponentStatusList {
+    export class ComponentStatusList extends KubernetesResource implements IComponentStatusList {
       items: core.v1.ComponentStatus[]
       metadata: meta.v1.ListMeta
       /**
@@ -3515,7 +3515,7 @@ export namespace core {
     /**
      * ConfigMap holds configuration data for pods to consume.
      */
-    export class ConfigMap extends Resource implements IConfigMap {
+    export class ConfigMap extends KubernetesResource implements IConfigMap {
       binaryData?: { [k: string]: string }
       data?: { [k: string]: string }
       metadata: meta.v1.ObjectMeta
@@ -3562,7 +3562,7 @@ export namespace core {
     /**
      * ConfigMapList is a resource containing a list of ConfigMap objects.
      */
-    export class ConfigMapList extends Resource implements IConfigMapList {
+    export class ConfigMapList extends KubernetesResource implements IConfigMapList {
       items: core.v1.ConfigMap[]
       metadata: meta.v1.ListMeta
       /**
@@ -3862,7 +3862,7 @@ export namespace core {
      *     },
      *  ]
      */
-    export class Endpoints extends Resource implements IEndpoints {
+    export class Endpoints extends KubernetesResource implements IEndpoints {
       metadata: meta.v1.ObjectMeta
       subsets?: core.v1.EndpointSubset[]
       /**
@@ -3894,7 +3894,7 @@ export namespace core {
     /**
      * EndpointsList is a list of endpoints.
      */
-    export class EndpointsList extends Resource implements IEndpointsList {
+    export class EndpointsList extends KubernetesResource implements IEndpointsList {
       items: core.v1.Endpoints[]
       metadata: meta.v1.ListMeta
       /**
@@ -3950,7 +3950,7 @@ export namespace core {
     /**
      * Event is a report of an event somewhere in the cluster.
      */
-    export class Event extends Resource implements IEvent {
+    export class Event extends KubernetesResource implements IEvent {
       action?: string
       count?: number
       eventTime?: meta.v1.MicroTime
@@ -4023,7 +4023,7 @@ export namespace core {
     /**
      * EventList is a list of events.
      */
-    export class EventList extends Resource implements IEventList {
+    export class EventList extends KubernetesResource implements IEventList {
       items: core.v1.Event[]
       metadata: meta.v1.ListMeta
       /**
@@ -4304,7 +4304,7 @@ export namespace core {
     /**
      * LimitRange sets resource usage limits for each kind of resource in a Namespace.
      */
-    export class LimitRange extends Resource implements ILimitRange {
+    export class LimitRange extends KubernetesResource implements ILimitRange {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.LimitRangeSpec
       /**
@@ -4342,7 +4342,7 @@ export namespace core {
     /**
      * LimitRangeList is a list of LimitRange items.
      */
-    export class LimitRangeList extends Resource implements ILimitRangeList {
+    export class LimitRangeList extends KubernetesResource implements ILimitRangeList {
       items: core.v1.LimitRange[]
       metadata: meta.v1.ListMeta
       /**
@@ -4413,7 +4413,7 @@ export namespace core {
     /**
      * Namespace provides a scope for Names. Use of multiple namespaces is optional.
      */
-    export class Namespace extends Resource implements INamespace {
+    export class Namespace extends KubernetesResource implements INamespace {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.NamespaceSpec
       /**
@@ -4434,7 +4434,7 @@ export namespace core {
     /**
      * NamespaceList is a list of Namespaces.
      */
-    export class NamespaceList extends Resource implements INamespaceList {
+    export class NamespaceList extends KubernetesResource implements INamespaceList {
       items: core.v1.Namespace[]
       metadata: meta.v1.ListMeta
       /**
@@ -4469,7 +4469,7 @@ export namespace core {
     /**
      * Node is a worker node in Kubernetes. Each node will have a unique identifier in the cache (i.e. in etcd).
      */
-    export class Node extends Resource implements INode {
+    export class Node extends KubernetesResource implements INode {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.NodeSpec
       /**
@@ -4552,7 +4552,7 @@ export namespace core {
     /**
      * NodeList is the whole list of all Nodes which have been registered with master.
      */
-    export class NodeList extends Resource implements INodeList {
+    export class NodeList extends KubernetesResource implements INodeList {
       items: core.v1.Node[]
       metadata: meta.v1.ListMeta
       /**
@@ -4697,7 +4697,7 @@ export namespace core {
     /**
      * PersistentVolume (PV) is a storage resource provisioned by an administrator. It is analogous to a node. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
      */
-    export class PersistentVolume extends Resource implements IPersistentVolume {
+    export class PersistentVolume extends KubernetesResource implements IPersistentVolume {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.PersistentVolumeSpec
       /**
@@ -4718,7 +4718,7 @@ export namespace core {
     /**
      * PersistentVolumeClaim is a user's request for and claim to a persistent volume
      */
-    export class PersistentVolumeClaim extends Resource implements IPersistentVolumeClaim {
+    export class PersistentVolumeClaim extends KubernetesResource implements IPersistentVolumeClaim {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.PersistentVolumeClaimSpec
       /**
@@ -4754,7 +4754,7 @@ export namespace core {
     /**
      * PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
      */
-    export class PersistentVolumeClaimList extends Resource implements IPersistentVolumeClaimList {
+    export class PersistentVolumeClaimList extends KubernetesResource implements IPersistentVolumeClaimList {
       items: core.v1.PersistentVolumeClaim[]
       metadata: meta.v1.ListMeta
       /**
@@ -4816,7 +4816,7 @@ export namespace core {
     /**
      * PersistentVolumeList is a list of PersistentVolume items.
      */
-    export class PersistentVolumeList extends Resource implements IPersistentVolumeList {
+    export class PersistentVolumeList extends KubernetesResource implements IPersistentVolumeList {
       items: core.v1.PersistentVolume[]
       metadata: meta.v1.ListMeta
       /**
@@ -4922,7 +4922,7 @@ export namespace core {
     /**
      * Pod is a collection of containers that can run on a host. This resource is created by clients and scheduled onto hosts.
      */
-    export class Pod extends Resource implements IPod {
+    export class Pod extends KubernetesResource implements IPod {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.PodSpec
       /**
@@ -5008,7 +5008,7 @@ export namespace core {
     /**
      * PodList is a list of Pods.
      */
-    export class PodList extends Resource implements IPodList {
+    export class PodList extends KubernetesResource implements IPodList {
       items: core.v1.Pod[]
       metadata: meta.v1.ListMeta
       /**
@@ -5155,7 +5155,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * PodTemplate describes a template for creating copies of a predefined pod.
      */
-    export class PodTemplate extends Resource implements IPodTemplate {
+    export class PodTemplate extends KubernetesResource implements IPodTemplate {
       metadata: meta.v1.ObjectMeta
       template?: core.v1.PodTemplateSpec
       /**
@@ -5176,7 +5176,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * PodTemplateList is a list of PodTemplates.
      */
-    export class PodTemplateList extends Resource implements IPodTemplateList {
+    export class PodTemplateList extends KubernetesResource implements IPodTemplateList {
       items: core.v1.PodTemplate[]
       metadata: meta.v1.ListMeta
       /**
@@ -5315,7 +5315,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ReplicationController represents the configuration of a replication controller.
      */
-    export class ReplicationController extends Resource implements IReplicationController {
+    export class ReplicationController extends KubernetesResource implements IReplicationController {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.ReplicationControllerSpec
       /**
@@ -5351,7 +5351,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ReplicationControllerList is a collection of replication controllers.
      */
-    export class ReplicationControllerList extends Resource implements IReplicationControllerList {
+    export class ReplicationControllerList extends KubernetesResource implements IReplicationControllerList {
       items: core.v1.ReplicationController[]
       metadata: meta.v1.ListMeta
       /**
@@ -5413,7 +5413,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ResourceQuota sets aggregate quota restrictions enforced per namespace
      */
-    export class ResourceQuota extends Resource implements IResourceQuota {
+    export class ResourceQuota extends KubernetesResource implements IResourceQuota {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.ResourceQuotaSpec
       /**
@@ -5434,7 +5434,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ResourceQuotaList is a list of ResourceQuota items.
      */
-    export class ResourceQuotaList extends Resource implements IResourceQuotaList {
+    export class ResourceQuotaList extends KubernetesResource implements IResourceQuotaList {
       items: core.v1.ResourceQuota[]
       metadata: meta.v1.ListMeta
       /**
@@ -5565,7 +5565,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * Secret holds secret data of a certain type. The total bytes of the values in the Data field must be less than MaxSecretSize bytes.
      */
-    export class Secret extends Resource implements ISecret {
+    export class Secret extends KubernetesResource implements ISecret {
       data?: { [k: string]: string }
       metadata: meta.v1.ObjectMeta
       stringData?: { [k: string]: string }
@@ -5616,7 +5616,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * SecretList is a list of Secret.
      */
-    export class SecretList extends Resource implements ISecretList {
+    export class SecretList extends KubernetesResource implements ISecretList {
       items: core.v1.Secret[]
       metadata: meta.v1.ListMeta
       /**
@@ -5697,7 +5697,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * Service is a named abstraction of software service (for example, mysql) consisting of local port (for example 3306) that the proxy listens on, and the selector that determines which pods will answer requests sent through the proxy.
      */
-    export class Service extends Resource implements IService {
+    export class Service extends KubernetesResource implements IService {
       metadata: meta.v1.ObjectMeta
       spec: core.v1.ServiceSpec
       /**
@@ -5718,7 +5718,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceAccount binds together: * a name, understood by users, and perhaps by peripheral systems, for an identity * a principal that can be authenticated and authorized * a set of secrets
      */
-    export class ServiceAccount extends Resource implements IServiceAccount {
+    export class ServiceAccount extends KubernetesResource implements IServiceAccount {
       automountServiceAccountToken?: boolean
       imagePullSecrets?: core.v1.LocalObjectReference[]
       metadata: meta.v1.ObjectMeta
@@ -5747,7 +5747,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceAccountList is a list of ServiceAccount objects
      */
-    export class ServiceAccountList extends Resource implements IServiceAccountList {
+    export class ServiceAccountList extends KubernetesResource implements IServiceAccountList {
       items: core.v1.ServiceAccount[]
       metadata: meta.v1.ListMeta
       /**
@@ -5779,7 +5779,7 @@ More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-
     /**
      * ServiceList holds a list of services.
      */
-    export class ServiceList extends Resource implements IServiceList {
+    export class ServiceList extends KubernetesResource implements IServiceList {
       items: core.v1.Service[]
       metadata: meta.v1.ListMeta
       /**
@@ -6098,7 +6098,7 @@ export namespace events {
     /**
      * Event is a report of an event somewhere in the cluster. It generally denotes some state change in the system.
      */
-    export class Event extends Resource implements IEvent {
+    export class Event extends KubernetesResource implements IEvent {
       action?: string
       deprecatedCount?: number
       deprecatedFirstTimestamp?: meta.v1.Time
@@ -6170,7 +6170,7 @@ export namespace events {
     /**
      * EventList is a list of Event objects.
      */
-    export class EventList extends Resource implements IEventList {
+    export class EventList extends KubernetesResource implements IEventList {
       items: events.v1beta1.Event[]
       metadata: meta.v1.ListMeta
       /**
@@ -6231,7 +6231,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for more information. DaemonSet represents the configuration of a daemon set.
      */
-    export class DaemonSet extends Resource implements IDaemonSet {
+    export class DaemonSet extends KubernetesResource implements IDaemonSet {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.DaemonSetSpec
       /**
@@ -6267,7 +6267,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DaemonSetList is a collection of daemon sets.
      */
-    export class DaemonSetList extends Resource implements IDaemonSetList {
+    export class DaemonSetList extends KubernetesResource implements IDaemonSetList {
       items: extensions.v1beta1.DaemonSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -6336,7 +6336,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for more information. Deployment enables declarative updates for Pods and ReplicaSets.
      */
-    export class Deployment extends Resource implements IDeployment {
+    export class Deployment extends KubernetesResource implements IDeployment {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.DeploymentSpec
       /**
@@ -6374,7 +6374,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DeploymentList is a list of Deployments.
      */
-    export class DeploymentList extends Resource implements IDeploymentList {
+    export class DeploymentList extends KubernetesResource implements IDeploymentList {
       items: extensions.v1beta1.Deployment[]
       metadata: meta.v1.ListMeta
       /**
@@ -6395,7 +6395,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * DEPRECATED. DeploymentRollback stores the information required to rollback a deployment.
      */
-    export class DeploymentRollback extends Resource implements IDeploymentRollback {
+    export class DeploymentRollback extends KubernetesResource implements IDeploymentRollback {
       name: string
       rollbackTo: extensions.v1beta1.RollbackConfig
       updatedAnnotations?: { [k: string]: string }
@@ -6525,7 +6525,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc. DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
      */
-    export class Ingress extends Resource implements IIngress {
+    export class Ingress extends KubernetesResource implements IIngress {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.IngressSpec
       /**
@@ -6555,7 +6555,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * IngressList is a collection of Ingress.
      */
-    export class IngressList extends Resource implements IIngressList {
+    export class IngressList extends KubernetesResource implements IIngressList {
       items: extensions.v1beta1.Ingress[]
       metadata: meta.v1.ListMeta
       /**
@@ -6616,7 +6616,7 @@ Both these may change in the future. Incoming requests are matched against the h
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy. NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
-    export class NetworkPolicy extends Resource implements INetworkPolicy {
+    export class NetworkPolicy extends KubernetesResource implements INetworkPolicy {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.NetworkPolicySpec
       /**
@@ -6655,7 +6655,7 @@ Both these may change in the future. Incoming requests are matched against the h
     /**
      * DEPRECATED 1.9 - This group version of NetworkPolicyList is deprecated by networking/v1/NetworkPolicyList. Network Policy List is a list of NetworkPolicy objects.
      */
-    export class NetworkPolicyList extends Resource implements INetworkPolicyList {
+    export class NetworkPolicyList extends KubernetesResource implements INetworkPolicyList {
       items: extensions.v1beta1.NetworkPolicy[]
       metadata: meta.v1.ListMeta
       /**
@@ -6713,7 +6713,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container. Deprecated: use PodSecurityPolicy from policy API Group instead.
      */
-    export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
+    export class PodSecurityPolicy extends KubernetesResource implements IPodSecurityPolicy {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.PodSecurityPolicySpec
       /**
@@ -6734,7 +6734,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * PodSecurityPolicyList is a list of PodSecurityPolicy objects. Deprecated: use PodSecurityPolicyList from policy API Group instead.
      */
-    export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
+    export class PodSecurityPolicyList extends KubernetesResource implements IPodSecurityPolicyList {
       items: extensions.v1beta1.PodSecurityPolicy[]
       metadata: meta.v1.ListMeta
       /**
@@ -6810,7 +6810,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for more information. ReplicaSet ensures that a specified number of pod replicas are running at any given time.
      */
-    export class ReplicaSet extends Resource implements IReplicaSet {
+    export class ReplicaSet extends KubernetesResource implements IReplicaSet {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.ReplicaSetSpec
       /**
@@ -6846,7 +6846,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * ReplicaSetList is a collection of ReplicaSets.
      */
-    export class ReplicaSetList extends Resource implements IReplicaSetList {
+    export class ReplicaSetList extends KubernetesResource implements IReplicaSetList {
       items: extensions.v1beta1.ReplicaSet[]
       metadata: meta.v1.ListMeta
       /**
@@ -6947,7 +6947,7 @@ Examples: e.g. "foo/*" forbids "foo/bar", "foo/baz", etc. e.g. "foo.*" forbids "
     /**
      * represents a scaling request for a resource.
      */
-    export class Scale extends Resource implements IScale {
+    export class Scale extends KubernetesResource implements IScale {
       metadata: meta.v1.ObjectMeta
       spec: extensions.v1beta1.ScaleSpec
       /**
@@ -7008,7 +7008,7 @@ export namespace networking {
     /**
      * NetworkPolicy describes what network traffic is allowed for a set of Pods
      */
-    export class NetworkPolicy extends Resource implements INetworkPolicy {
+    export class NetworkPolicy extends KubernetesResource implements INetworkPolicy {
       metadata: meta.v1.ObjectMeta
       spec: networking.v1.NetworkPolicySpec
       /**
@@ -7047,7 +7047,7 @@ export namespace networking {
     /**
      * NetworkPolicyList is a list of NetworkPolicy objects.
      */
-    export class NetworkPolicyList extends Resource implements INetworkPolicyList {
+    export class NetworkPolicyList extends KubernetesResource implements INetworkPolicyList {
       items: networking.v1.NetworkPolicy[]
       metadata: meta.v1.ListMeta
       /**
@@ -7123,7 +7123,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
      */
-    export class Ingress extends Resource implements IIngress {
+    export class Ingress extends KubernetesResource implements IIngress {
       metadata: meta.v1.ObjectMeta
       spec: networking.v1beta1.IngressSpec
       /**
@@ -7153,7 +7153,7 @@ If NamespaceSelector is also set, then the NetworkPolicyPeer as a whole selects 
     /**
      * IngressList is a collection of Ingress.
      */
-    export class IngressList extends Resource implements IIngressList {
+    export class IngressList extends KubernetesResource implements IIngressList {
       items: networking.v1beta1.Ingress[]
       metadata: meta.v1.ListMeta
       /**
@@ -7218,7 +7218,7 @@ export namespace node {
     /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
-    export class RuntimeClass extends Resource implements IRuntimeClass {
+    export class RuntimeClass extends KubernetesResource implements IRuntimeClass {
       metadata: meta.v1.ObjectMeta
       spec: node.v1alpha1.RuntimeClassSpec
       /**
@@ -7239,7 +7239,7 @@ export namespace node {
     /**
      * RuntimeClassList is a list of RuntimeClass objects.
      */
-    export class RuntimeClassList extends Resource implements IRuntimeClassList {
+    export class RuntimeClassList extends KubernetesResource implements IRuntimeClassList {
       items: node.v1alpha1.RuntimeClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -7269,7 +7269,7 @@ export namespace node {
     /**
      * RuntimeClass defines a class of container runtime supported in the cluster. The RuntimeClass is used to determine which container runtime is used to run all containers in a pod. RuntimeClasses are (currently) manually defined by a user or cluster provisioner, and referenced in the PodSpec. The Kubelet is responsible for resolving the RuntimeClassName reference before running the pod.  For more details, see https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
      */
-    export class RuntimeClass extends Resource implements IRuntimeClass {
+    export class RuntimeClass extends KubernetesResource implements IRuntimeClass {
       handler: string
       metadata: meta.v1.ObjectMeta
       /**
@@ -7290,7 +7290,7 @@ export namespace node {
     /**
      * RuntimeClassList is a list of RuntimeClass objects.
      */
-    export class RuntimeClassList extends Resource implements IRuntimeClassList {
+    export class RuntimeClassList extends KubernetesResource implements IRuntimeClassList {
       items: node.v1beta1.RuntimeClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -7340,7 +7340,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * Eviction evicts a pod from its node subject to certain policies and safety constraints. This is a subresource of Pod.  A request to cause such an eviction is created by POSTing to .../pods/<pod name>/evictions.
      */
-    export class Eviction extends Resource implements IEviction {
+    export class Eviction extends KubernetesResource implements IEviction {
       deleteOptions?: meta.v1.DeleteOptions
       metadata: meta.v1.ObjectMeta
       /**
@@ -7388,7 +7388,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
      */
-    export class PodDisruptionBudget extends Resource implements IPodDisruptionBudget {
+    export class PodDisruptionBudget extends KubernetesResource implements IPodDisruptionBudget {
       metadata: meta.v1.ObjectMeta
       spec: policy.v1beta1.PodDisruptionBudgetSpec
       /**
@@ -7408,7 +7408,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodDisruptionBudgetList is a collection of PodDisruptionBudgets.
      */
-    export class PodDisruptionBudgetList extends Resource implements IPodDisruptionBudgetList {
+    export class PodDisruptionBudgetList extends KubernetesResource implements IPodDisruptionBudgetList {
       items: policy.v1beta1.PodDisruptionBudget[]
       metadata: meta.v1.ListMeta
       /**
@@ -7455,7 +7455,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodSecurityPolicy governs the ability to make requests that affect the Security Context that will be applied to a pod and container.
      */
-    export class PodSecurityPolicy extends Resource implements IPodSecurityPolicy {
+    export class PodSecurityPolicy extends KubernetesResource implements IPodSecurityPolicy {
       metadata: meta.v1.ObjectMeta
       spec: policy.v1beta1.PodSecurityPolicySpec
       /**
@@ -7476,7 +7476,7 @@ Examples: `/foo` would allow `/foo`, `/foo/` and `/foo/bar` `/foo` would not all
     /**
      * PodSecurityPolicyList is a list of PodSecurityPolicy objects.
      */
-    export class PodSecurityPolicyList extends Resource implements IPodSecurityPolicyList {
+    export class PodSecurityPolicyList extends KubernetesResource implements IPodSecurityPolicyList {
       items: policy.v1beta1.PodSecurityPolicy[]
       metadata: meta.v1.ListMeta
       /**
@@ -7599,7 +7599,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Resource implements IClusterRole {
+    export class ClusterRole extends KubernetesResource implements IClusterRole {
       aggregationRule?: rbac.v1.AggregationRule
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
@@ -7624,7 +7624,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends KubernetesResource implements IClusterRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
@@ -7649,7 +7649,7 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends KubernetesResource implements IClusterRoleBindingList {
       items: rbac.v1.ClusterRoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -7670,7 +7670,7 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Resource implements IClusterRoleList {
+    export class ClusterRoleList extends KubernetesResource implements IClusterRoleList {
       items: rbac.v1.ClusterRole[]
       metadata: meta.v1.ListMeta
       /**
@@ -7706,7 +7706,7 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Resource implements IRole {
+    export class Role extends KubernetesResource implements IRole {
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1.PolicyRule[]
       /**
@@ -7727,7 +7727,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Resource implements IRoleBinding {
+    export class RoleBinding extends KubernetesResource implements IRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1.RoleRef
       subjects?: rbac.v1.Subject[]
@@ -7752,7 +7752,7 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Resource implements IRoleBindingList {
+    export class RoleBindingList extends KubernetesResource implements IRoleBindingList {
       items: rbac.v1.RoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -7773,7 +7773,7 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Resource implements IRoleList {
+    export class RoleList extends KubernetesResource implements IRoleList {
       items: rbac.v1.Role[]
       metadata: meta.v1.ListMeta
       /**
@@ -7827,7 +7827,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Resource implements IClusterRole {
+    export class ClusterRole extends KubernetesResource implements IClusterRole {
       aggregationRule?: rbac.v1alpha1.AggregationRule
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
@@ -7852,7 +7852,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends KubernetesResource implements IClusterRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
@@ -7877,7 +7877,7 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends KubernetesResource implements IClusterRoleBindingList {
       items: rbac.v1alpha1.ClusterRoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -7898,7 +7898,7 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Resource implements IClusterRoleList {
+    export class ClusterRoleList extends KubernetesResource implements IClusterRoleList {
       items: rbac.v1alpha1.ClusterRole[]
       metadata: meta.v1.ListMeta
       /**
@@ -7934,7 +7934,7 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Resource implements IRole {
+    export class Role extends KubernetesResource implements IRole {
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1alpha1.PolicyRule[]
       /**
@@ -7955,7 +7955,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Resource implements IRoleBinding {
+    export class RoleBinding extends KubernetesResource implements IRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1alpha1.RoleRef
       subjects?: rbac.v1alpha1.Subject[]
@@ -7980,7 +7980,7 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Resource implements IRoleBindingList {
+    export class RoleBindingList extends KubernetesResource implements IRoleBindingList {
       items: rbac.v1alpha1.RoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -8001,7 +8001,7 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Resource implements IRoleList {
+    export class RoleList extends KubernetesResource implements IRoleList {
       items: rbac.v1alpha1.Role[]
       metadata: meta.v1.ListMeta
       /**
@@ -8055,7 +8055,7 @@ export namespace rbac {
     /**
      * ClusterRole is a cluster level, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding or ClusterRoleBinding.
      */
-    export class ClusterRole extends Resource implements IClusterRole {
+    export class ClusterRole extends KubernetesResource implements IClusterRole {
       aggregationRule?: rbac.v1beta1.AggregationRule
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
@@ -8080,7 +8080,7 @@ export namespace rbac {
     /**
      * ClusterRoleBinding references a ClusterRole, but not contain it.  It can reference a ClusterRole in the global namespace, and adds who information via Subject.
      */
-    export class ClusterRoleBinding extends Resource implements IClusterRoleBinding {
+    export class ClusterRoleBinding extends KubernetesResource implements IClusterRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
@@ -8105,7 +8105,7 @@ export namespace rbac {
     /**
      * ClusterRoleBindingList is a collection of ClusterRoleBindings
      */
-    export class ClusterRoleBindingList extends Resource implements IClusterRoleBindingList {
+    export class ClusterRoleBindingList extends KubernetesResource implements IClusterRoleBindingList {
       items: rbac.v1beta1.ClusterRoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -8126,7 +8126,7 @@ export namespace rbac {
     /**
      * ClusterRoleList is a collection of ClusterRoles
      */
-    export class ClusterRoleList extends Resource implements IClusterRoleList {
+    export class ClusterRoleList extends KubernetesResource implements IClusterRoleList {
       items: rbac.v1beta1.ClusterRole[]
       metadata: meta.v1.ListMeta
       /**
@@ -8162,7 +8162,7 @@ export namespace rbac {
     /**
      * Role is a namespaced, logical grouping of PolicyRules that can be referenced as a unit by a RoleBinding.
      */
-    export class Role extends Resource implements IRole {
+    export class Role extends KubernetesResource implements IRole {
       metadata: meta.v1.ObjectMeta
       rules?: rbac.v1beta1.PolicyRule[]
       /**
@@ -8183,7 +8183,7 @@ export namespace rbac {
     /**
      * RoleBinding references a role, but does not contain it.  It can reference a Role in the same namespace or a ClusterRole in the global namespace. It adds who information via Subjects and namespace information by which namespace it exists in.  RoleBindings in a given namespace only have effect in that namespace.
      */
-    export class RoleBinding extends Resource implements IRoleBinding {
+    export class RoleBinding extends KubernetesResource implements IRoleBinding {
       metadata: meta.v1.ObjectMeta
       roleRef: rbac.v1beta1.RoleRef
       subjects?: rbac.v1beta1.Subject[]
@@ -8208,7 +8208,7 @@ export namespace rbac {
     /**
      * RoleBindingList is a collection of RoleBindings
      */
-    export class RoleBindingList extends Resource implements IRoleBindingList {
+    export class RoleBindingList extends KubernetesResource implements IRoleBindingList {
       items: rbac.v1beta1.RoleBinding[]
       metadata: meta.v1.ListMeta
       /**
@@ -8229,7 +8229,7 @@ export namespace rbac {
     /**
      * RoleList is a collection of Roles
      */
-    export class RoleList extends Resource implements IRoleList {
+    export class RoleList extends KubernetesResource implements IRoleList {
       items: rbac.v1beta1.Role[]
       metadata: meta.v1.ListMeta
       /**
@@ -8278,7 +8278,7 @@ export namespace scheduling {
     /**
      * PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Resource implements IPriorityClass {
+    export class PriorityClass extends KubernetesResource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: meta.v1.ObjectMeta
@@ -8307,7 +8307,7 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Resource implements IPriorityClassList {
+    export class PriorityClassList extends KubernetesResource implements IPriorityClassList {
       items: scheduling.v1.PriorityClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -8330,7 +8330,7 @@ export namespace scheduling {
     /**
      * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Resource implements IPriorityClass {
+    export class PriorityClass extends KubernetesResource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: meta.v1.ObjectMeta
@@ -8359,7 +8359,7 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Resource implements IPriorityClassList {
+    export class PriorityClassList extends KubernetesResource implements IPriorityClassList {
       items: scheduling.v1alpha1.PriorityClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -8382,7 +8382,7 @@ export namespace scheduling {
     /**
      * DEPRECATED - This group version of PriorityClass is deprecated by scheduling.k8s.io/v1/PriorityClass. PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
      */
-    export class PriorityClass extends Resource implements IPriorityClass {
+    export class PriorityClass extends KubernetesResource implements IPriorityClass {
       description?: string
       globalDefault?: boolean
       metadata: meta.v1.ObjectMeta
@@ -8411,7 +8411,7 @@ export namespace scheduling {
     /**
      * PriorityClassList is a collection of priority classes.
      */
-    export class PriorityClassList extends Resource implements IPriorityClassList {
+    export class PriorityClassList extends KubernetesResource implements IPriorityClassList {
       items: scheduling.v1beta1.PriorityClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -8436,7 +8436,7 @@ export namespace settings {
     /**
      * PodPreset is a policy resource that defines additional runtime requirements for a Pod.
      */
-    export class PodPreset extends Resource implements IPodPreset {
+    export class PodPreset extends KubernetesResource implements IPodPreset {
       metadata: meta.v1.ObjectMeta
       spec: settings.v1alpha1.PodPresetSpec
       /**
@@ -8455,7 +8455,7 @@ export namespace settings {
     /**
      * PodPresetList is a list of PodPreset objects.
      */
-    export class PodPresetList extends Resource implements IPodPresetList {
+    export class PodPresetList extends KubernetesResource implements IPodPresetList {
       items: settings.v1alpha1.PodPreset[]
       metadata: meta.v1.ListMeta
       /**
@@ -8497,7 +8497,7 @@ export namespace storage {
      *
      * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
      */
-    export class StorageClass extends Resource implements IStorageClass {
+    export class StorageClass extends KubernetesResource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       metadata: meta.v1.ObjectMeta
@@ -8544,7 +8544,7 @@ export namespace storage {
     /**
      * StorageClassList is a collection of storage classes.
      */
-    export class StorageClassList extends Resource implements IStorageClassList {
+    export class StorageClassList extends KubernetesResource implements IStorageClassList {
       items: storage.v1.StorageClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -8567,7 +8567,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Resource implements IVolumeAttachment {
+    export class VolumeAttachment extends KubernetesResource implements IVolumeAttachment {
       metadata: meta.v1.ObjectMeta
       spec: storage.v1.VolumeAttachmentSpec
       /**
@@ -8590,7 +8590,7 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends KubernetesResource implements IVolumeAttachmentList {
       items: storage.v1.VolumeAttachment[]
       metadata: meta.v1.ListMeta
       /**
@@ -8655,7 +8655,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Resource implements IVolumeAttachment {
+    export class VolumeAttachment extends KubernetesResource implements IVolumeAttachment {
       metadata: meta.v1.ObjectMeta
       spec: storage.v1alpha1.VolumeAttachmentSpec
       /**
@@ -8678,7 +8678,7 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends KubernetesResource implements IVolumeAttachmentList {
       items: storage.v1alpha1.VolumeAttachment[]
       metadata: meta.v1.ListMeta
       /**
@@ -8741,7 +8741,7 @@ export namespace storage {
     /**
      * CSIDriver captures information about a Container Storage Interface (CSI) volume driver deployed on the cluster. CSI drivers do not need to create the CSIDriver object directly. Instead they may use the cluster-driver-registrar sidecar container. When deployed with a CSI driver it automatically creates a CSIDriver object representing the driver. Kubernetes attach detach controller uses this object to determine whether attach is required. Kubelet uses this object to determine whether pod information needs to be passed on mount. CSIDriver objects are non-namespaced.
      */
-    export class CSIDriver extends Resource implements ICSIDriver {
+    export class CSIDriver extends KubernetesResource implements ICSIDriver {
       metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.CSIDriverSpec
       /**
@@ -8762,7 +8762,7 @@ export namespace storage {
     /**
      * CSIDriverList is a collection of CSIDriver objects.
      */
-    export class CSIDriverList extends Resource implements ICSIDriverList {
+    export class CSIDriverList extends KubernetesResource implements ICSIDriverList {
       items: storage.v1beta1.CSIDriver[]
       metadata: meta.v1.ListMeta
       /**
@@ -8792,7 +8792,7 @@ export namespace storage {
     /**
      * CSINode holds information about all CSI drivers installed on a node. CSI drivers do not need to create the CSINode object directly. As long as they use the node-driver-registrar sidecar container, the kubelet will automatically populate the CSINode object for the CSI driver as part of kubelet plugin registration. CSINode has the same name as a node. If the object is missing, it means either there are no CSI Drivers available on the node, or the Kubelet version is low enough that it doesn't create this object. CSINode has an OwnerReference that points to the corresponding node object.
      */
-    export class CSINode extends Resource implements ICSINode {
+    export class CSINode extends KubernetesResource implements ICSINode {
       metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.CSINodeSpec
       /**
@@ -8824,7 +8824,7 @@ export namespace storage {
     /**
      * CSINodeList is a collection of CSINode objects.
      */
-    export class CSINodeList extends Resource implements ICSINodeList {
+    export class CSINodeList extends KubernetesResource implements ICSINodeList {
       items: storage.v1beta1.CSINode[]
       metadata: meta.v1.ListMeta
       /**
@@ -8854,7 +8854,7 @@ export namespace storage {
      *
      * StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
      */
-    export class StorageClass extends Resource implements IStorageClass {
+    export class StorageClass extends KubernetesResource implements IStorageClass {
       allowVolumeExpansion?: boolean
       allowedTopologies?: core.v1.TopologySelectorTerm[]
       metadata: meta.v1.ObjectMeta
@@ -8901,7 +8901,7 @@ export namespace storage {
     /**
      * StorageClassList is a collection of storage classes.
      */
-    export class StorageClassList extends Resource implements IStorageClassList {
+    export class StorageClassList extends KubernetesResource implements IStorageClassList {
       items: storage.v1beta1.StorageClass[]
       metadata: meta.v1.ListMeta
       /**
@@ -8924,7 +8924,7 @@ export namespace storage {
      *
      * VolumeAttachment objects are non-namespaced.
      */
-    export class VolumeAttachment extends Resource implements IVolumeAttachment {
+    export class VolumeAttachment extends KubernetesResource implements IVolumeAttachment {
       metadata: meta.v1.ObjectMeta
       spec: storage.v1beta1.VolumeAttachmentSpec
       /**
@@ -8947,7 +8947,7 @@ export namespace storage {
     /**
      * VolumeAttachmentList is a collection of VolumeAttachment objects.
      */
-    export class VolumeAttachmentList extends Resource implements IVolumeAttachmentList {
+    export class VolumeAttachmentList extends KubernetesResource implements IVolumeAttachmentList {
       items: storage.v1beta1.VolumeAttachment[]
       metadata: meta.v1.ListMeta
       /**
@@ -9040,7 +9040,7 @@ export namespace apiextensions {
     /**
      * CustomResourceDefinition represents a resource that should be exposed on the API server.  Its name MUST be in the format <.spec.name>.<.spec.group>.
      */
-    export class CustomResourceDefinition extends Resource implements ICustomResourceDefinition {
+    export class CustomResourceDefinition extends KubernetesResource implements ICustomResourceDefinition {
       metadata: meta.v1.ObjectMeta
       spec: apiextensions.v1beta1.CustomResourceDefinitionSpec
       /**
@@ -9075,7 +9075,7 @@ export namespace apiextensions {
     /**
      * CustomResourceDefinitionList is a list of CustomResourceDefinition objects.
      */
-    export class CustomResourceDefinitionList extends Resource implements ICustomResourceDefinitionList {
+    export class CustomResourceDefinitionList extends KubernetesResource implements ICustomResourceDefinitionList {
       items: apiextensions.v1beta1.CustomResourceDefinition[]
       metadata: meta.v1.ListMeta
       /**
@@ -9395,7 +9395,7 @@ export namespace meta {
     /**
      * APIGroup contains the name, the supported versions, and the preferred version of a group.
      */
-    export class APIGroup extends Resource implements IAPIGroup {
+    export class APIGroup extends KubernetesResource implements IAPIGroup {
       name: string
       preferredVersion?: meta.v1.GroupVersionForDiscovery
       serverAddressByClientCIDRs?: meta.v1.ServerAddressByClientCIDR[]
@@ -9424,7 +9424,7 @@ export namespace meta {
     /**
      * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
      */
-    export class APIGroupList extends Resource implements IAPIGroupList {
+    export class APIGroupList extends KubernetesResource implements IAPIGroupList {
       groups: meta.v1.APIGroup[]
       /**
        * APIGroupList is a list of APIGroup, to allow clients to discover the API at /apis.
@@ -9466,7 +9466,7 @@ export namespace meta {
     /**
      * APIResourceList is a list of APIResource, it is used to expose the name of the resources supported in a specific group and version, and if the resource is namespaced.
      */
-    export class APIResourceList extends Resource implements IAPIResourceList {
+    export class APIResourceList extends KubernetesResource implements IAPIResourceList {
       groupVersion: string
       resources: meta.v1.APIResource[]
       /**
@@ -9487,7 +9487,7 @@ export namespace meta {
     /**
      * APIVersions lists the versions that are available, to allow clients to discover the API at /api, which is the root path of the legacy v1 API.
      */
-    export class APIVersions extends Resource implements IAPIVersions {
+    export class APIVersions extends KubernetesResource implements IAPIVersions {
       serverAddressByClientCIDRs: meta.v1.ServerAddressByClientCIDR[]
       versions: string[]
       /**
@@ -9508,7 +9508,7 @@ export namespace meta {
     /**
      * DeleteOptions may be provided when deleting an API object.
      */
-    export class DeleteOptions extends Resource implements IDeleteOptions {
+    export class DeleteOptions extends KubernetesResource implements IDeleteOptions {
       dryRun?: string[]
       gracePeriodSeconds?: number
       orphanDependents?: boolean
@@ -9718,7 +9718,7 @@ Populated by the system. Read-only. More info: http://kubernetes.io/docs/user-gu
     /**
      * Status is a return value for calls that don't return other objects.
      */
-    export class Status extends Resource implements IStatus {
+    export class Status extends KubernetesResource implements IStatus {
       code?: number
       details?: meta.v1.StatusDetails
       message?: string
@@ -9787,7 +9787,7 @@ Examples:
     /**
      * Event represents a single event to a watched resource.
      */
-    export class WatchEvent extends Resource implements IWatchEvent {
+    export class WatchEvent extends KubernetesResource implements IWatchEvent {
       object: misc.runtime.RawExtension
       type: string
       /**
@@ -9815,7 +9815,7 @@ export namespace apiregistration {
     /**
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
-    export class APIService extends Resource implements IAPIService {
+    export class APIService extends KubernetesResource implements IAPIService {
       metadata: meta.v1.ObjectMeta
       spec: apiregistration.v1.APIServiceSpec
       /**
@@ -9850,7 +9850,7 @@ export namespace apiregistration {
     /**
      * APIServiceList is a list of APIService objects.
      */
-    export class APIServiceList extends Resource implements IAPIServiceList {
+    export class APIServiceList extends KubernetesResource implements IAPIServiceList {
       items: apiregistration.v1.APIService[]
       metadata: meta.v1.ListMeta
       /**
@@ -9906,7 +9906,7 @@ export namespace apiregistration {
     /**
      * APIService represents a server for a particular GroupVersion. Name must be "version.group".
      */
-    export class APIService extends Resource implements IAPIService {
+    export class APIService extends KubernetesResource implements IAPIService {
       metadata: meta.v1.ObjectMeta
       spec: apiregistration.v1beta1.APIServiceSpec
       /**
@@ -9941,7 +9941,7 @@ export namespace apiregistration {
     /**
      * APIServiceList is a list of APIService objects.
      */
-    export class APIServiceList extends Resource implements IAPIServiceList {
+    export class APIServiceList extends KubernetesResource implements IAPIServiceList {
       items: apiregistration.v1beta1.APIService[]
       metadata: meta.v1.ListMeta
       /**
