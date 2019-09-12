@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { Solsa } from '../solution'
+import { Solution } from '../solution'
 import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as minimist from 'minimist'
@@ -156,7 +156,7 @@ function loadConfig (fatal?: boolean) {
 
 // load solution file
 
-function loadApp (): Solsa {
+function loadApp (): Solution {
   // resolve module even if not in default path
   const _resolveFilename = Module._resolveFilename
   Module._resolveFilename = function (request: string, parent: string) {
@@ -173,10 +173,10 @@ function loadApp (): Solsa {
 
   try {
     const app = require(path.resolve(argv.file))
-    if (!(app._solsa)) {
+    if (!(app.getResources && app.getImages)) {
       reportError(`No solution exported by "${argv.file}"`, true)
     }
-    return app._solsa
+    return app
   } finally {
     Module._resolveFilename = _resolveFilename
   }
@@ -237,7 +237,7 @@ function yamlCommand () {
       this.getLayer(layer).patchesJSON[path] = { patch, target: Object.assign({ path }, target) }
     }
 
-    finalizeImageRenames (context: any, app: Solsa) {
+    finalizeImageRenames (context: any, app: Solution) {
       const images: any[] = []
       for (let name of app.getImages().map(image => image.name)) {
         const pos = name.indexOf(':', name.indexOf('/'))
@@ -257,7 +257,7 @@ function yamlCommand () {
       return (context.images || []).concat(images)
     }
 
-    finalize (config: any, app: Solsa) {
+    finalize (config: any, app: Solution) {
       for (const cluster of config.clusters) {
         const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
         clusterLayer.bases.push('./../../base')

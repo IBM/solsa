@@ -16,40 +16,13 @@
 
 import { dynamic } from './helpers'
 
-/** @internal */
-export class Solsa {
-  [k: string]: any
-  solution: Solution
-
-  constructor (Solution: Solution) {
-    this.solution = Solution
-  }
-
-  getResources (...args: any[]) {
-    return this.skip ? [] : this.solution.getResources(...args)
-  }
-
-  getImages () {
-    return this.skip ? [] : this.solution.getImages()
-  }
-}
-
 /**
  * Solution is the root of SolSA's class hierarchy. A solution is either a SolSA
  * resource or a bundle of SolSA resources.
  */
 export abstract class Solution {
-  [k: string]: any
-  /** @internal */
-  /** Internal state of the Solution */
-  _solsa = new Solsa(this)
-
-  constructor () {
-    Object.defineProperty(this, '_solsa', { enumerable: false })
-  }
-
   /**
-   * Skip this solution when synthesizing YAML.
+   * Omit receiver when synthesizing YAML.
    *
    * This method makes it possible to declare resources requirements for which
    * no YAML is synthesized. It mutates the receiver object and returns it.
@@ -57,7 +30,8 @@ export abstract class Solution {
    * @return this
    */
   useExisting () {
-    this._solsa.skip = true
+    this.getResources = function (...args: any[]) { return [] }
+    this.getImages = function () { return [] }
     return this
   }
 
@@ -90,6 +64,8 @@ export abstract class Solution {
  */
 
 export class Bundle extends Solution {
+  [k: string]: any
+
   /**
    * Create an empty resource bundle.
    */
@@ -100,8 +76,8 @@ export class Bundle extends Solution {
   getResources (...args: any[]): dynamic[] {
     const resources = []
     for (let value of Object.values(this)) {
-      if (value._solsa) {
-        resources.push(...value._solsa.getResources(...args))
+      if (value.getResources) {
+        resources.push(...value.getResources(...args))
       }
     }
     return resources
@@ -110,8 +86,8 @@ export class Bundle extends Solution {
   getImages (): { name: string, build?: string, main?: string }[] {
     const images = []
     for (let value of Object.values(this)) {
-      if (value._solsa) {
-        images.push(...value._solsa.getImages())
+      if (value.getImages) {
+        images.push(...value.getImages())
       }
     }
     return images
