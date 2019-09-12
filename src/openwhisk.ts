@@ -18,7 +18,7 @@
 
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format */
 
-import { Resource } from './bundle'
+import { KubernetesResource } from './solution'
 import { core, meta, misc } from './core'
 
 export namespace openwhisk {
@@ -33,7 +33,7 @@ export namespace openwhisk {
     /**
      * Function is the Schema for the functions API
      */
-    export class Function extends Resource implements IFunction {
+    export class Function extends KubernetesResource implements IFunction {
       metadata: meta.v1.ObjectMeta
       spec: openwhisk.v1alpha1.FunctionSpec
       /**
@@ -52,7 +52,7 @@ export namespace openwhisk {
     /**
      * FunctionList contains a list of Function
      */
-    export class FunctionList extends Resource implements IFunctionList {
+    export class FunctionList extends KubernetesResource implements IFunctionList {
       items: openwhisk.v1alpha1.Function[]
       metadata: meta.v1.ListMeta
       /**
@@ -132,7 +132,7 @@ Runtime	| image name	| Description
     /**
      * Invocation is the Schema for the invocations API
      */
-    export class Invocation extends Resource implements IInvocation {
+    export class Invocation extends KubernetesResource implements IInvocation {
       metadata: meta.v1.ObjectMeta
       spec: openwhisk.v1alpha1.InvocationSpec
       /**
@@ -160,7 +160,7 @@ Runtime	| image name	| Description
     /**
      * InvocationList contains a list of Invocation
      */
-    export class InvocationList extends Resource implements IInvocationList {
+    export class InvocationList extends KubernetesResource implements IInvocationList {
       items: openwhisk.v1alpha1.Invocation[]
       metadata: meta.v1.ListMeta
       /**
@@ -225,7 +225,7 @@ Runtime	| image name	| Description
     /**
      * Package is the Schema for the packages API
      */
-    export class Package extends Resource implements IPackage {
+    export class Package extends KubernetesResource implements IPackage {
       metadata: meta.v1.ObjectMeta
       spec: openwhisk.v1alpha1.PackageSpec
       /**
@@ -244,7 +244,7 @@ Runtime	| image name	| Description
     /**
      * PackageList contains a list of Package
      */
-    export class PackageList extends Resource implements IPackageList {
+    export class PackageList extends KubernetesResource implements IPackageList {
       items: openwhisk.v1alpha1.Package[]
       metadata: meta.v1.ListMeta
       /**
@@ -302,7 +302,7 @@ Runtime	| image name	| Description
     /**
      * Rule is the Schema for the rules API
      */
-    export class Rule extends Resource implements IRule {
+    export class Rule extends KubernetesResource implements IRule {
       metadata: meta.v1.ObjectMeta
       spec: openwhisk.v1alpha1.RuleSpec
       /**
@@ -321,7 +321,7 @@ Runtime	| image name	| Description
     /**
      * RuleList contains a list of Rule
      */
-    export class RuleList extends Resource implements IRuleList {
+    export class RuleList extends KubernetesResource implements IRuleList {
       items: openwhisk.v1alpha1.Rule[]
       metadata: meta.v1.ListMeta
       /**
@@ -369,7 +369,7 @@ Runtime	| image name	| Description
     /**
      * Trigger is the Schema for the triggers API
      */
-    export class Trigger extends Resource implements ITrigger {
+    export class Trigger extends KubernetesResource implements ITrigger {
       metadata: meta.v1.ObjectMeta
       spec: openwhisk.v1alpha1.TriggerSpec
       /**
@@ -388,7 +388,7 @@ Runtime	| image name	| Description
     /**
      * TriggerList contains a list of Trigger
      */
-    export class TriggerList extends Resource implements ITriggerList {
+    export class TriggerList extends KubernetesResource implements ITriggerList {
       items: openwhisk.v1alpha1.Trigger[]
       metadata: meta.v1.ListMeta
       /**

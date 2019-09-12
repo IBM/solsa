@@ -115,7 +115,7 @@ console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format */`)
 console.log()
 
 // imports
-console.log(`import { Resource } from './bundle'`)
+console.log(`import { KubernetesResource } from './solution'`)
 if (!tree.core) console.log(`import { core, meta, misc } from './core'`)
 console.log()
 
@@ -140,7 +140,7 @@ for (let [group, g] of Object.entries(tree)) {
       } else {
         if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class
           let apiVersion = resource['x-kubernetes-group-version-kind'][0].group ? resource['x-kubernetes-group-version-kind'][0].group + '/' + version : version
-          console.log(`    export class ${kind} extends Resource implements I${kind} {`) // declare class
+          console.log(`    export class ${kind} extends KubernetesResource implements I${kind} {`) // declare class
           for (let [key, value, required] of properties) { // field declarations
             console.log(`      ${format([key, value, required])}`) // field declaration
           }

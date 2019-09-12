@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Resource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
 import { Ingress } from './ingress'
 
 /**
  * A ContainerizedService is a higher-level abstraction for generating matched
  * Kubernetes `Deployment` and `Service` resources. A typical usage is to specify
- * a containerized microservice that is deployed as part of an overall Solution.
+ * a containerized microservice that is deployed as part of an overall solution.
  */
-export class ContainerizedService extends Bundle implements IContainerizedService {
+export class ContainerizedService extends Resource implements IContainerizedService {
+  _livenessProbe?: any
+  _readinessProbe?: any
+  _port?: number
   name: string
   image: string
   env: dynamic
@@ -36,11 +39,11 @@ export class ContainerizedService extends Bundle implements IContainerizedServic
   main?: string
   pv?: any   // FIXME: Define a more precise type here (complex record).
 
-  get livenessProbe () { return either(this._solsa._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
-  set livenessProbe (val) { this._solsa._livenessProbe = val }
+  get livenessProbe () { return either(this._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
+  set livenessProbe (val) { this._livenessProbe = val }
 
-  get readinessProbe () { return either(this._solsa._readinessProbe, this.livenessProbe) }
-  set readinessProbe (val) { this._solsa._readinessProbe = val }
+  get readinessProbe () { return either(this._readinessProbe, this.livenessProbe) }
+  set readinessProbe (val) { this._readinessProbe = val }
 
   /**
    * Create a ContainerizedService. The properties `name` and `image` are mandatory.
@@ -66,8 +69,10 @@ export class ContainerizedService extends Bundle implements IContainerizedServic
     const that = this
 
     return class extends Ingress {
-      get port () { return either(this._solsa._port, that.port) }
-      set port (val) { this._solsa._port = val }
+      _port?: number
+
+      get port () { return either(this._port, that.port) }
+      set port (val) { this._port = val }
 
       constructor ({ name = that.name, port, endpoints }: { name?: string, port?: number, endpoints?: { paths: string[], port: number }[] } = {}) {
         super({ name, port, endpoints })

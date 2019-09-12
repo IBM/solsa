@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-import { Bundle } from './bundle'
+import { Resource } from './solution'
 import { either } from './helpers'
 
-export class Ingress extends Bundle {
+export class Ingress extends Resource {
+  _endpoints?: { paths: string[], port: number }[]
+  _generateSecret?: boolean
   name: string
   port?: number
 
-  get endpoints (): { paths: string[], port: number }[] { return either(this._solsa._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
-  set endpoints (val) { this._solsa._endpoints = val }
+  get endpoints (): { paths: string[], port: number }[] { return either(this._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
+  set endpoints (val) { this._endpoints = val }
 
   constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number }[] }) {
     super()
     this.name = name
     this.port = port
-    this._solsa._endpoints = endpoints
+    this._endpoints = endpoints
   }
 
   getSecret () {
-    this._solsa._generateSecret = true
+    this._generateSecret = true
     return { valueFrom: { secretKeyRef: { name: `${this.name}-ingress`, key: 'url' } } }
   }
 
@@ -69,7 +71,7 @@ export class Ingress extends Bundle {
           }
         }
         resources.push({ obj: ing, layer })
-        if (this._solsa._generateSecret) {
+        if (this._generateSecret) {
           const secret = {
             apiVersion: 'v1',
             kind: 'Secret',
@@ -111,7 +113,7 @@ export class Ingress extends Bundle {
           }
           resources.push({ obj: route, layer })
         }
-        if (this.generateSecret) {
+        if (this._generateSecret) {
           const secret = {
             apiVersion: 'v1',
             kind: 'Secret',
