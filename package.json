@@ -6,10 +6,11 @@
   "description": "Solution Service Architecture",
   "homepage": "https://github.com/IBM/solsa",
   "bin": {
-    "solsa": "./dist/bin/solsa.js"
+    "solsa": "./dist/bin/solsa.js",
+    "solsa-importer": "./dist/bin/solsa-importer.js"
   },
   "scripts": {
-    "build": "tsc && chmod a+x dist/bin/solsa.js",
+    "build": "tsc && chmod a+x dist/bin/solsa.js && chmod a+x dist/bin/solsa-importer.js",
     "clean": "rm -Rf dist || true",
     "codegen-core": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.14/api/openapi-spec/swagger.json | node dist/codegen.js ' and The Kubernetes Authors' > src/core.ts",
     "codegen-openwhisk": "curl https://raw.githubusercontent.com/IBM/cloud-functions-operator/v0.8.0/api/swagger/swagger.json | node dist/codegen.js '' ibmcloud openwhisk > src/openwhisk.ts",
