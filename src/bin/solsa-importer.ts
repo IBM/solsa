@@ -85,6 +85,8 @@ function writePreamble (outStream: fs.WriteStream) {
   outStream.write('const app = new solsa.Bundle()\n')
   outStream.write('module.exports = app\n')
   outStream.write('\n')
+  outStream.write('/* eslint-disable no-template-curly-in-string */\n')
+  outStream.write('\n')
 }
 
 function importCommand () {
