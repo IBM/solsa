@@ -17,16 +17,28 @@
 import { Resource } from './solution'
 import { either } from './helpers'
 
+/**
+ * An Ingress manages external access to the services in a cluster.
+ */
 export class Ingress extends Resource {
+  /** @internal */
   _endpoints?: { paths: string[], port: number }[]
+  /** @internal */
   _generateSecret?: boolean
+  /** The name of the ingress. */
   name: string
+  /** If the ingress exposes a single port, its port number. */
   port?: number
 
+  /** The endpoints of the ingress. */
   get endpoints (): { paths: string[], port: number }[] { return either(this._endpoints, this.port === undefined ? [] : [{ paths: ['/'], port: this.port }]) }
   set endpoints (val) { this._endpoints = val }
 
-  constructor ({ name, port, endpoints }: { name: string, port?: number, endpoints?: { paths: string[], port: number }[] }) {
+  /**
+   * Create an Ingress. The `name` is mandatory. Specify either a single `port`
+   * or an array of `endpoints`.
+   */
+  constructor ({ name, port, endpoints }: IIngress) {
     super()
     this.name = name
     this.port = port
@@ -192,4 +204,13 @@ export class Ingress extends Resource {
     }
     return resources
   }
+}
+
+export interface IIngress {
+  /** The name of the ingress. */
+  name: string,
+  /** If the ingress exposes a single port, its port number. */
+  port?: number,
+  /** The endpoints of the ingress. */
+  endpoints?: { paths: string[], port: number }[]
 }

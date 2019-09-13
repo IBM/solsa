@@ -16,7 +16,7 @@
 
 import { Resource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
-import { Ingress } from './ingress'
+import { Ingress, IIngress } from './ingress'
 
 /**
  * A ContainerizedService is a higher-level abstraction for generating matched
@@ -24,24 +24,38 @@ import { Ingress } from './ingress'
  * a containerized microservice that is deployed as part of an overall solution.
  */
 export class ContainerizedService extends Resource implements IContainerizedService {
-  _livenessProbe?: any
-  _readinessProbe?: any
-  _port?: number
+  /** The name of the microservice. */
   name: string
+  /** The container image that implements the service. */
   image: string
+  /** The environment variable bindings to be defined for the executing container. */
   env: dynamic
+  /** If the service exports a single port, its port number. */
   port?: number
+  /** If the service exports multiple ports, an array of their names and port numbers. */
   ports: { name: string, port: number }[]
+  /** The desired number of replicas of the container. */
   replicas: number
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
   labels: dictionary
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
   annotations?: dictionary
+  /** The path to the NodeJS package that implements the service. */
   build?: string
+  /** The name of the entry point to be executed. */
   main?: string
-  pv?: any   // FIXME: Define a more precise type here (complex record).
+  /** @internal */
+  _readinessProbe?: any // FIXME: Define a more precise type here (complex record).
+  /** @internal */
+  _livenessProbe?: any // FIXME: Define a more precise type here (complex record).
+  /** A persistent volume to be created for each replica of the service. */
+  pv?: any // FIXME: Define a more precise type here (complex record).
 
+  /** The liveness probe for the service. */
   get livenessProbe () { return either(this._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
   set livenessProbe (val) { this._livenessProbe = val }
 
+  /** The readiness probe for the service. */
   get readinessProbe () { return either(this._readinessProbe, this.livenessProbe) }
   set readinessProbe (val) { this._readinessProbe = val }
 
@@ -65,16 +79,21 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     this.pv = pv
   }
 
-  get Ingress () {
+  /**
+   * An Ingress manages external access to this ContainerizedService in a cluster.
+   */
+  get Ingress (): typeof ContainerizedServiceIngress {
     const that = this
 
     return class extends Ingress {
+      /** @internal */
       _port?: number
 
       get port () { return either(this._port, that.port) }
       set port (val) { this._port = val }
 
-      constructor ({ name = that.name, port, endpoints }: { name?: string, port?: number, endpoints?: { paths: string[], port: number }[] } = {}) {
+      // see ContainerizedServiceIngress
+      constructor ({ name = that.name, port, endpoints }: IContainerizedServiceIngress = {}) {
         super({ name, port, endpoints })
       }
     }
@@ -192,11 +211,11 @@ export class ContainerizedService extends Resource implements IContainerizedServ
 }
 
 export interface IContainerizedService {
-  /** The name of the microservice */
+  /** The name of the microservice. */
   name: string
-  /** The container image that implements the service */
+  /** The container image that implements the service. */
   image: string
-  /** The environment variable bindings to be defined for the executing container  */
+  /** The environment variable bindings to be defined for the executing container. */
   env?: dynamic
   /** If the service exports a single port, its port number. */
   port?: number
@@ -204,18 +223,30 @@ export interface IContainerizedService {
   ports?: { name: string, port: number }[]
   /** The desired number of replicas of the container. */
   replicas?: number
-  /** A dictionary of labels to apply to the `Deployment` and `Service` resources */
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
   labels?: dictionary
-  /** A dictionary of labels to apply to the `Deployment` and `Service` resources */
+  /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
   annotations?: dictionary
-  /** The path to the NodeJS package that implements the service */
+  /** The path to the NodeJS package that implements the service. */
   build?: string
-  /** The name of the entry point to be executed */
+  /** The name of the entry point to be executed. */
   main?: string
-  /** The readiness probe for the service */
+  /** The readiness probe for the service. */
   readinessProbe?: any // FIXME: Define a more precise type here (complex record).
-  /** The liveness probe for the service */
+  /** The liveness probe for the service. */
   livenessProbe?: any // FIXME: Define a more precise type here (complex record).
-  /** A persistent volume to be created for each replica of the service */
-  pv?: any   // FIXME: Define a more precise type here (complex record).
+  /** A persistent volume to be created for each replica of the service. */
+  pv?: any // FIXME: Define a more precise type here (complex record).
 }
+
+class ContainerizedServiceIngress extends Ingress {
+  /**
+   * Create an ingress for this ContainerizedService. Omitted properties are
+   * derived from the properties of the ContainerizedService.
+   */
+  constructor ({ name = 'fake', port, endpoints }: IContainerizedServiceIngress) {
+    super({ name, port, endpoints })
+  }
+}
+
+interface IContainerizedServiceIngress extends Partial<IIngress> { }
