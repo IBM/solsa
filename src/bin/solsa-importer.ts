@@ -95,9 +95,24 @@ function importCommand () {
   writePreamble(outStream)
 
   resources.forEach(function (val, index) {
-    outStream.write(`app.var${index} = new solsa.KubernetesResource(`)
-    outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: false }))
-    outStream.write(')\n')
+    var specialized = false
+    if (val.apiVersion && val.kind) {
+      const apiVersion = val.apiVersion
+      const kind = val.kind
+      if (!apiVersion.includes('/')) {
+        specialized = true
+        delete val.kind
+        delete val.apiVersion
+        outStream.write(`app.var${index} = new solsa.core.${apiVersion}.${kind}(`)
+        outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: true }))
+        outStream.write(')\n')
+      }
+    }
+    if (!specialized) {
+      outStream.write(`app.var${index} = new solsa.KubernetesResource(`)
+      outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: true }))
+      outStream.write(')\n')
+    }
   })
 
   outStream.end()
