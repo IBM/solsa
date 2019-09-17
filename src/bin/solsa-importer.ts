@@ -126,18 +126,18 @@ function importCommand () {
       }
     }
     outStream.write('\n')
-    var specialized = false
+    let specialized = false
     if (val.apiVersion && val.kind) {
       const apiVersion = val.apiVersion
       const kind = val.kind
       const solsaType = mapToSolsaType(apiVersion, kind)
-      if (solsaType != 'unknown') {
+      if (solsaType !== 'unknown') {
         specialized = true
         delete val.kind
         delete val.apiVersion
-        var varName = `resource_${index}`
+        let varName = `resource_${index}`
         if (val.metadata && val.metadata.name) {
-          varName = val.metadata.name.replace(/([-_][a-z])/g, (n:string) => n.toUpperCase().replace('-', '').replace('_', ''))
+          varName = val.metadata.name.replace(/([-_][a-z])/g, (n: string) => n.toUpperCase().replace('-', '').replace('_', ''))
           if (!varName.endsWith(kind)) {
             varName = `${varName}_${kind}`
           }
