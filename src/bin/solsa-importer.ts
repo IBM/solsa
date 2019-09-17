@@ -52,7 +52,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
   console.error('      --dehelm               remove helm chart artifacts during import (default true)')
-  console.error('  -c  --compact              generate compact ouput (default false')
+  console.error('  -c  --compact              generate compact ouput (default false)')
   console.error()
   process.exit(1)
 }
