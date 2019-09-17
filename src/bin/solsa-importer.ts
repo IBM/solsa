@@ -51,8 +51,8 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error()
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
-  console.error('      --dehelm               remove helm chart artifacts during import')
-  console.error('  -c  --compact              generate compact ouput')
+  console.error('      --dehelm               remove helm chart artifacts during import (default true)')
+  console.error('  -c  --compact              generate compact ouput (default false')
   console.error()
   process.exit(1)
 }
@@ -135,13 +135,20 @@ function importCommand () {
         specialized = true
         delete val.kind
         delete val.apiVersion
-        outStream.write(`app.var${index} = new solsa.${solsaType}(`)
+        var varName = `resource_${index}`
+        if (val.metadata && val.metadata.name) {
+          varName = val.metadata.name.replace(/([-_][a-z])/g, (n:string) => n.toUpperCase().replace('-', '').replace('_', ''))
+          if (!varName.endsWith(kind)) {
+            varName = `${varName}_${kind}`
+          }
+        }
+        outStream.write(`app.${varName} = new solsa.${solsaType}(`)
         outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
-      outStream.write(`app.var${index} = new solsa.KubernetesResource(`)
+      outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
       outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
       outStream.write(')\n')
     }
