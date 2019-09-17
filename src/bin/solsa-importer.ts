@@ -31,9 +31,10 @@ const commands: { [key: string]: () => void } = { import: importCommand }
 // process command line arguments
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['output'],
-  alias: { output: 'o' },
-  default: { output: 'myApp.js' }
+  string: ['output', 'dehelm'],
+  boolean: [ 'compact' ],
+  alias: { output: 'o', compact: 'c' },
+  default: { output: 'myApp.js', 'dehelm': true, compact: false }
 })
 
 argv.command = argv._[0]
@@ -50,6 +51,8 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error()
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
+  console.error('      --dehelm               remove helm chart artifacts during import')
+  console.error('  -c  --compact              generate compact ouput')
   console.error()
   process.exit(1)
 }
@@ -86,7 +89,26 @@ function writePreamble (outStream: fs.WriteStream) {
   outStream.write('module.exports = app\n')
   outStream.write('\n')
   outStream.write('/* eslint-disable no-template-curly-in-string */\n')
-  outStream.write('\n')
+}
+
+function isExcludedHelmArtifact (obj: any): boolean {
+  if (obj.metadata && obj.metadata.annotations && 'helm.sh/hook' in obj.metadata.annotations) {
+    return true
+  }
+  return false
+}
+
+function mapToSolsaType (apiVersion: string, kind: string): string {
+  apiVersion = apiVersion.replace('.k8s.io', '').replace('/', '.').replace('rbac.authorization', 'rbac')
+  if (apiVersion === 'v1') {
+    if (kind === 'APIGroup' || kind === 'APIGroupList' || kind === 'APIResourceList' || kind === 'APIVersions' ||
+      kind === 'DeleteEvent' || kind === 'Status' || kind === 'WatchEvent') {
+      apiVersion = 'meta.v1'
+    } else {
+      apiVersion = 'core.v1'
+    }
+  }
+  return `${apiVersion}.${kind}`
 }
 
 function importCommand () {
@@ -95,22 +117,32 @@ function importCommand () {
   writePreamble(outStream)
 
   resources.forEach(function (val, index) {
+    if (argv.dehelm) {
+      if (isExcludedHelmArtifact(val)) {
+        return
+      }
+      if (val.metadata && val.metadata.labels) {
+        delete val.metadata.labels['helm.sh/chart']
+      }
+    }
+    outStream.write('\n')
     var specialized = false
     if (val.apiVersion && val.kind) {
       const apiVersion = val.apiVersion
       const kind = val.kind
-      if (!apiVersion.includes('/')) {
+      const solsaType = mapToSolsaType(apiVersion, kind)
+      if (solsaType != 'unknown') {
         specialized = true
         delete val.kind
         delete val.apiVersion
-        outStream.write(`app.var${index} = new solsa.core.${apiVersion}.${kind}(`)
-        outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: true }))
+        outStream.write(`app.var${index} = new solsa.${solsaType}(`)
+        outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
       outStream.write(`app.var${index} = new solsa.KubernetesResource(`)
-      outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: true }))
+      outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
       outStream.write(')\n')
     }
   })
