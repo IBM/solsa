@@ -1,0 +1,21 @@
+{
+  "include": [
+    "samples/**/*.js",
+    "src/**/*.ts",
+    "test/**/*.js"
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "solsa": [
+        "."
+      ]
+    },
+    "target": "es6",
+    "module": "commonjs",
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "noEmit": true
+  }
+}

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-/* eslint-env mocha */
-
 // run "npm test" to run the tests
 // run "node test.js" to regenerate the tests
+
+// @ts-check
 
 'use strict'
 
 const assert = require('assert')
 const cp = require('child_process')
 const fs = require('fs')
+const { it } = require('mocha')
 const path = require('path')
 
 const cli = path.join(__dirname, '..', 'dist', 'bin', 'solsa.js')
@@ -32,6 +33,7 @@ const dir = path.join(__dirname, 'yaml')
 const config = path.join(__dirname, 'solsa.yaml')
 const ext = '.yaml'
 
+/** @param {string} name */
 function solsaYaml (name) {
   return cp.execSync(`${cli} yaml --config ${config} --cluster test ${path.join(src, name)}`)
 }
@@ -51,4 +53,4 @@ function testgen () {
   }
 }
 
-if (typeof it === 'function') test(); else testgen()
+if (typeof describe === 'function') test(); else testgen()
