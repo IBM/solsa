@@ -32,9 +32,9 @@ const commands: { [key: string]: () => void } = { import: importCommand }
 
 const argv = minimist(process.argv.slice(2), {
   string: ['output', 'dehelm'],
-  boolean: [ 'compact' ],
-  alias: { output: 'o', compact: 'c' },
-  default: { output: 'myApp.js', 'dehelm': true, compact: false }
+  boolean: [ 'function' ],
+  alias: { output: 'o', function: 'f' },
+  default: { output: 'myApp', 'dehelm': true, function: false }
 })
 
 argv.command = argv._[0]
@@ -52,7 +52,7 @@ if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
   console.error('      --dehelm               remove helm chart artifacts during import (default true)')
-  console.error('  -c  --compact              generate compact ouput (default false)')
+  console.error('  -f  --function             export a function that wraps bundle creation (default false)')
   console.error()
   process.exit(1)
 }
@@ -83,12 +83,28 @@ function loadObjects (fileName: string): any[] {
   }
 }
 
+function snakeToCamel (str: string) {
+  return str.replace(/([-_][a-z])/g, (n: string) => n.toUpperCase().replace('-', '').replace('_', ''))
+}
+
 function writePreamble (outStream: fs.WriteStream) {
-  outStream.write('const solsa = require(\'solsa\')\n')
-  outStream.write('const app = new solsa.Bundle()\n')
-  outStream.write('module.exports = app\n')
-  outStream.write('\n')
   outStream.write('/* eslint-disable no-template-curly-in-string */\n')
+  outStream.write('const solsa = require(\'solsa\')\n\n')
+
+  if (!argv.function) {
+    outStream.write('const app = new solsa.Bundle()\n')
+    outStream.write('module.exports = app\n')
+  } else {
+    outStream.write(`module.exports = function ${snakeToCamel(argv.output)} () {\n`)
+    outStream.write('const app = new solsa.Bundle()\n')
+  }
+}
+
+function writeEpilogue (outStream: fs.WriteStream) {
+  if (argv.function) {
+    outStream.write('return app\n')
+    outStream.write('}\n')
+  }
 }
 
 function isExcludedHelmArtifact (obj: any): boolean {
@@ -112,8 +128,9 @@ function mapToSolsaType (apiVersion: string, kind: string): string {
 }
 
 function importCommand () {
+  const inspectOpts = { depth: null, maxArrayLength: null, compact: 4, breakLength: 100 }
   const resources = loadObjects(argv.file).filter(x => x != null)
-  const outStream = fs.createWriteStream(argv.output)
+  const outStream = fs.createWriteStream(`${argv.output}.js`)
   writePreamble(outStream)
 
   resources.forEach(function (val, index) {
@@ -137,22 +154,24 @@ function importCommand () {
         delete val.apiVersion
         let varName = `resource_${index}`
         if (val.metadata && val.metadata.name) {
-          varName = val.metadata.name.replace(/([-_][a-z])/g, (n: string) => n.toUpperCase().replace('-', '').replace('_', ''))
+          varName = snakeToCamel(val.metadata.name)
           if (!varName.endsWith(kind)) {
             varName = `${varName}_${kind}`
           }
         }
         outStream.write(`app.${varName} = new solsa.${solsaType}(`)
-        outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
+        outStream.write(util.inspect(val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
       outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
-      outStream.write(util.inspect(val, { depth: null, maxArrayLength: null, compact: argv.compact }))
+      outStream.write(util.inspect(val, inspectOpts))
       outStream.write(')\n')
     }
   })
+
+  writeEpilogue(outStream)
 
   outStream.end()
 }
