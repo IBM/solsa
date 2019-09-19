@@ -15,6 +15,7 @@
  */
 
 import { dynamic } from './helpers'
+import { runCommand } from './cli'
 
 /**
  * Solution is the root of SolSA's class hierarchy. A solution is either a SolSA
@@ -49,6 +50,13 @@ export abstract class Solution {
    */
   getImages (): { name: string, build?: string, main?: string }[] {
     return []
+  }
+
+  /**
+   * Run command on this solution.
+   */
+  runCommand (args: string[]): void {
+    runCommand(args, this)
   }
 }
 
