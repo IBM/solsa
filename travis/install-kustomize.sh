@@ -16,10 +16,6 @@
 
 # Script derived from https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md
 
-curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest |\
-  grep browser_download |\
-  grep linux |\
-  cut -d '"' -f 4 |\
-  xargs curl -O -L
+curl -O -L https://github.com/kubernetes-sigs/kustomize/releases/download/v3.2.0/kustomize_3.2.0_linux_amd64
 mv kustomize_*_linux_amd64 /home/travis/bin/kustomize
 chmod u+x /home/travis/bin/kustomize
