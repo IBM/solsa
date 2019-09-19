@@ -1,8 +1,8 @@
 {
-  "include": [
-    "samples/**/*.js",
-    "src/**/*.ts",
-    "test/**/*.js"
+  "exclude": [
+    "dist",
+    "node_modules",
+    "runtime"
   ],
   "compilerOptions": {
     "baseUrl": ".",
