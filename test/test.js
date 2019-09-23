@@ -19,12 +19,13 @@
 
 // @ts-check
 
+/* eslint-env mocha */
+
 'use strict'
 
 const assert = require('assert')
 const cp = require('child_process')
 const fs = require('fs')
-const { it } = require('mocha')
 const path = require('path')
 
 const cli = path.join(__dirname, '..', 'dist', 'bin', 'solsa.js')
