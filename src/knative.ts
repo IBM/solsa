@@ -41,15 +41,9 @@ export class KnativeService extends Resource implements IKnativeService {
     this.ingress = !!ingress
   }
 
-  get Ingress () {
-    const that = this
-
-    return class extends Bundle {
-      constructor () {
-        super()
-        that.ingress = true
-      }
-    }
+  getIngress () {
+    this.ingress = true
+    return new Bundle()
   }
 
   getResources () {

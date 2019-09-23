@@ -80,23 +80,18 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   }
 
   /**
-   * An Ingress manages external access to this ContainerizedService in a cluster.
+   * Create an Ingress for this ContainerizedService.
    */
-  get Ingress (): typeof ContainerizedServiceIngress {
-    const that = this
+  getIngress ({ name = this.name, port, endpoints }: Partial<IIngress> = {}) {
+    const ingress = new Ingress({ name, port, endpoints })
 
-    return class extends Ingress {
-      /** @internal */
-      _port?: number
+    // default to ContainerizedService port
+    Object.defineProperty(ingress, 'port', {
+      get: () => either(port, this.port),
+      set: (val) => { port = val }
+    })
 
-      get port () { return either(this._port, that.port) }
-      set port (val) { this._port = val }
-
-      // see ContainerizedServiceIngress
-      constructor ({ name = that.name, port, endpoints }: IContainerizedServiceIngress = {}) {
-        super({ name, port, endpoints })
-      }
-    }
+    return ingress
   }
 
   getResources () {
@@ -238,15 +233,3 @@ export interface IContainerizedService {
   /** A persistent volume to be created for each replica of the service. */
   pv?: any // FIXME: Define a more precise type here (complex record).
 }
-
-class ContainerizedServiceIngress extends Ingress {
-  /**
-   * Create an ingress for this ContainerizedService. Omitted properties are
-   * derived from the properties of the ContainerizedService.
-   */
-  constructor ({ name = 'fake', port, endpoints }: IContainerizedServiceIngress) {
-    super({ name, port, endpoints })
-  }
-}
-
-interface IContainerizedServiceIngress extends Partial<IIngress> { }

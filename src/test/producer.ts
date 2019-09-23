@@ -19,7 +19,7 @@ let bundle = new solsa.Bundle()
 export = bundle
 
 bundle.kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' }).useExisting()
-bundle.topic = new bundle.kafka.Topic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
+bundle.topic = bundle.kafka.getTopic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
 
 bundle.producer = new solsa.ContainerizedService({ name: 'producer', image: 'kafka-producer', build: 'kafka-producer' })
 

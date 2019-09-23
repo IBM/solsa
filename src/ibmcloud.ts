@@ -34,14 +34,8 @@ export namespace ibmcloud {
         this.serviceClassType = serviceClassType
       }
 
-      get Binding () {
-        const that = this
-
-        return class extends Binding {
-          constructor ({ name = that.name } = {}) {
-            super({ name, serviceName: that.name })
-          }
-        }
+      getBinding ({ name = this.name } = {}) {
+        return new Binding({ name, serviceName: this.name })
       }
 
       getResources () {
@@ -102,25 +96,19 @@ export namespace ibmcloud {
         this.topicName = topicName
       }
 
-      get Source () {
-        const that = this
-
-        return class extends KafkaSource {
-          constructor ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
-            const secret = that.bindingFrom.getSecret('kafka_brokers_sasl').valueFrom.secretKeyRef
-            const bootstrapServers = {
-              getValueFrom: {
-                kind: 'Secret',
-                name: secret.name,
-                path: `{.data.${secret.key}}`,
-                'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString']
-              }
-            }
-            const user = that.bindingFrom.getSecret('user').valueFrom
-            const password = that.bindingFrom.getSecret('password').valueFrom
-            super({ name, bootstrapServers, consumerGroup, user, password, topics: that.topicName, sink })
+      getSource ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
+        const secret = this.bindingFrom.getSecret('kafka_brokers_sasl').valueFrom.secretKeyRef
+        const bootstrapServers = {
+          getValueFrom: {
+            kind: 'Secret',
+            name: secret.name,
+            path: `{.data.${secret.key}}`,
+            'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString']
           }
         }
+        const user = this.bindingFrom.getSecret('user').valueFrom
+        const password = this.bindingFrom.getSecret('password').valueFrom
+        return new KafkaSource({ name, bootstrapServers, consumerGroup, user, password, topics: this.topicName, sink })
       }
 
       getResources () {
@@ -150,7 +138,7 @@ export class CloudService extends Bundle {
   constructor ({ name, serviceClass, plan, serviceClassType }: { name: string, serviceClass: string, plan: string, serviceClassType?: string }) {
     super()
     this.service = new ibmcloud.v1alpha1.Service({ name, serviceClass, plan, serviceClassType })
-    this.binding = new this.service.Binding()
+    this.binding = this.service.getBinding()
   }
 
   getSecret (key: string) {
@@ -215,14 +203,8 @@ export class EventStreams extends CloudService {
     }
   }
 
-  get Topic () {
-    const bindingFrom = this.binding
-
-    return class extends ibmcloud.v1alpha1.Topic {
-      constructor ({ name, topicName }: { name: string, topicName?: string }) {
-        super({ name, topicName, bindingFrom })
-      }
-    }
+  getTopic ({ name, topicName }: { name: string, topicName?: string }) {
+    return new ibmcloud.v1alpha1.Topic({ name, topicName, bindingFrom: this.binding })
   }
 
   addTopic (topic: string) {
