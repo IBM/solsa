@@ -16,10 +16,11 @@
 
 /* GENERATED FILE; DO NOT EDIT */
 
-/* tslint:disable:no-unnecessary-qualifier jsdoc-format */
+/* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name */
 
 import { KubernetesResource } from './solution'
 import { core, meta, misc } from './core'
+import { dynamic } from './helpers'
 
 export namespace openwhisk {
   export namespace v1alpha1 {
