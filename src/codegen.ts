@@ -20,7 +20,7 @@ interface Definition {
   // [k: string]: any
   description?: string,
   type?: string,
-  properties?: { [k: string]: any },
+  properties?: { [k: string]: any } | null,
   required?: string[],
   'x-kubernetes-group-version-kind'?: { group: string, version: string, kind: string }[]
 }
@@ -50,6 +50,10 @@ for (let key of Object.keys(definitions)) {
 
 // return type of property value
 function typeOf (value: any): string {
+  if (value == null) return 'any'
+  if (value.type === 'object' && value.properties) {
+    return `{ ${Object.entries(value.properties).map(([key, v]: [string, any]) => `${format([key, v, value.required && value.required.includes(key)])}`).join(', ')} }`
+  }
   if (value['$ref']) {
     return split(value['$ref'].substring(14)).join('.')
   }
@@ -69,7 +73,7 @@ function typeOf (value: any): string {
 
 // format a property declaration
 function format ([key, value, required]: [string, any, boolean]) {
-  return `${key}${required ? '' : '?'}: ${typeOf(value)}`
+  return `${key.includes('-') ? `'${key}'` : key}${required ? '' : '?'}: ${typeOf(value)}`
 }
 
 // build array of resource properties
@@ -111,12 +115,13 @@ console.log(`/* GENERATED FILE; DO NOT EDIT */`)
 console.log()
 
 // tslint config
-console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format */`)
+console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name */`)
 console.log()
 
 // imports
 console.log(`import { KubernetesResource } from './solution'`)
 if (!tree.core) console.log(`import { core, meta, misc } from './core'`)
+console.log(`import { dynamic } from './helpers'`)
 console.log()
 
 // generate namespace, type, and class declarations
@@ -140,7 +145,7 @@ for (let [group, g] of Object.entries(tree)) {
       } else {
         if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class
           let apiVersion = resource['x-kubernetes-group-version-kind'][0].group ? resource['x-kubernetes-group-version-kind'][0].group + '/' + version : version
-          console.log(`    export class ${kind} extends KubernetesResource implements I${kind} {`) // declare class
+          console.log(`    export class ${kind} extends KubernetesResource ${resource.properties !== null ? `implements I${kind} ` : ''}{`) // declare class
           for (let [key, value, required] of properties) { // field declarations
             console.log(`      ${format([key, value, required])}`) // field declaration
           }
@@ -149,9 +154,14 @@ for (let [group, g] of Object.entries(tree)) {
             resource.description.split('\n').map(line => console.log(`       *${line ? ' ' + line : ''}`))
             console.log(`       */`)
           }
-          console.log(`      constructor (properties: I${kind}) {`) // constructor
-          console.log(`        super({ apiVersion: '${apiVersion}', kind: '${kind}' })`) // super call
-          console.log(`        ${properties.map(([key]) => `this.${key} = properties.${key}`).join('\n        ')}`) // field initializers
+          if (resource.properties !== null) {
+            console.log(`      constructor (properties: I${kind}) {`) // constructor
+            console.log(`        super({ apiVersion: '${apiVersion}', kind: '${kind}' })`) // super call
+            console.log(`        ${properties.map(([key]) => `this.${key} = properties.${key}`).join('\n        ')}`) // field initializers
+          } else {
+            console.log(`      constructor (properties: dynamic) {`) // constructor
+            console.log(`        super(Object.assign({ apiVersion: '${apiVersion}', kind: '${kind}' }, properties))`) // super call
+          }
           console.log(`      }`)
           console.log(`    }`)
         }
@@ -162,7 +172,7 @@ for (let [group, g] of Object.entries(tree)) {
             console.log(`      ${format([key, value, required])}`) // field declaration
           }
           console.log(`    }`)
-        } else { // object with no properties
+        } else if (resource.properties !== null) { // object with no properties
           console.log(`    export type ${kind} = any`)
         }
       }

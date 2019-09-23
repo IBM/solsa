@@ -16,9 +16,10 @@
 
 /* GENERATED FILE; DO NOT EDIT */
 
-/* tslint:disable:no-unnecessary-qualifier jsdoc-format */
+/* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name */
 
 import { KubernetesResource } from './solution'
+import { dynamic } from './helpers'
 
 export namespace admissionregistration {
   export namespace v1beta1 {

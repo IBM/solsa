@@ -16,6 +16,7 @@
 
 export * from './container'
 export * from './core'
+export * from './crds'
 export * from './ibmcloud'
 export * from './ingress'
 export * from './knative'
