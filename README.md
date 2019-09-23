@@ -219,7 +219,7 @@ const bundle = new solsa.Bundle()
 module.exports = bundle
 
 bundle.helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
-bundle.ingress = new bundle.helloWorld.Ingress()
+bundle.ingress = bundle.helloWorld.getIngress()
 ```
 It consists of a single containerized service and an ingress for this service.
 
