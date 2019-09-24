@@ -27,5 +27,5 @@ bundle.producer.env = {
   BROKERS: bundle.kafka.getSecret('kafka_brokers_sasl'),
   USER: bundle.kafka.getSecret('user'),
   PASSWORD: bundle.kafka.getSecret('password'),
-  TOPIC: bundle.topic.topicName
+  TOPIC: bundle.topic.spec.topicName
 }
