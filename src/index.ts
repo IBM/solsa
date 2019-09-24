@@ -16,7 +16,7 @@
 
 export * from './container'
 export * from './core'
-export * from './core-ext'
+import './core-ext'
 export * from './crds'
 export * from './ibmcloud'
 export * from './ingress'

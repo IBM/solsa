@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-import { core, apps } from './core'
+import { core, apps, extensions } from './core'
 
 declare module './core' {
     namespace apps {
         namespace v1 {
+            interface Deployment {
+              getService (): core.v1.Service
+            }
+        }
+        namespace v1beta2 {
+            interface Deployment {
+              getService (): core.v1.Service
+            }
+        }
+    }
+    namespace extensions {
+        namespace v1beta1 {
             interface Deployment {
               getService (): core.v1.Service
             }
@@ -31,13 +43,17 @@ apps.v1.Deployment.prototype.getService = function () {
     throw new Error('Cannot get a service on Deployment without a spec')
   }
 
-  const ports: core.v1.ServicePort[] = []
-  this.spec.template.spec.containers.map(function (c: core.v1.Container) {
+  let ports: core.v1.ServicePort[] = []
+  this.spec.template.spec.containers.forEach(function (c: core.v1.Container) {
     if (c.ports !== undefined) {
-      ports.push.apply(c.ports.map(function (cp: core.v1.ContainerPort) {
-        return { name: cp.name, port: cp.containerPort, targetPort: cp.containerPort, protocol: cp.protocol }
-      }))
+      c.ports.forEach(function (cp: core.v1.ContainerPort) {
+        ports.push({ name: cp.name, port: cp.containerPort, targetPort: cp.containerPort, protocol: cp.protocol })
+      })
     }
   })
+
   return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports } })
 }
+
+extensions.v1beta1.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
+apps.v1beta2.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
