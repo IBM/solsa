@@ -34,7 +34,7 @@ declare module './crds' {
 }
 
 com_ibm_ibmcloud.v1alpha1.Service.prototype.getBinding = function ({ name }: { name?: string } = {}) {
-  return new com_ibm_ibmcloud.v1alpha1.Binding({ metadata: { name: name || this.metadata.name }, spec: { serviceName: this.metadata.name as string } })
+  return new com_ibm_ibmcloud.v1alpha1.Binding({ metadata: { name: name || this.metadata.name }, spec: { serviceName: this.metadata.name! } })
 }
 
 com_ibm_ibmcloud.v1alpha1.Topic.prototype.getSource = function ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
@@ -131,7 +131,7 @@ export class EventStreams extends CloudService {
   getTopic ({ name, topicName }: { name: string, topicName?: string }) {
     return new com_ibm_ibmcloud.v1alpha1.Topic({
       metadata: { name },
-      spec: { topicName: topicName || name, bindingFrom: { name: this.binding.metadata.name as string } }
+      spec: { topicName: topicName || name, bindingFrom: { name: this.binding.metadata.name! } }
     })
   }
 
