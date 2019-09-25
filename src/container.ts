@@ -94,7 +94,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     return ingress
   }
 
-  getResources () {
+  toResources () {
     const ports = this.port ? [{ port: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
@@ -200,7 +200,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     return objs
   }
 
-  getImages () {
+  toImages () {
     return [{ name: this.image, build: this.build, main: this.main }]
   }
 }

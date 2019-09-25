@@ -79,7 +79,7 @@ class EventStreamsSecret extends Resource {
     this.name = name
   }
 
-  getResources () {
+  toResources () {
     const obj = {
       apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Composable',

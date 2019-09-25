@@ -50,7 +50,7 @@ export class Ingress extends Resource {
     return { valueFrom: { secretKeyRef: { name: `${this.name}-ingress`, key: 'url' } } }
   }
 
-  getResources ({ config = {} }: { config: any }) {
+  toResources ({ config = {} }: { config: any }) {
     let resources = []
 
     const paths = []

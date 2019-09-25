@@ -208,7 +208,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
 
       finalizeImageRenames (context: any, app: Solution) {
         const images: any[] = []
-        for (let name of app.getImages().map(image => image.name)) {
+        for (let name of app.toImages().map(image => image.name)) {
           const pos = name.indexOf(':', name.indexOf('/'))
           let newName = pos === -1 ? name : name.substring(0, pos)
           let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -287,7 +287,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
     const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
     const sa = new SolsaArchiver(outputRoot)
-    for (let item of app.getResources({ config })) {
+    for (let item of app.toResources({ config })) {
       if (item.obj) {
         sa.addResource(item.obj, item.layer)
       } else if (item.JSONPatch) {
@@ -350,7 +350,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       dir.removeCallback()
     }
 
-    const images = app.getImages()
+    const images = app.toImages()
 
     new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name) || { name: 'never' }))
   }
@@ -373,7 +373,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       return newTag ? newName + ':' + newTag : newName
     }
 
-    const images = app.getImages().filter(image => image.build)
+    const images = app.toImages().filter(image => image.build)
 
     const config = loadConfig(true)
     const context = config.clusters.find(({ name }: any) => name === config.targetCluster)
