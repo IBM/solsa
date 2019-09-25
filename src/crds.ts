@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 IBM Corporationundefined
+ * Copyright 2019 IBM Corporation. Comments are copyrighted by their respective authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1226,6 +1226,34 @@ export namespace com_storageos {
 export namespace io_rook_ceph {
   export namespace v1 {
     /**
+     * CephNFS spec.
+     */
+    export interface CephNFSSpec {
+      rados?: { [k: string]: any }
+      server?: { [k: string]: any }
+    }
+    /**
+     * Represents a cluster of Ceph NFS ganesha gateways.
+     */
+    export class CephNFS extends KubernetesResource implements ICephNFS {
+      spec: io_rook_ceph.v1.CephNFSSpec
+      metadata: meta.v1.ObjectMeta
+      /**
+       * Represents a cluster of Ceph NFS ganesha gateways.
+       */
+      constructor (properties: ICephNFS) {
+        super({ apiVersion: 'ceph.rook.io/v1', kind: 'CephNFS' })
+        this.spec = properties.spec
+        this.metadata = properties.metadata
+      }
+    }
+    export interface ICephNFS {
+      /** CephNFS spec. */
+      spec: io_rook_ceph.v1.CephNFSSpec
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+    }
+    /**
      * CephCluster spec.
      */
     export interface CephClusterSpec {
@@ -1751,10 +1779,13 @@ export namespace com_ibm_ibmcloud {
      * Binding spec.
      */
     export interface BindingSpec {
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
       role?: string
+      /** Name of the secret where credentials will be stored */
       secretName?: string
       /** Name of the service resource to bind */
       serviceName: string
+      serviceNamespace?: string
     }
     /**
      * Represents an instance of a service binding resource on IBM Cloud. A Binding creates a secret with the service instance credentials.
@@ -1781,9 +1812,9 @@ export namespace com_ibm_ibmcloud {
      * Service spec.
      */
     export interface ServiceSpec {
-      /** Parameters []keyvaluev1.KeyValue `json:"parameters,omitempty"` */
-      context?: { org: string, region: string, resourcegroup: string, resourcelocation: string, space: string }
+      context?: { org?: string, region?: string, resourcegroup?: string, resourcelocation?: string, space?: string }
       externalName?: string
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
       /** Plan for the service from the IBM Cloud Catalog */
       plan: string
       /** Service class is the name of the service from the IBM Cloud Catalog */
@@ -1810,6 +1841,210 @@ export namespace com_ibm_ibmcloud {
       metadata: meta.v1.ObjectMeta
       /** Service spec. */
       spec: com_ibm_ibmcloud.v1alpha1.ServiceSpec
+    }
+    /**
+     * Rule spec.
+     */
+    export interface RuleSpec {
+      /** Reference to a secret representing where to deploy this entity Default is `seed-default-owprops` The secret must defines these fields: apihost (string) : The OpenWhisk host auth (string): the authorization key cert (string):  the client certificate (optional) insecure (bool):  Whether or not to bypass certificate checking (optional, default is false) */
+      contextFrom?: { [k: string]: any }
+      /** Name of the action the rule applies to */
+      function: string
+      /** Rule name. Override metadata.name. */
+      name?: string
+      /** Name of the trigger the Rule applies to */
+      trigger: string
+    }
+    /**
+     * Represent a Rule
+     */
+    export class Rule extends KubernetesResource implements IRule {
+      metadata: meta.v1.ObjectMeta
+      spec: com_ibm_ibmcloud.v1alpha1.RuleSpec
+      /**
+       * Represent a Rule
+       */
+      constructor (properties: IRule) {
+        super({ apiVersion: 'ibmcloud.ibm.com/v1alpha1', kind: 'Rule' })
+        this.metadata = properties.metadata
+        this.spec = properties.spec
+      }
+    }
+    export interface IRule {
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Rule spec. */
+      spec: com_ibm_ibmcloud.v1alpha1.RuleSpec
+    }
+    /**
+     * Invocation spec.
+     */
+    export interface InvocationSpec {
+      /** Reference to a secret representing where to deploy this entity Default is `seed-default-owprops` The secret must defines these fields: apihost (string) : The OpenWhisk host auth (string): the authorization key cert (string):  the client certificate (optional) insecure (bool):  Whether or not to bypass certificate checking (optional, default is false) */
+      contextFrom?: { [k: string]: any }
+      /** Defines the function to invoke when this resource is deleted. */
+      finalizer?: { function: string, parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[] }
+      /** defines the name of function to invoke (eg. `/whisk.system/utils/echo` or `myfunction`) Invokes the function in the invocation context when the name is not fully qualified */
+      function: string
+      /** Defines the list of parameters to use for the invocation */
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** Defines where to store the invocation result. Discard the result when not specified. */
+      to?: { configMapKeyRef?: { [k: string]: any }, projection?: string, secretKeyRef?: { [k: string]: any } }
+    }
+    /**
+     * Represent an action invocation
+     */
+    export class Invocation extends KubernetesResource implements IInvocation {
+      metadata: meta.v1.ObjectMeta
+      spec: com_ibm_ibmcloud.v1alpha1.InvocationSpec
+      /**
+       * Represent an action invocation
+       */
+      constructor (properties: IInvocation) {
+        super({ apiVersion: 'ibmcloud.ibm.com/v1alpha1', kind: 'Invocation' })
+        this.metadata = properties.metadata
+        this.spec = properties.spec
+      }
+    }
+    export interface IInvocation {
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Invocation spec. */
+      spec: com_ibm_ibmcloud.v1alpha1.InvocationSpec
+    }
+    /**
+     * Function spec.
+     */
+    export interface FunctionSpec {
+      /** List of key/value annotations */
+      annotations?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** The inline code to deploy. */
+      code?: string
+      /** The location of the code to deploy. Support `http(s)` and `file` protocols. */
+      codeURI?: string
+      /** Reference to a secret representing where to deploy this entity Default is `seed-default-owprops` The secret must defines these fields: apihost (string) : The OpenWhisk host auth (string): the authorization key cert (string):  the client certificate (optional) insecure (bool):  Whether or not to bypass certificate checking (optional, default is false) */
+      contextFrom?: { [k: string]: any }
+      /** Docker image identifier (in dockerhub). More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/actions-docker.md */
+      docker?: string
+      /** Comma separated sequence of actions. Only valid when `runtime` is `sequence` */
+      functions?: string
+      /** Sets the action limits. More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/reference.md#system-limits */
+      limits?: { logSize?: number, memory?: number, timeout?: number }
+      /** The name of the action entry point (function or fully-qualified method name when applicable) */
+      main?: string
+      /** Action name. Override metadata.name. Does not include the package name (see below) */
+      name?: string
+      /** Run the action as native. More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/actions-docker.md#creating-native-actions */
+      native?: boolean
+      /** Action package name. Add it to the default package when not specified */
+      package?: string
+      /** List of key/value input parameters */
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** Indicates if the function is able to consume the raw contents within the body of an HTTP request. Only valid when `webExport` is `true`. More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/webactions.md#raw-http-handling */
+      rawHTTP?: boolean
+      /** Runtime name and optional version. More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/actions.md#languages-and-runtimes */
+      runtime: string
+      /** Turns the function into a "web action" causing it to return HTTP content without use of an API Gateway. More info: https://github.com/apache/incubator-openwhisk/blob/master/docs/webactions.md */
+      webExport?: boolean
+    }
+    /**
+     * Represent an Action
+     */
+    export class Function extends KubernetesResource implements IFunction {
+      metadata: meta.v1.ObjectMeta
+      spec: com_ibm_ibmcloud.v1alpha1.FunctionSpec
+      /**
+       * Represent an Action
+       */
+      constructor (properties: IFunction) {
+        super({ apiVersion: 'ibmcloud.ibm.com/v1alpha1', kind: 'Function' })
+        this.metadata = properties.metadata
+        this.spec = properties.spec
+      }
+    }
+    export interface IFunction {
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Function spec. */
+      spec: com_ibm_ibmcloud.v1alpha1.FunctionSpec
+    }
+    /**
+     * Trigger spec.
+     */
+    export interface TriggerSpec {
+      /** List of key/value annotations */
+      annotations?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** Reference to a secret representing where to deploy this entity Default is `seed-default-owprops` The secret must defines these fields: apihost (string) : The OpenWhisk host auth (string): the authorization key cert (string):  the client certificate (optional) insecure (bool):  Whether or not to bypass certificate checking (optional, default is false) */
+      contextFrom?: { [k: string]: any }
+      /** Name of the feed associated with the trigger */
+      feed?: string
+      /** Trigger name. Override metadata.name. */
+      name?: string
+      /** List of key/value input parameters */
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+    }
+    /**
+     * Represent a Trigger
+     */
+    export class Trigger extends KubernetesResource implements ITrigger {
+      metadata: meta.v1.ObjectMeta
+      spec: com_ibm_ibmcloud.v1alpha1.TriggerSpec
+      /**
+       * Represent a Trigger
+       */
+      constructor (properties: ITrigger) {
+        super({ apiVersion: 'ibmcloud.ibm.com/v1alpha1', kind: 'Trigger' })
+        this.metadata = properties.metadata
+        this.spec = properties.spec
+      }
+    }
+    export interface ITrigger {
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Trigger spec. */
+      spec: com_ibm_ibmcloud.v1alpha1.TriggerSpec
+    }
+    /**
+     * Package spec.
+     */
+    export interface PackageSpec {
+      /** List of key/value annotations */
+      annotations?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** Name of the package for which a binding should be created */
+      bind?: string
+      /** Reference to a secret representing where to deploy this entity Default is `seed-default-owprops` The secret must defines these fields: apihost (string) : The OpenWhisk host auth (string): the authorization key cert (string):  the client certificate (optional) insecure (bool):  Whether or not to bypass certificate checking (optional, default is false) */
+      contextFrom?: { [k: string]: any }
+      /** Package name. Override metadata.name. `default` is reserved. */
+      name?: string
+      /** List of key/value input parameters */
+      parameters?: { attributes?: { [k: string]: any }, name: string, value?: { [k: string]: any }, valueFrom?: { configMapKeyRef?: { [k: string]: any }, secretKeyRef?: { [k: string]: any } } }[]
+      /** List of key/value input parameters coming from a Secret or ConfigMap When multiple sources are specified, all key/value pairs are merged into a single set of key/value pairs, from the first source to the last source Duplicates are handled by overriding the previous key/value pair. The parameters property is applied last */
+      parametersFrom?: { configMapKeyRef?: { name?: string }, secretKeyRef?: { name?: string } }[]
+      /** Package visibility; `true` for `shared`, `false` for `private` */
+      publish?: boolean
+      /** indicates a cloud service resource which you want to bind to. This feature provides automatic injection of service keys into the binding parameters (for example user, password, urls) */
+      service?: string
+    }
+    /**
+     * Represent a Package
+     */
+    export class Package extends KubernetesResource implements IPackage {
+      metadata: meta.v1.ObjectMeta
+      spec: com_ibm_ibmcloud.v1alpha1.PackageSpec
+      /**
+       * Represent a Package
+       */
+      constructor (properties: IPackage) {
+        super({ apiVersion: 'ibmcloud.ibm.com/v1alpha1', kind: 'Package' })
+        this.metadata = properties.metadata
+        this.spec = properties.spec
+      }
+    }
+    export interface IPackage {
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+      /** Package spec. */
+      spec: com_ibm_ibmcloud.v1alpha1.PackageSpec
     }
     /**
      * Topic spec.

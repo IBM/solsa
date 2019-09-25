@@ -10,11 +10,10 @@
     "solsa-importer": "./dist/bin/solsa-importer.js"
   },
   "scripts": {
-    "build": "tsc && chmod a+x dist/bin/solsa.js && chmod a+x dist/bin/solsa-importer.js",
+    "build": "tsc && chmod a+x dist/bin/solsa.js dist/bin/solsa-importer.js",
     "clean": "rm -Rf dist || true",
     "codegen-core": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.14/api/openapi-spec/swagger.json | node dist/codegen.js ' and The Kubernetes Authors' > src/core.ts",
-    "codegen-openwhisk": "curl https://raw.githubusercontent.com/IBM/cloud-functions-operator/v0.8.0/api/swagger/swagger.json | node dist/codegen.js '' ibmcloud openwhisk > src/openwhisk.ts",
-    "codegen": "npm run codegen-core && npm run codegen-openwhisk",
+    "codegen": "npm run codegen-core",
     "testgen": "node test/test.js",
     "test": "standard && tsc -p dryrun.json && tslint -p . && mocha"
   },

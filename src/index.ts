@@ -21,7 +21,6 @@ export * from './crds'
 export * from './ibmcloud'
 export * from './ingress'
 export * from './knative'
-export * from './openwhisk'
 export * from './solution'
 export * from './transform'
 
