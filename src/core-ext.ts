@@ -42,6 +42,22 @@ apps.v1.Deployment.prototype.getService = function () {
   if (this.spec.template.spec === undefined) {
     throw new Error('Cannot get a service on Deployment without a spec')
   }
+  if (this.metadata.name === undefined) {
+    throw new Error('Deployment must have a `name` to derive a service')
+  }
+  if (this.spec.selector.matchLabels === undefined) {
+    throw new Error('Deployment must define spec.selector.matchLabels to use getService')
+  }
+
+  // Ensure all labels in selector are included in the PodSpec metadata
+  // TODO: Should we really do this, or should we throw an error if the user screwed up and this isn't already true?
+  const selector = this.spec.selector.matchLabels
+  if (this.spec.template.metadata === undefined) {
+    this.spec.template.metadata = { labels: {} }
+  } else if (this.spec.template.metadata.labels === undefined) {
+    this.spec.template.metadata.labels = {}
+  }
+  Object.assign(this.spec.template.metadata.labels, selector)
 
   let ports: core.v1.ServicePort[] = []
   this.spec.template.spec.containers.forEach(function (c: core.v1.Container) {
@@ -52,8 +68,7 @@ apps.v1.Deployment.prototype.getService = function () {
     }
   })
 
-  return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports } })
+  return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports, selector, type: 'ClusterIP' } })
 }
-
 extensions.v1beta1.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
 apps.v1beta2.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
