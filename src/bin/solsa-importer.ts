@@ -89,6 +89,7 @@ function snakeToCamel (str: string) {
 
 function writePreamble (outStream: fs.WriteStream) {
   outStream.write('/* eslint-disable no-template-curly-in-string */\n')
+  outStream.write('// @ts-check\n')
   outStream.write('const solsa = require(\'solsa\')\n\n')
 
   if (!argv.function) {
