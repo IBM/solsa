@@ -14,6 +14,7 @@
     "clean": "rm -Rf dist || true",
     "codegen-core": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.14/api/openapi-spec/swagger.json | node dist/codegen.js ' and The Kubernetes Authors' > src/core.ts",
     "codegen": "npm run codegen-core",
+    "postinstall": "tools/install-kustomize.sh",
     "testgen": "node test/test.js",
     "test": "standard && tsc -p dryrun.json && tslint -p . && mocha"
   },
