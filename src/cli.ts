@@ -311,7 +311,9 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
         } else {
           selectedLayer = path.join(outputRoot, 'base')
         }
-        cp.execSync(`kustomize build ${selectedLayer}`, { stdio: [0, 1, 2] })
+        let kustomize = path.join(__dirname, '..', 'tools', 'kustomize')
+        if (!fs.existsSync(kustomize)) kustomize = 'kustomize' // look for kustomize in PATH
+        cp.execSync(`${kustomize} build ${selectedLayer}`, { stdio: [0, 1, 2] })
       } catch (err) {
         console.log(err)
         if (!(err.signal === 'SIGPIPE')) {
