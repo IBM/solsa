@@ -31,9 +31,60 @@ declare module './core' {
          */
         propogateLabels (): void
       }
+      interface StatefulSet {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
+        getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
+      }
     }
     namespace v1beta2 {
       interface Deployment {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
+        getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
+      }
+      interface StatefulSet {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
+        getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
+      }
+    }
+
+    namespace v1beta1 {
+      interface Deployment {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
+        getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
+      }
+      interface StatefulSet {
         /**
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
@@ -114,8 +165,11 @@ apps.v1.Deployment.prototype.getService = function () {
   const ports = coreExt.servicePorts(this.spec.template.spec.containers)
   return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports, selector, type: 'ClusterIP' } })
 }
+apps.v1.StatefulSet.prototype.getService = apps.v1.Deployment.prototype.getService
+apps.v1beta2.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
+apps.v1beta2.StatefulSet.prototype.getService = apps.v1.Deployment.prototype.getService
 
-extensions.v1beta1.Deployment.prototype.getService = function () {
+apps.v1beta1.Deployment.prototype.getService = function () {
   if (this.spec.template.spec === undefined) {
     throw new Error('Cannot get a service on Deployment without a spec')
   }
@@ -136,8 +190,8 @@ extensions.v1beta1.Deployment.prototype.getService = function () {
   const ports = coreExt.servicePorts(this.spec.template.spec.containers)
   return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports, selector, type: 'ClusterIP' } })
 }
-
-apps.v1beta2.Deployment.prototype.getService = extensions.v1beta1.Deployment.prototype.getService
+apps.v1beta1.StatefulSet.prototype.getService = apps.v1beta1.Deployment.prototype.getService
+extensions.v1beta1.Deployment.prototype.getService = apps.v1beta1.Deployment.prototype.getService
 
 /*
  * propogateLabels
@@ -150,5 +204,9 @@ apps.v1.Deployment.prototype.propogateLabels = function () {
     coreExt.augmentLabels(this.spec.template.metadata, this.metadata.labels)
   }
 }
-extensions.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+apps.v1.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 apps.v1beta2.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+apps.v1beta2.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+apps.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+apps.v1beta1.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+extensions.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
