@@ -27,9 +27,9 @@ const commands: { [key: string]: () => void } = { import: importCommand }
 
 const argv = minimist(process.argv.slice(2), {
   string: ['output', 'dehelm'],
-  boolean: ['function', 'backticks'],
-  alias: { output: 'o', function: 'f', backticks: 'b' },
-  default: { output: 'myApp', 'dehelm': true, function: false, backticks: false }
+  boolean: ['function', 'extern'],
+  alias: { output: 'o', function: 'f', extern: 'e' },
+  default: { output: 'myApp', 'dehelm': true, function: false, extern: false }
 })
 
 argv.command = argv._[0]
@@ -123,30 +123,47 @@ function mapToSolsaType (apiVersion: string, kind: string): string {
   return `${apiVersion}.${kind}`
 }
 
-class String {
-  s: string
+class Text {
+  text: string
+  key: string
 
-  constructor (s: string) {
-    this.s = s
+  static count: number = 0
+
+  constructor (text: string, key: string = '') {
+    this.text = text
+    this.key = key
   }
 
   [util.inspect.custom] () {
-    return '`' + this.s.replace(/`/g, '\\`').replace(/\${/g, '\\${') + '`'
+    const count = this.text.split('\n').length
+    if (count < 50) return util.inspect(this.text)
+    let filename = `${argv.output}-${++Text.count}`
+    if (/^[0-9a-zA-Z _\-\._]+$/.test(this.key)) {
+      filename += '-' + this.key
+    }
+    if (!this.key.includes('.')) {
+      try {
+        JSON.parse(this.text)
+        filename += '.json'
+      } catch (error) {
+        filename += '.txt'
+      }
+    }
+    fs.writeFileSync(filename, this.text)
+    return `require('fs').readFileSync('${filename}').toString()`
   }
 }
 
-function wrap (val: any): any {
+function wrap (val: any, key?: string): any {
   if (val == null) return val
-  if (Array.isArray(val)) return val.map(wrap)
   switch (typeof val) {
     case 'string':
-      return new String(val)
+      return new Text(val, key)
     case 'object':
-      for (let key of Object.keys(val)) val[key] = wrap(val[key])
-      return val
-    default:
-      return val
+      if (Array.isArray(val)) return val.map(val => wrap(val)) // return new array
+      for (let key of Object.keys(val)) val[key] = wrap(val[key], key) // update object in place
   }
+  return val
 }
 
 function importCommand () {
@@ -182,13 +199,13 @@ function importCommand () {
           }
         }
         outStream.write(`app.${varName} = new solsa.${solsaType}(`)
-        outStream.write(util.inspect(argv.backticks ? wrap(val) : val, inspectOpts))
+        outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
       outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
-      outStream.write(util.inspect(argv.backticks ? wrap(val) : val, inspectOpts))
+      outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }
   })
