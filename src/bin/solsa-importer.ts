@@ -16,15 +16,10 @@
  * limitations under the License.
  */
 
-import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as minimist from 'minimist'
-import * as os from 'os'
-import * as path from 'path'
 import * as util from 'util'
 import * as yaml from 'js-yaml'
-import { Resource, KubernetesResource } from '../solution'
-import { WriteStream } from 'tty'
 
 const commands: { [key: string]: () => void } = { import: importCommand }
 
@@ -32,9 +27,9 @@ const commands: { [key: string]: () => void } = { import: importCommand }
 
 const argv = minimist(process.argv.slice(2), {
   string: ['output', 'dehelm'],
-  boolean: [ 'function' ],
-  alias: { output: 'o', function: 'f' },
-  default: { output: 'myApp', 'dehelm': true, function: false }
+  boolean: ['function', 'backticks'],
+  alias: { output: 'o', function: 'f', backticks: 'b' },
+  default: { output: 'myApp', 'dehelm': true, function: false, backticks: false }
 })
 
 argv.command = argv._[0]
@@ -128,6 +123,32 @@ function mapToSolsaType (apiVersion: string, kind: string): string {
   return `${apiVersion}.${kind}`
 }
 
+class String {
+  s: string
+
+  constructor (s: string) {
+    this.s = s
+  }
+
+  [util.inspect.custom] () {
+    return '`' + this.s.replace(/`/g, '\\`').replace(/\${/g, '\\${') + '`'
+  }
+}
+
+function wrap (val: any): any {
+  if (val == null) return val
+  if (Array.isArray(val)) return val.map(wrap)
+  switch (typeof val) {
+    case 'string':
+      return new String(val)
+    case 'object':
+      for (let key of Object.keys(val)) val[key] = wrap(val[key])
+      return val
+    default:
+      return val
+  }
+}
+
 function importCommand () {
   const inspectOpts = { depth: null, maxArrayLength: null, compact: 4, breakLength: 100 }
   const resources = loadObjects(argv.file).filter(x => x != null)
@@ -161,13 +182,13 @@ function importCommand () {
           }
         }
         outStream.write(`app.${varName} = new solsa.${solsaType}(`)
-        outStream.write(util.inspect(val, inspectOpts))
+        outStream.write(util.inspect(argv.backticks ? wrap(val) : val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
       outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
-      outStream.write(util.inspect(val, inspectOpts))
+      outStream.write(util.inspect(argv.backticks ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }
   })
