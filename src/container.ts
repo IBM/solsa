@@ -16,7 +16,8 @@
 
 import { Resource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
-import { Ingress, IIngress } from './ingress'
+import { Ingress } from './ingress'
+import * as k8s from './core'
 
 /**
  * A ContainerizedService is a higher-level abstraction for generating matched
@@ -82,16 +83,23 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   /**
    * Create an Ingress for this ContainerizedService.
    */
-  getIngress ({ name = this.name, port, endpoints }: Partial<IIngress> = {}) {
-    const ingress = new Ingress({ name, port, endpoints })
-
-    // default to ContainerizedService port
-    Object.defineProperty(ingress, 'port', {
-      get: () => either(port, this.port),
-      set: (val) => { port = val }
-    })
-
-    return ingress
+  getIngress ({ name = this.name, vhost = this.name, targetPort }: { name?: string, vhost?: string, targetPort?: number } = {}) {
+    const exposedPort = targetPort ? targetPort : (this.port ? this.port : this.ports[0].port)
+    const rule: k8s.extensions.v1beta1.IngressRule = {
+      host: vhost,
+      http: {
+        paths: [
+          {
+            path: '/',
+            backend: {
+              serviceName: this.name,
+              servicePort: exposedPort
+            }
+          }
+        ]
+      }
+    }
+    return new Ingress({ name, rules: [rule] })
   }
 
   toResources () {

@@ -15,6 +15,7 @@
  */
 
 import { core, apps, extensions, meta } from './core'
+import { Ingress } from './ingress'
 
 declare module './core' {
   namespace apps {
@@ -95,6 +96,17 @@ declare module './core' {
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
          */
         propogateLabels (): void
+      }
+    }
+  }
+
+  namespace core {
+    namespace v1 {
+      interface Service {
+        /**
+         * Construct a solsa.Ingress instance for this Service
+         */
+        getIngress (): Ingress
       }
     }
   }
@@ -210,3 +222,28 @@ apps.v1beta2.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototyp
 apps.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 apps.v1beta1.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 extensions.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+
+/*
+ * getIngress
+ */
+core.v1.Service.prototype.getIngress = function ({ name, vhost, targetPort }: { name?: string, vhost?: string, targetPort?: number } = {}) {
+  const ingName = name ? name : this.metadata.name!
+  const ingVhost = vhost ? vhost : this.metadata.name!
+  const serviceName = this.metadata.name!
+  const servicePort = targetPort ? targetPort : (this.spec.ports![0].port)
+  const rule: extensions.v1beta1.IngressRule = {
+    host: ingVhost,
+    http: {
+      paths: [
+        {
+          path: '/',
+          backend: {
+            serviceName: serviceName,
+            servicePort: servicePort
+          }
+        }
+      ]
+    }
+  }
+  return new Ingress({ name: ingName, rules: [rule] })
+}
