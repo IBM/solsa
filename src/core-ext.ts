@@ -20,24 +20,55 @@ declare module './core' {
   namespace apps {
     namespace v1 {
       interface Deployment {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
         getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
       }
     }
     namespace v1beta2 {
       interface Deployment {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
         getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
       }
     }
   }
+
   namespace extensions {
     namespace v1beta1 {
       interface Deployment {
+        /**
+         * Construct a core.v1.Service instance for this Deployment
+         * @returns the core.v1.Service object for this Deployment
+         */
         getService (): core.v1.Service
+
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
       }
     }
   }
 }
 
+/*
+ * Helper functions
+ */
 namespace coreExt {
   export function servicePorts (containers: core.v1.Container[]): core.v1.ServicePort[] {
     let ports: core.v1.ServicePort[] = []
@@ -59,6 +90,9 @@ namespace coreExt {
   }
 }
 
+/*
+ * getService
+ */
 apps.v1.Deployment.prototype.getService = function () {
   if (this.spec.template.spec === undefined) {
     throw new Error('Cannot get a service on Deployment without a spec')
@@ -73,7 +107,7 @@ apps.v1.Deployment.prototype.getService = function () {
   // Ensure all labels in selector are included in the PodSpec metadata
   const selector = this.spec.selector.matchLabels
   if (this.spec.template.metadata === undefined) {
-    this.spec.template.metadata = { }
+    this.spec.template.metadata = {}
   }
   coreExt.augmentLabels(this.spec.template.metadata, selector)
 
@@ -89,13 +123,13 @@ extensions.v1beta1.Deployment.prototype.getService = function () {
     throw new Error('Deployment must have a `name` to derive a service')
   }
   if (this.spec.selector === undefined) {
-    this.spec.selector = { matchLabels: { 'solsa.ibm.com/pod' : this.metadata.name } }
+    this.spec.selector = { matchLabels: { 'solsa.ibm.com/pod': this.metadata.name } }
   }
 
   // Ensure all labels in selector are included in the PodSpec metadata
   const selector = this.spec.selector.matchLabels
   if (this.spec.template.metadata === undefined) {
-    this.spec.template.metadata = { }
+    this.spec.template.metadata = {}
   }
   coreExt.augmentLabels(this.spec.template.metadata, selector!)
 
@@ -104,3 +138,17 @@ extensions.v1beta1.Deployment.prototype.getService = function () {
 }
 
 apps.v1beta2.Deployment.prototype.getService = extensions.v1beta1.Deployment.prototype.getService
+
+/*
+ * propogateLabels
+ */
+apps.v1.Deployment.prototype.propogateLabels = function () {
+  if (this.metadata.labels !== undefined) {
+    if (this.spec.template.metadata === undefined) {
+      this.spec.template.metadata = {}
+    }
+    coreExt.augmentLabels(this.spec.template.metadata, this.metadata.labels)
+  }
+}
+extensions.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+apps.v1beta2.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
