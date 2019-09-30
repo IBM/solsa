@@ -16,7 +16,6 @@
 
 import { Resource } from './solution'
 import * as k8s from './core'
-import { dynamic } from './helpers'
 
 /**
  * An Ingress enables external access to selected services in a cluster.
