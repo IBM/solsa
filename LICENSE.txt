@@ -215,4 +215,4 @@ This product bundles code and documentation which is automatically
 generated from community operators published on OperatorHub.io found
 at at https://github.com/operator-framework/community-operators
 and which is distributed under the Apache License, Version 2.0.
-For details see ./src/operators.ts
+For details see ./src/crds.ts

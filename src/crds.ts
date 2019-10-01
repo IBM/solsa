@@ -734,6 +734,17 @@ export namespace com_lightbend_app {
       /** AkkaCluster spec. */
       spec: com_lightbend_app.v1alpha1.AkkaClusterSpec
     }
+    /**
+     * Console
+     */
+    export class Console extends KubernetesResource {
+      /**
+       * Console
+       */
+      constructor (properties: dynamic) {
+        super(Object.assign({ apiVersion: 'app.lightbend.com/v1alpha1', kind: 'Console' }, properties))
+      }
+    }
   }
 }
 export namespace com_sysdig {
@@ -3321,21 +3332,59 @@ export namespace de_dentrassi_iot {
 export namespace com_coreos_monitoring {
   export namespace v1 {
     /**
-     * ServiceMonitor spec.
+     * PodMonitor spec.
      */
-    export interface ServiceMonitorSpec {
-      /** A list of endpoints allowed as part of this ServiceMonitor */
-      endpoints: { [k: string]: any }[]
+    export interface PodMonitorSpec {
       /** The label to use to retrieve the job name from */
       jobLabel?: string
       /** NamespaceSelector is a selector for selecting either all namespaces or a list of namespaces. */
-      namespaceSelector?: { [k: string]: any }
+      namespaceSelector?: { any?: boolean, matchNames?: string[] }
+      /** A list of endpoints allowed as part of this PodMonitor */
+      podMetricsEndpoints: { honorLabels?: boolean, interval?: string, metricRelabelings?: { action?: string, modulus?: number, regex?: string, replacement?: string, separator?: string, sourceLabels?: string[], targetLabel?: string }[], params?: { [k: string]: any }, path?: string, port?: string, proxyUrl?: string, relabelings?: { action?: string, modulus?: number, regex?: string, replacement?: string, separator?: string, sourceLabels?: string[], targetLabel?: string }[], scheme?: string, scrapeTimeout?: string, targetPort?: { [k: string]: any } }[]
       /** PodTargetLabels transfers labels on the Kubernetes Pod onto the target. */
       podTargetLabels?: string[]
       /** SampleLimit defines per-scrape limit on number of scraped samples that will be accepted. */
       sampleLimit?: number
       /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
-      selector: { [k: string]: any }
+      selector: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
+    }
+    /**
+     * Configures prometheus to monitor a particular pod
+     */
+    export class PodMonitor extends KubernetesResource implements IPodMonitor {
+      spec: com_coreos_monitoring.v1.PodMonitorSpec
+      metadata: meta.v1.ObjectMeta
+      /**
+       * Configures prometheus to monitor a particular pod
+       */
+      constructor (properties: IPodMonitor) {
+        super({ apiVersion: 'monitoring.coreos.com/v1', kind: 'PodMonitor' })
+        this.spec = properties.spec
+        this.metadata = properties.metadata
+      }
+    }
+    export interface IPodMonitor {
+      /** PodMonitor spec. */
+      spec: com_coreos_monitoring.v1.PodMonitorSpec
+      /** Standard object metadata. */
+      metadata: meta.v1.ObjectMeta
+    }
+    /**
+     * ServiceMonitor spec.
+     */
+    export interface ServiceMonitorSpec {
+      /** A list of endpoints allowed as part of this ServiceMonitor */
+      endpoints: { basicAuth?: { password?: { key: string, name?: string, optional?: boolean }, username?: { key: string, name?: string, optional?: boolean } }, bearerTokenFile?: string, honorLabels?: boolean, interval?: string, metricRelabelings?: { action?: string, modulus?: number, regex?: string, replacement?: string, separator?: string, sourceLabels?: string[], targetLabel?: string }[], params?: { [k: string]: any }, path?: string, port?: string, proxyUrl?: string, relabelings?: { action?: string, modulus?: number, regex?: string, replacement?: string, separator?: string, sourceLabels?: string[], targetLabel?: string }[], scheme?: string, scrapeTimeout?: string, targetPort?: { [k: string]: any }, tlsConfig?: { caFile?: string, certFile?: string, insecureSkipVerify?: boolean, keyFile?: string, serverName?: string } }[]
+      /** The label to use to retrieve the job name from */
+      jobLabel?: string
+      /** NamespaceSelector is a selector for selecting either all namespaces or a list of namespaces. */
+      namespaceSelector?: { any?: boolean, matchNames?: string[] }
+      /** PodTargetLabels transfers labels on the Kubernetes Pod onto the target. */
+      podTargetLabels?: string[]
+      /** SampleLimit defines per-scrape limit on number of scraped samples that will be accepted. */
+      sampleLimit?: number
+      /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
+      selector: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
       /** TargetLabels transfers labels on the Kubernetes Service onto the target. */
       targetLabels?: string[]
     }
@@ -3365,7 +3414,7 @@ export namespace com_coreos_monitoring {
      */
     export interface PrometheusRuleSpec {
       /** Content of Prometheus rule file */
-      groups?: { [k: string]: any }[]
+      groups?: { interval?: string, name: string, rules: { alert?: string, annotations?: { [k: string]: any }, expr: { [k: string]: any }, for?: string, labels?: { [k: string]: any }, record?: string }[] }[]
     }
     /**
      * A Prometheus Rule configures groups of sequentially evaluated recording and alerting rules.
@@ -3393,23 +3442,23 @@ export namespace com_coreos_monitoring {
      */
     export interface PrometheusSpec {
       /** SecretKeySelector selects a key of a Secret. */
-      additionalAlertManagerConfigs?: { [k: string]: any }
+      additionalAlertManagerConfigs?: { key: string, name?: string, optional?: boolean }
       /** SecretKeySelector selects a key of a Secret. */
-      additionalAlertRelabelConfigs?: { [k: string]: any }
+      additionalAlertRelabelConfigs?: { key: string, name?: string, optional?: boolean }
       /** SecretKeySelector selects a key of a Secret. */
-      additionalScrapeConfigs?: { [k: string]: any }
+      additionalScrapeConfigs?: { key: string, name?: string, optional?: boolean }
       /** Affinity is a group of affinity scheduling rules. */
-      affinity?: { [k: string]: any }
+      affinity?: { nodeAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { preference: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchFields?: { key: string, operator: string, values?: string[] }[] }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { nodeSelectorTerms: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchFields?: { key: string, operator: string, values?: string[] }[] }[] } }, podAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { podAffinityTerm: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }[] }, podAntiAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { podAffinityTerm: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }[] } }
       /** AlertingSpec defines parameters for alerting configuration of Prometheus servers. */
-      alerting?: { [k: string]: any }
+      alerting?: { alertmanagers: { bearerTokenFile?: string, name: string, namespace: string, pathPrefix?: string, port: { [k: string]: any }, scheme?: string, tlsConfig?: { caFile?: string, certFile?: string, insecureSkipVerify?: boolean, keyFile?: string, serverName?: string } }[] }
       /** APIServerConfig defines a host and auth methods to access apiserver. More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config */
-      apiserverConfig?: { [k: string]: any }
+      apiserverConfig?: { basicAuth?: { password?: { key: string, name?: string, optional?: boolean }, username?: { key: string, name?: string, optional?: boolean } }, bearerToken?: string, bearerTokenFile?: string, host: string, tlsConfig?: { caFile?: string, certFile?: string, insecureSkipVerify?: boolean, keyFile?: string, serverName?: string } }
       /** Base image to use for a Prometheus deployment. */
       baseImage?: string
       /** ConfigMaps is a list of ConfigMaps in the same namespace as the Prometheus object, which shall be mounted into the Prometheus Pods. The ConfigMaps are mounted into /etc/prometheus/configmaps/<configmap-name>. */
       configMaps?: string[]
-      /** Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to a Prometheus pod. */
-      containers?: { [k: string]: any }[]
+      /** Containers allows injecting additional containers or modifying operator generated containers. This can be used to allow adding an authentication proxy to a Prometheus pod or to change the behavior of an operator generated container. Containers described here modify an operator generated container if they share the same name and modifications are done via a strategic merge patch. The current container names are: `prometheus`, `prometheus-config-reloader`, `rules-configmap-reloader`, and `thanos-sidecar`. Overriding containers is entirely outside the scope of what the maintainers will support and by doing so, you accept that this behaviour may break at any time without notice. */
+      containers?: { args?: string[], command?: string[], env?: { name: string, value?: string, valueFrom?: { configMapKeyRef?: { key: string, name?: string, optional?: boolean }, fieldRef?: { apiVersion?: string, fieldPath: string }, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string }, secretKeyRef?: { key: string, name?: string, optional?: boolean } } }[], envFrom?: { configMapRef?: { name?: string, optional?: boolean }, prefix?: string, secretRef?: { name?: string, optional?: boolean } }[], image?: string, imagePullPolicy?: string, lifecycle?: { postStart?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } }, preStop?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } } }, livenessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, name: string, ports?: { containerPort: number, hostIP?: string, hostPort?: number, name?: string, protocol?: string }[], readinessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, securityContext?: { allowPrivilegeEscalation?: boolean, capabilities?: { add?: string[], drop?: string[] }, privileged?: boolean, procMount?: string, readOnlyRootFilesystem?: boolean, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }, stdin?: boolean, stdinOnce?: boolean, terminationMessagePath?: string, terminationMessagePolicy?: string, tty?: boolean, volumeDevices?: { devicePath: string, name: string }[], volumeMounts?: { mountPath: string, mountPropagation?: string, name: string, readOnly?: boolean, subPath?: string, subPathExpr?: string }[], workingDir?: string }[]
       /** Enable access to prometheus web admin API. Defaults to the value of `false`. WARNING: Enabling the admin APIs enables mutating endpoints, to delete data, shutdown Prometheus, and more. Enabling this should be done with care and the user is advised to add additional authentication authorization via a proxy to ensure only clients authorized to perform these actions can do so. For more information see https://prometheus.io/docs/prometheus/latest/querying/api/#tsdb-admin-apis */
       enableAdminAPI?: boolean
       /** Interval between consecutive evaluations. */
@@ -3421,7 +3470,9 @@ export namespace com_coreos_monitoring {
       /** Image if specified has precedence over baseImage, tag and sha combinations. Specifying the version is still necessary to ensure the Prometheus Operator knows what version of Prometheus is being configured. */
       image?: string
       /** An optional list of references to secrets in the same namespace to use for pulling prometheus and alertmanager images from registries see http://kubernetes.io/docs/user-guide/images#specifying-imagepullsecrets-on-a-pod */
-      imagePullSecrets?: { [k: string]: any }[]
+      imagePullSecrets?: { name?: string }[]
+      /** InitContainers allows adding initContainers to the pod definition. Those can be used to e.g. fetch secrets for injection into the Prometheus configuration from external sources. Any errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ Using initContainers for any use case other then secret fetching is entirely outside the scope of what the maintainers will support and by doing so, you accept that this behaviour may break at any time without notice. */
+      initContainers?: { args?: string[], command?: string[], env?: { name: string, value?: string, valueFrom?: { configMapKeyRef?: { key: string, name?: string, optional?: boolean }, fieldRef?: { apiVersion?: string, fieldPath: string }, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string }, secretKeyRef?: { key: string, name?: string, optional?: boolean } } }[], envFrom?: { configMapRef?: { name?: string, optional?: boolean }, prefix?: string, secretRef?: { name?: string, optional?: boolean } }[], image?: string, imagePullPolicy?: string, lifecycle?: { postStart?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } }, preStop?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } } }, livenessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, name: string, ports?: { containerPort: number, hostIP?: string, hostPort?: number, name?: string, protocol?: string }[], readinessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, securityContext?: { allowPrivilegeEscalation?: boolean, capabilities?: { add?: string[], drop?: string[] }, privileged?: boolean, procMount?: string, readOnlyRootFilesystem?: boolean, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }, stdin?: boolean, stdinOnce?: boolean, terminationMessagePath?: string, terminationMessagePolicy?: string, tty?: boolean, volumeDevices?: { devicePath: string, name: string }[], volumeMounts?: { mountPath: string, mountPropagation?: string, name: string, readOnly?: boolean, subPath?: string, subPathExpr?: string }[], workingDir?: string }[]
       /** ListenLocal makes the Prometheus server listen on loopback, so that it does not bind against the Pod IP. */
       listenLocal?: boolean
       /** Log format for Prometheus to be configured with. */
@@ -3433,53 +3484,69 @@ export namespace com_coreos_monitoring {
       /** When a Prometheus deployment is paused, no actions except for deletion will be performed on the underlying objects. */
       paused?: boolean
       /** ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create. */
-      podMetadata?: { [k: string]: any }
+      podMetadata?: { annotations?: { [k: string]: any }, clusterName?: string, creationTimestamp?: string, deletionGracePeriodSeconds?: number, deletionTimestamp?: string, finalizers?: string[], generateName?: string, generation?: number, initializers?: { pending: { name: string }[], result?: { apiVersion?: string, code?: number, details?: { causes?: { field?: string, message?: string, reason?: string }[], group?: string, kind?: string, name?: string, retryAfterSeconds?: number, uid?: string }, kind?: string, message?: string, metadata?: { continue?: string, remainingItemCount?: number, resourceVersion?: string, selfLink?: string }, reason?: string, status?: string } }, labels?: { [k: string]: any }, managedFields?: { apiVersion?: string, fields?: { [k: string]: any }, manager?: string, operation?: string, time?: string }[], name?: string, namespace?: string, ownerReferences?: { apiVersion: string, blockOwnerDeletion?: boolean, controller?: boolean, kind: string, name: string, uid: string }[], resourceVersion?: string, selfLink?: string, uid?: string }
+      /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
+      podMonitorNamespaceSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
+      /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
+      podMonitorSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
+      /** Port name used for the pods and governing service. This defaults to web */
+      portName?: string
       /** Priority class assigned to the Pods */
       priorityClassName?: string
+      /** Name of Prometheus external label used to denote Prometheus instance name. Defaults to the value of `prometheus`. External label will _not_ be added when value is set to empty string (`""`). */
+      prometheusExternalLabelName?: string
       /** QuerySpec defines the query command line flags when starting Prometheus. */
-      query?: { [k: string]: any }
+      query?: { lookbackDelta?: string, maxConcurrency?: number, maxSamples?: number, timeout?: string }
       /** If specified, the remote_read spec. This is an experimental feature, it may change in any upcoming release in a breaking way. */
-      remoteRead?: { [k: string]: any }[]
+      remoteRead?: { basicAuth?: { password?: { key: string, name?: string, optional?: boolean }, username?: { key: string, name?: string, optional?: boolean } }, bearerToken?: string, bearerTokenFile?: string, proxyUrl?: string, readRecent?: boolean, remoteTimeout?: string, requiredMatchers?: { [k: string]: any }, tlsConfig?: { caFile?: string, certFile?: string, insecureSkipVerify?: boolean, keyFile?: string, serverName?: string }, url: string }[]
       /** If specified, the remote_write spec. This is an experimental feature, it may change in any upcoming release in a breaking way. */
-      remoteWrite?: { [k: string]: any }[]
+      remoteWrite?: { basicAuth?: { password?: { key: string, name?: string, optional?: boolean }, username?: { key: string, name?: string, optional?: boolean } }, bearerToken?: string, bearerTokenFile?: string, proxyUrl?: string, queueConfig?: { batchSendDeadline?: string, capacity?: number, maxBackoff?: string, maxRetries?: number, maxSamplesPerSend?: number, maxShards?: number, minBackoff?: string, minShards?: number }, remoteTimeout?: string, tlsConfig?: { caFile?: string, certFile?: string, insecureSkipVerify?: boolean, keyFile?: string, serverName?: string }, url: string, writeRelabelConfigs?: { action?: string, modulus?: number, regex?: string, replacement?: string, separator?: string, sourceLabels?: string[], targetLabel?: string }[] }[]
+      /** Name of Prometheus external label used to denote replica name. Defaults to the value of `prometheus_replica`. External label will _not_ be added when value is set to empty string (`""`). */
+      replicaExternalLabelName?: string
       /** Desired number of Pods for the cluster */
       replicas?: number
       /** Limits describes the minimum/maximum amount of compute resources required/allowed */
-      resources?: { [k: string]: any }
+      resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }
       /** Time duration Prometheus shall retain data for. Default is '24h', and must match the regular expression `[0-9]+(ms|s|m|h|d|w|y)` (milliseconds seconds minutes hours days weeks years). */
       retention?: string
+      /** Maximum amount of disk space used by blocks. */
+      retentionSize?: string
       /** The route prefix Prometheus registers HTTP handlers for. This is useful, if using ExternalURL and a proxy is rewriting HTTP routes of a request, and the actual ExternalURL is still true, but the server serves requests under a different route prefix. For example for use with `kubectl proxy`. */
       routePrefix?: string
       /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
-      ruleNamespaceSelector?: { [k: string]: any }
+      ruleNamespaceSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
       /** A selector for the ConfigMaps from which to load rule files */
-      ruleSelector?: { [k: string]: any }
+      ruleSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
       /** /--rules.*\ command-line arguments */
-      rules?: { [k: string]: any }
+      rules?: { alert?: { forGracePeriod?: string, forOutageTolerance?: string, resendDelay?: string } }
       /** Interval between consecutive scrapes. */
       scrapeInterval?: string
       /** Secrets is a list of Secrets in the same namespace as the Prometheus object, which shall be mounted into the Prometheus Pods. The Secrets are mounted into /etc/prometheus/secrets/<secret-name>. */
       secrets?: string[]
       /** PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext. */
-      securityContext?: { [k: string]: any }
+      securityContext?: { fsGroup?: number, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, supplementalGroups?: number[], sysctls?: { name: string, value: string }[], windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }
       /** The ServiceAccount to use to run the Prometheus pods */
       serviceAccountName?: string
       /** A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects. */
-      serviceMonitorNamespaceSelector?: { [k: string]: any }
+      serviceMonitorNamespaceSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
       /** ServiceMonitors to be selected for target discovery */
-      serviceMonitorSelector?: { [k: string]: any }
+      serviceMonitorSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }
       /** SHA of Prometheus container image to be deployed. Defaults to the value of `version`. Similar to a tag, but the SHA explicitly deploys an immutable container image. Version and Tag are ignored if SHA is set. */
       sha?: string
       /** StorageSpec defines the configured storage for a group Prometheus servers. If neither `emptyDir` nor `volumeClaimTemplate` is specified, then by default an [EmptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) will be used. */
-      storage?: { [k: string]: any }
+      storage?: { emptyDir?: { medium?: string, sizeLimit?: { [k: string]: any } }, volumeClaimTemplate?: { apiVersion?: string, kind?: string, metadata?: { annotations?: { [k: string]: any }, clusterName?: string, creationTimestamp?: string, deletionGracePeriodSeconds?: number, deletionTimestamp?: string, finalizers?: string[], generateName?: string, generation?: number, initializers?: { pending: { name: string }[], result?: { apiVersion?: string, code?: number, details?: { causes?: { field?: string, message?: string, reason?: string }[], group?: string, kind?: string, name?: string, retryAfterSeconds?: number, uid?: string }, kind?: string, message?: string, metadata?: { continue?: string, remainingItemCount?: number, resourceVersion?: string, selfLink?: string }, reason?: string, status?: string } }, labels?: { [k: string]: any }, managedFields?: { apiVersion?: string, fields?: { [k: string]: any }, manager?: string, operation?: string, time?: string }[], name?: string, namespace?: string, ownerReferences?: { apiVersion: string, blockOwnerDeletion?: boolean, controller?: boolean, kind: string, name: string, uid: string }[], resourceVersion?: string, selfLink?: string, uid?: string }, spec?: { accessModes?: string[], dataSource?: { apiGroup?: string, kind: string, name: string }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, selector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, storageClassName?: string, volumeMode?: string, volumeName?: string }, status?: { accessModes?: string[], capacity?: { [k: string]: any }, conditions?: { lastProbeTime?: string, lastTransitionTime?: string, message?: string, reason?: string, status: string, type: string }[], phase?: string } } }
       /** Tag of Prometheus container image to be deployed. Defaults to the value of `version`. Version is ignored if Tag is set. */
       tag?: string
       /** ThanosSpec defines parameters for a Prometheus server within a Thanos deployment. */
-      thanos?: { [k: string]: any }
+      thanos?: { baseImage?: string, image?: string, objectStorageConfig?: { key: string, name?: string, optional?: boolean }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, sha?: string, tag?: string, version?: string }
       /** If specified, the pod's tolerations. */
-      tolerations?: { [k: string]: any }[]
+      tolerations?: { effect?: string, key?: string, operator?: string, tolerationSeconds?: number, value?: string }[]
       /** Version of Prometheus to be deployed. */
       version?: string
+      /** Volumes allows configuration of additional volumes on the output StatefulSet definition. Volumes specified will be appended to other volumes that are generated as a result of StorageSpec objects. */
+      volumes?: { awsElasticBlockStore?: { fsType?: string, partition?: number, readOnly?: boolean, volumeID: string }, azureDisk?: { cachingMode?: string, diskName: string, diskURI: string, fsType?: string, kind?: string, readOnly?: boolean }, azureFile?: { readOnly?: boolean, secretName: string, shareName: string }, cephfs?: { monitors: string[], path?: string, readOnly?: boolean, secretFile?: string, secretRef?: { name?: string }, user?: string }, cinder?: { fsType?: string, readOnly?: boolean, secretRef?: { name?: string }, volumeID: string }, configMap?: { defaultMode?: number, items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, csi?: { driver: string, fsType?: string, nodePublishSecretRef?: { name?: string }, readOnly?: boolean, volumeAttributes?: { [k: string]: any } }, downwardAPI?: { defaultMode?: number, items?: { fieldRef?: { apiVersion?: string, fieldPath: string }, mode?: number, path: string, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string } }[] }, emptyDir?: { medium?: string, sizeLimit?: { [k: string]: any } }, fc?: { fsType?: string, lun?: number, readOnly?: boolean, targetWWNs?: string[], wwids?: string[] }, flexVolume?: { driver: string, fsType?: string, options?: { [k: string]: any }, readOnly?: boolean, secretRef?: { name?: string } }, flocker?: { datasetName?: string, datasetUUID?: string }, gcePersistentDisk?: { fsType?: string, partition?: number, pdName: string, readOnly?: boolean }, gitRepo?: { directory?: string, repository: string, revision?: string }, glusterfs?: { endpoints: string, path: string, readOnly?: boolean }, hostPath?: { path: string, type?: string }, iscsi?: { chapAuthDiscovery?: boolean, chapAuthSession?: boolean, fsType?: string, initiatorName?: string, iqn: string, iscsiInterface?: string, lun: number, portals?: string[], readOnly?: boolean, secretRef?: { name?: string }, targetPortal: string }, name: string, nfs?: { path: string, readOnly?: boolean, server: string }, persistentVolumeClaim?: { claimName: string, readOnly?: boolean }, photonPersistentDisk?: { fsType?: string, pdID: string }, portworxVolume?: { fsType?: string, readOnly?: boolean, volumeID: string }, projected?: { defaultMode?: number, sources: { configMap?: { items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, downwardAPI?: { items?: { fieldRef?: { apiVersion?: string, fieldPath: string }, mode?: number, path: string, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string } }[] }, secret?: { items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, serviceAccountToken?: { audience?: string, expirationSeconds?: number, path: string } }[] }, quobyte?: { group?: string, readOnly?: boolean, registry: string, tenant?: string, user?: string, volume: string }, rbd?: { fsType?: string, image: string, keyring?: string, monitors: string[], pool?: string, readOnly?: boolean, secretRef?: { name?: string }, user?: string }, scaleIO?: { fsType?: string, gateway: string, protectionDomain?: string, readOnly?: boolean, secretRef: { name?: string }, sslEnabled?: boolean, storageMode?: string, storagePool?: string, system: string, volumeName?: string }, secret?: { defaultMode?: number, items?: { key: string, mode?: number, path: string }[], optional?: boolean, secretName?: string }, storageos?: { fsType?: string, readOnly?: boolean, secretRef?: { name?: string }, volumeName?: string, volumeNamespace?: string }, vsphereVolume?: { fsType?: string, storagePolicyID?: string, storagePolicyName?: string, volumePath: string } }[]
+      /** Enable compression of the write-ahead log using Snappy. This flag is only available in versions of Prometheus >= 2.11.0. */
+      walCompression?: boolean
     }
     /**
      * A running Prometheus instance
@@ -3509,21 +3576,25 @@ export namespace com_coreos_monitoring {
       /** AdditionalPeers allows injecting a set of additional Alertmanagers to peer with to form a highly available cluster. */
       additionalPeers?: string[]
       /** Affinity is a group of affinity scheduling rules. */
-      affinity?: { [k: string]: any }
+      affinity?: { nodeAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { preference: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchFields?: { key: string, operator: string, values?: string[] }[] }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { nodeSelectorTerms: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchFields?: { key: string, operator: string, values?: string[] }[] }[] } }, podAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { podAffinityTerm: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }[] }, podAntiAffinity?: { preferredDuringSchedulingIgnoredDuringExecution?: { podAffinityTerm: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }, weight: number }[], requiredDuringSchedulingIgnoredDuringExecution?: { labelSelector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, namespaces?: string[], topologyKey: string }[] } }
       /** Base image that is used to deploy pods, without tag. */
       baseImage?: string
       /** ConfigMaps is a list of ConfigMaps in the same namespace as the Alertmanager object, which shall be mounted into the Alertmanager Pods. The ConfigMaps are mounted into /etc/alertmanager/configmaps/<configmap-name>. */
       configMaps?: string[]
       /** Containers allows injecting additional containers. This is meant to allow adding an authentication proxy to an Alertmanager pod. */
-      containers?: { [k: string]: any }[]
+      containers?: { args?: string[], command?: string[], env?: { name: string, value?: string, valueFrom?: { configMapKeyRef?: { key: string, name?: string, optional?: boolean }, fieldRef?: { apiVersion?: string, fieldPath: string }, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string }, secretKeyRef?: { key: string, name?: string, optional?: boolean } } }[], envFrom?: { configMapRef?: { name?: string, optional?: boolean }, prefix?: string, secretRef?: { name?: string, optional?: boolean } }[], image?: string, imagePullPolicy?: string, lifecycle?: { postStart?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } }, preStop?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } } }, livenessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, name: string, ports?: { containerPort: number, hostIP?: string, hostPort?: number, name?: string, protocol?: string }[], readinessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, securityContext?: { allowPrivilegeEscalation?: boolean, capabilities?: { add?: string[], drop?: string[] }, privileged?: boolean, procMount?: string, readOnlyRootFilesystem?: boolean, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }, stdin?: boolean, stdinOnce?: boolean, terminationMessagePath?: string, terminationMessagePolicy?: string, tty?: boolean, volumeDevices?: { devicePath: string, name: string }[], volumeMounts?: { mountPath: string, mountPropagation?: string, name: string, readOnly?: boolean, subPath?: string, subPathExpr?: string }[], workingDir?: string }[]
       /** The external URL the Alertmanager instances will be available under. This is necessary to generate correct URLs. This is necessary if Alertmanager is not served from root of a DNS name. */
       externalUrl?: string
       /** Image if specified has precedence over baseImage, tag and sha combinations. Specifying the version is still necessary to ensure the Prometheus Operator knows what version of Alertmanager is being configured. */
       image?: string
       /** An optional list of references to secrets in the same namespace to use for pulling prometheus and alertmanager images from registries see http://kubernetes.io/docs/user-guide/images#specifying-imagepullsecrets-on-a-pod */
-      imagePullSecrets?: { [k: string]: any }[]
+      imagePullSecrets?: { name?: string }[]
+      /** InitContainers allows adding initContainers to the pod definition. Those can be used to e.g. fetch secrets for injection into the Alertmanager configuration from external sources. Any errors during the execution of an initContainer will lead to a restart of the Pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ Using initContainers for any use case other then secret fetching is entirely outside the scope of what the maintainers will support and by doing so, you accept that this behaviour may break at any time without notice. */
+      initContainers?: { args?: string[], command?: string[], env?: { name: string, value?: string, valueFrom?: { configMapKeyRef?: { key: string, name?: string, optional?: boolean }, fieldRef?: { apiVersion?: string, fieldPath: string }, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string }, secretKeyRef?: { key: string, name?: string, optional?: boolean } } }[], envFrom?: { configMapRef?: { name?: string, optional?: boolean }, prefix?: string, secretRef?: { name?: string, optional?: boolean } }[], image?: string, imagePullPolicy?: string, lifecycle?: { postStart?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } }, preStop?: { exec?: { command?: string[] }, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, tcpSocket?: { host?: string, port: { [k: string]: any } } } }, livenessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, name: string, ports?: { containerPort: number, hostIP?: string, hostPort?: number, name?: string, protocol?: string }[], readinessProbe?: { exec?: { command?: string[] }, failureThreshold?: number, httpGet?: { host?: string, httpHeaders?: { name: string, value: string }[], path?: string, port: { [k: string]: any }, scheme?: string }, initialDelaySeconds?: number, periodSeconds?: number, successThreshold?: number, tcpSocket?: { host?: string, port: { [k: string]: any } }, timeoutSeconds?: number }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, securityContext?: { allowPrivilegeEscalation?: boolean, capabilities?: { add?: string[], drop?: string[] }, privileged?: boolean, procMount?: string, readOnlyRootFilesystem?: boolean, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }, stdin?: boolean, stdinOnce?: boolean, terminationMessagePath?: string, terminationMessagePolicy?: string, tty?: boolean, volumeDevices?: { devicePath: string, name: string }[], volumeMounts?: { mountPath: string, mountPropagation?: string, name: string, readOnly?: boolean, subPath?: string, subPathExpr?: string }[], workingDir?: string }[]
       /** ListenLocal makes the Alertmanager server listen on loopback, so that it does not bind against the Pod IP. Note this is only for the Alertmanager UI, not the gossip communication. */
       listenLocal?: boolean
+      /** Log format for Alertmanager to be configured with. */
+      logFormat?: string
       /** Log level for Alertmanager to be configured with. */
       logLevel?: string
       /** Define which Nodes the Pods are scheduled on. */
@@ -3531,13 +3602,15 @@ export namespace com_coreos_monitoring {
       /** If set to true all actions on the underlaying managed objects are not goint to be performed, except for delete actions. */
       paused?: boolean
       /** ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create. */
-      podMetadata?: { [k: string]: any }
+      podMetadata?: { annotations?: { [k: string]: any }, clusterName?: string, creationTimestamp?: string, deletionGracePeriodSeconds?: number, deletionTimestamp?: string, finalizers?: string[], generateName?: string, generation?: number, initializers?: { pending: { name: string }[], result?: { apiVersion?: string, code?: number, details?: { causes?: { field?: string, message?: string, reason?: string }[], group?: string, kind?: string, name?: string, retryAfterSeconds?: number, uid?: string }, kind?: string, message?: string, metadata?: { continue?: string, remainingItemCount?: number, resourceVersion?: string, selfLink?: string }, reason?: string, status?: string } }, labels?: { [k: string]: any }, managedFields?: { apiVersion?: string, fields?: { [k: string]: any }, manager?: string, operation?: string, time?: string }[], name?: string, namespace?: string, ownerReferences?: { apiVersion: string, blockOwnerDeletion?: boolean, controller?: boolean, kind: string, name: string, uid: string }[], resourceVersion?: string, selfLink?: string, uid?: string }
+      /** Port name used for the pods and governing service. This defaults to web */
+      portName?: string
       /** Priority class assigned to the Pods */
       priorityClassName?: string
       /** Desired number of Pods for the cluster */
       replicas?: number
       /** Limits describes the minimum/maximum amount of compute resources required/allowed */
-      resources?: { [k: string]: any }
+      resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }
       /** Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression `[0-9]+(ms|s|m|h)` (milliseconds seconds minutes hours). */
       retention?: string
       /** The route prefix Alertmanager registers HTTP handlers for. This is useful, if using ExternalURL and a proxy is rewriting HTTP routes of a request, and the actual ExternalURL is still true, but the server serves requests under a different route prefix. For example for use with `kubectl proxy`. */
@@ -3545,19 +3618,21 @@ export namespace com_coreos_monitoring {
       /** Secrets is a list of Secrets in the same namespace as the Alertmanager object, which shall be mounted into the Alertmanager Pods. The Secrets are mounted into /etc/alertmanager/secrets/<secret-name>. */
       secrets?: string[]
       /** PodSecurityContext holds pod-level security attributes and common container settings. Some fields are also present in container.securityContext.  Field values of container.securityContext take precedence over field values of PodSecurityContext. */
-      securityContext?: { [k: string]: any }
+      securityContext?: { fsGroup?: number, runAsGroup?: number, runAsNonRoot?: boolean, runAsUser?: number, seLinuxOptions?: { level?: string, role?: string, type?: string, user?: string }, supplementalGroups?: number[], sysctls?: { name: string, value: string }[], windowsOptions?: { gmsaCredentialSpec?: string, gmsaCredentialSpecName?: string } }
       /** ServiceAccountName is the name of the ServiceAccount to use to run the Prometheus Pods. */
       serviceAccountName?: string
       /** SHA of Alertmanager container image to be deployed. Defaults to the value of `version`. Similar to a tag, but the SHA explicitly deploys an immutable container image. Version and Tag are ignored if SHA is set. */
       sha?: string
       /** StorageSpec defines the configured storage for a group Prometheus servers. If neither `emptyDir` nor `volumeClaimTemplate` is specified, then by default an [EmptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir) will be used. */
-      storage?: { [k: string]: any }
+      storage?: { emptyDir?: { medium?: string, sizeLimit?: { [k: string]: any } }, volumeClaimTemplate?: { apiVersion?: string, kind?: string, metadata?: { annotations?: { [k: string]: any }, clusterName?: string, creationTimestamp?: string, deletionGracePeriodSeconds?: number, deletionTimestamp?: string, finalizers?: string[], generateName?: string, generation?: number, initializers?: { pending: { name: string }[], result?: { apiVersion?: string, code?: number, details?: { causes?: { field?: string, message?: string, reason?: string }[], group?: string, kind?: string, name?: string, retryAfterSeconds?: number, uid?: string }, kind?: string, message?: string, metadata?: { continue?: string, remainingItemCount?: number, resourceVersion?: string, selfLink?: string }, reason?: string, status?: string } }, labels?: { [k: string]: any }, managedFields?: { apiVersion?: string, fields?: { [k: string]: any }, manager?: string, operation?: string, time?: string }[], name?: string, namespace?: string, ownerReferences?: { apiVersion: string, blockOwnerDeletion?: boolean, controller?: boolean, kind: string, name: string, uid: string }[], resourceVersion?: string, selfLink?: string, uid?: string }, spec?: { accessModes?: string[], dataSource?: { apiGroup?: string, kind: string, name: string }, resources?: { limits?: { [k: string]: any }, requests?: { [k: string]: any } }, selector?: { matchExpressions?: { key: string, operator: string, values?: string[] }[], matchLabels?: { [k: string]: any } }, storageClassName?: string, volumeMode?: string, volumeName?: string }, status?: { accessModes?: string[], capacity?: { [k: string]: any }, conditions?: { lastProbeTime?: string, lastTransitionTime?: string, message?: string, reason?: string, status: string, type: string }[], phase?: string } } }
       /** Tag of Alertmanager container image to be deployed. Defaults to the value of `version`. Version is ignored if Tag is set. */
       tag?: string
       /** If specified, the pod's tolerations. */
-      tolerations?: { [k: string]: any }[]
+      tolerations?: { effect?: string, key?: string, operator?: string, tolerationSeconds?: number, value?: string }[]
       /** Version the cluster should be on. */
       version?: string
+      /** Volumes allows configuration of additional volumes on the output StatefulSet definition. Volumes specified will be appended to other volumes that are generated as a result of StorageSpec objects. */
+      volumes?: { awsElasticBlockStore?: { fsType?: string, partition?: number, readOnly?: boolean, volumeID: string }, azureDisk?: { cachingMode?: string, diskName: string, diskURI: string, fsType?: string, kind?: string, readOnly?: boolean }, azureFile?: { readOnly?: boolean, secretName: string, shareName: string }, cephfs?: { monitors: string[], path?: string, readOnly?: boolean, secretFile?: string, secretRef?: { name?: string }, user?: string }, cinder?: { fsType?: string, readOnly?: boolean, secretRef?: { name?: string }, volumeID: string }, configMap?: { defaultMode?: number, items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, csi?: { driver: string, fsType?: string, nodePublishSecretRef?: { name?: string }, readOnly?: boolean, volumeAttributes?: { [k: string]: any } }, downwardAPI?: { defaultMode?: number, items?: { fieldRef?: { apiVersion?: string, fieldPath: string }, mode?: number, path: string, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string } }[] }, emptyDir?: { medium?: string, sizeLimit?: { [k: string]: any } }, fc?: { fsType?: string, lun?: number, readOnly?: boolean, targetWWNs?: string[], wwids?: string[] }, flexVolume?: { driver: string, fsType?: string, options?: { [k: string]: any }, readOnly?: boolean, secretRef?: { name?: string } }, flocker?: { datasetName?: string, datasetUUID?: string }, gcePersistentDisk?: { fsType?: string, partition?: number, pdName: string, readOnly?: boolean }, gitRepo?: { directory?: string, repository: string, revision?: string }, glusterfs?: { endpoints: string, path: string, readOnly?: boolean }, hostPath?: { path: string, type?: string }, iscsi?: { chapAuthDiscovery?: boolean, chapAuthSession?: boolean, fsType?: string, initiatorName?: string, iqn: string, iscsiInterface?: string, lun: number, portals?: string[], readOnly?: boolean, secretRef?: { name?: string }, targetPortal: string }, name: string, nfs?: { path: string, readOnly?: boolean, server: string }, persistentVolumeClaim?: { claimName: string, readOnly?: boolean }, photonPersistentDisk?: { fsType?: string, pdID: string }, portworxVolume?: { fsType?: string, readOnly?: boolean, volumeID: string }, projected?: { defaultMode?: number, sources: { configMap?: { items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, downwardAPI?: { items?: { fieldRef?: { apiVersion?: string, fieldPath: string }, mode?: number, path: string, resourceFieldRef?: { containerName?: string, divisor?: { [k: string]: any }, resource: string } }[] }, secret?: { items?: { key: string, mode?: number, path: string }[], name?: string, optional?: boolean }, serviceAccountToken?: { audience?: string, expirationSeconds?: number, path: string } }[] }, quobyte?: { group?: string, readOnly?: boolean, registry: string, tenant?: string, user?: string, volume: string }, rbd?: { fsType?: string, image: string, keyring?: string, monitors: string[], pool?: string, readOnly?: boolean, secretRef?: { name?: string }, user?: string }, scaleIO?: { fsType?: string, gateway: string, protectionDomain?: string, readOnly?: boolean, secretRef: { name?: string }, sslEnabled?: boolean, storageMode?: string, storagePool?: string, system: string, volumeName?: string }, secret?: { defaultMode?: number, items?: { key: string, mode?: number, path: string }[], optional?: boolean, secretName?: string }, storageos?: { fsType?: string, readOnly?: boolean, secretRef?: { name?: string }, volumeName?: string, volumeNamespace?: string }, vsphereVolume?: { fsType?: string, storagePolicyID?: string, storagePolicyName?: string, volumePath: string } }[]
     }
     /**
      * Configures an Alertmanager for the namespace
