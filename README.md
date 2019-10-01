@@ -110,13 +110,22 @@ SolSA consists of:
 
 SolSA supports Node.js 8 and above, Kubernetes 1.14 and above.
 
-## Setup
+## SolSA Setup
 
-Install SolSA globally:
+### Option 1: Global Install
+
+The easiest way to use SolSA is to install it _globally_. Run the following
+command:
 ```shell
 npm install -g solsa
 ```
-This will add the SolSA CLI to you PATH. Try the CLI:
+This will add the SolSA CLI to your PATH. This will also download `kustomize` on
+supported platforms (`darwin x86_64` and `linux x86_64`). On other platforms,
+please install `kustomize` per Kustomize's [install
+instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
+and adjust your PATH to include it.
+
+Try the CLI:
 ```shell
 solsa
 ```
@@ -133,11 +142,12 @@ Global flags:
       --cluster <cluster>    use <cluster> instead of current kubernetes cluster
       --config <config>      use <config> file instead of default
   -c, --context <context>    use <context> instead of current kubernetes context
+  -d, --debug                output a stack trace on error
 
 Flags for "yaml" command:
   -o, --output <file>        output base yaml and context overlays to <file>.tgz
 ```
-While a global NPM install is enough to use the SolSA CLI, we recommend you also
+While a global install is enough to use the SolSA CLI, we recommend you also
 link SolSA from your home directory:
 ```shell
 cd
@@ -147,22 +157,76 @@ This will ensure that IDEs such as Visual Studio Code can locate the SolSA
 module and provide an optimal developer experience with code completion and
 hover help.
 
-### Kubernetes Cluster Setup
+### Option 2: Local Install
 
-#### Minimal install
+Install SolSA _locally_ for use in a single project.
+```shell
+npm install solsa
+```
+This will install SolSA as a dependency to your current project
+(`package.json`). This will also download `kustomize` on supported platforms
+(`darwin x86_64` and `linux x86_64`). On other platforms, please install
+`kustomize` per Kustomize's [install
+instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
+and adjust your PATH to include it.
+
+Typically, a local install does not add the SolSA CLI to the PATH. To run the
+CLI use:
+```shell
+$(npm bin)/solsa
+```
+```
+Usage:
+  solsa <command> <solution> [flags]
+
+Available commands:
+  build <solution>           build container images
+  push <solution>            push container images to registries for current kubernetes context
+  yaml <solution>            synthesize yaml for current kubernetes context
+
+Global flags:
+      --cluster <cluster>    use <cluster> instead of current kubernetes cluster
+      --config <config>      use <config> file instead of default
+  -c, --context <context>    use <context> instead of current kubernetes context
+  -d, --debug                output a stack trace on error
+
+Flags for "yaml" command:
+  -o, --output <file>        output base yaml and context overlays to <file>.tgz
+  -a, --appname <name>       add the label solsa.ibm.com/app=<name> to all generated resources
+```
+
+### Option 3: Developer Install
+
+To contribute to the development of SolSA, you will need to clone this
+repository, install, build, and link SolSA:
+```shell
+git clone https://github.com/IBM/solsa.git
+cd solsa
+npm install
+npm run build
+npm link
+```
+To use your local SolSA checkout in other projects run in each project:
+```shell
+npm link solsa
+```
+
+## Kubernetes Cluster Setup
+
+### Minimal install
 
 We assume that you have already configured `kubectl` or `oc` to be able to
 access each Kubernetes cluster you will be using with SolSA.
 
-We assume that you have already installed `kustomize` and it is in your PATH. If
-not, please install it per Kustomize's [install
+We assume that you have already installed `kustomize`. If not, please install it
+per Kustomize's [install
 instructions](https://github.com/kubernetes-sigs/kustomize/blob/master/docs/INSTALL.md)
 and adjust your PATH to include it.
 
 Proper configuration of `kubectl`/`oc` and `kustomize` is sufficient to enable
 you to use SolSA to generate YAML for all core Kubernetes resource types.
 
-#### Optional install: Operators
+### Optional install: Operators
 
 If you intend to use SolSA to define solutions that include advanced features
 such as configuring cloud services or Knative resources, you will need to
@@ -177,14 +241,14 @@ install the necessary Operators.  On each cluster, do the following:
 4. Install the IBM Cloud Functions Operator from
    https://github.com/IBM/cloud-functions-operator.
 
-#### Optional install: Knative
+### Optional install: Knative
 
 If you intend to use SolSA to define solutions that include Knative resources,
 you will need a cluster with Knative installed.  For example, if you are using a
 cluster provisioned via the IBM Cloud Kubernetes Service, follow the
 instructions at https://knative.dev/docs/install/knative-with-iks.
 
-### SolSA Local Configuration File
+## SolSA Local Configuration File
 
 You can optionally create a `.solsa.yaml` file in your home directory that
 describes each Kubernetes context for which you want SolSA to generate a
@@ -277,15 +341,3 @@ solsa yaml mySolution.js | kubectl apply -f -
 The `build` command builds images for the SolSA-defined services. The `push`
 command tags and pushes these images according to the SolSA configuration for
 the current Kubernetes context.
-
-## Development
-
-To contribute to the development of SolSA, you will need to clone this
-repository, install, build, and link SolSA:
-```shell
-git clone https://github.com/IBM/solsa.git
-cd solsa
-npm install
-npm run build
-npm link
-```

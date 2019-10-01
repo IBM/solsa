@@ -53,6 +53,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
     console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
     console.error('      --config <config>      use <config> file instead of default')
     console.error('  -c, --context <context>    use <context> instead of current kubernetes context')
+    console.error('  -d, --debug                output a stack trace on error')
     console.error()
     console.error(`Flags for "yaml" command:`)
     console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
@@ -302,24 +303,22 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       cp.execSync(`tar -C ${dir.name} -zcf ${argv.output}.tgz ${path.basename(argv.output)}`, { stdio: [0, 1, 2] })
       console.log(`Generated YAML to ${argv.output}.tgz`)
     } else {
-      try {
-        let selectedLayer
-        if (config.targetContext) {
-          selectedLayer = path.join(outputRoot, 'context', config.targetContext)
-        } else if (config.targetCluster) {
-          selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
-        } else {
-          selectedLayer = path.join(outputRoot, 'base')
-        }
-        let kustomize = path.join(__dirname, '..', 'tools', 'kustomize')
-        if (!fs.existsSync(kustomize)) kustomize = 'kustomize' // look for kustomize in PATH
-        cp.execSync(`${kustomize} build ${selectedLayer}`, { stdio: [0, 1, 2] })
-      } catch (err) {
-        console.log(err)
-        if (!(err.signal === 'SIGPIPE')) {
-          throw err
-        }
+      let selectedLayer
+      if (config.targetContext) {
+        selectedLayer = path.join(outputRoot, 'context', config.targetContext)
+      } else if (config.targetCluster) {
+        selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
+      } else {
+        selectedLayer = path.join(outputRoot, 'base')
       }
+      let kustomize = path.join(__dirname, '..', 'tools', 'kustomize')
+      if (!fs.existsSync(kustomize)) kustomize = 'kustomize' // look for kustomize in PATH
+      try {
+        cp.execSync(`${kustomize}`, { stdio: 'ignore' })
+      } catch (err) {
+        reportError('Cannot find kustomize; please install kustomize to your PATH', true)
+      }
+      cp.execSync(`${kustomize} build ${selectedLayer}`, { stdio: [0, 1, 2] })
     }
     dir.removeCallback()
   }

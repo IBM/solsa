@@ -24,7 +24,10 @@ const Module = require('module')
 
 const args = process.argv.slice(2)
 
-const argv = minimist(args)
+const argv = minimist(args, {
+  boolean: ['debug'],
+  alias: { debug: 'd' }
+})
 
 if (argv._.length !== 2) runCommand([]) // usage
 
@@ -48,17 +51,9 @@ let solution: any
 
 try {
   solution = require(file)
-} catch (error) {
-  console.error(`Error: Cannot load module '${file}'`)
-  console.error(error)
+  if (!solution.runCommand) throw new Error(`Module '${file}' does not export a SolSA solution`)
+  solution.runCommand(args, solution)
+} catch (err) {
+  console.error(argv.debug ? err : `Error: ${err.message}`)
   process.exit(1)
 }
-
-Module._resolveFilename = _resolveFilename
-
-if (!solution.runCommand) {
-  console.error(`Error: Module '${file}' does not export a SolSA solution`)
-  process.exit(1)
-}
-
-solution.runCommand(args, solution)
