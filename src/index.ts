@@ -26,6 +26,6 @@ export * from './transform'
 
 export { safeLoad as parseYaml } from 'js-yaml'
 
-export function base64Encode (secret:string) {
+export function base64Encode (secret: string) {
   return Buffer.from(secret).toString('base64')
 }
