@@ -31,8 +31,8 @@ export abstract class Solution {
    * @return this
    */
   useExisting () {
-    this.getResources = function (...args: any[]) { return [] }
-    this.getImages = function () { return [] }
+    this.toResources = function (...args: any[]) { return [] }
+    this.toImages = function () { return [] }
     return this
   }
 
@@ -41,14 +41,14 @@ export abstract class Solution {
    *
    * @return an array of Kubernetes resources
    */
-  abstract getResources (...args: any[]): dynamic[]
+  abstract toResources (...args: any[]): dynamic[]
 
   /**
    * Collect every container image descriptor in this solution.
    *
    * @return an array of container image descriptors
    */
-  getImages (): { name: string, build?: string, main?: string }[] {
+  toImages (): { name: string, build?: string, main?: string }[] {
     return []
   }
 
@@ -81,21 +81,21 @@ export class Bundle extends Solution {
     super()
   }
 
-  getResources (...args: any[]): dynamic[] {
+  toResources (...args: any[]): dynamic[] {
     const resources = []
     for (let value of Object.values(this)) {
-      if (value.getResources) {
-        resources.push(...value.getResources(...args))
+      if (value.toResources) {
+        resources.push(...value.toResources(...args))
       }
     }
     return resources
   }
 
-  getImages (): { name: string, build?: string, main?: string }[] {
+  toImages (): { name: string, build?: string, main?: string }[] {
     const images = []
     for (let value of Object.values(this)) {
-      if (value.getImages) {
-        images.push(...value.getImages())
+      if (value.toImages) {
+        images.push(...value.toImages())
       }
     }
     return images
@@ -120,7 +120,7 @@ export class KubernetesResource extends Resource {
     Object.assign(this, properties)
   }
 
-  getResources (...args: any[]): dynamic[] {
+  toResources (...args: any[]): dynamic[] {
     return [{ obj: this }]
   }
 }

@@ -18,143 +18,56 @@ import { Bundle, Resource } from './solution'
 import { KafkaSource } from './knative'
 import { dynamic } from './helpers'
 
-export namespace ibmcloud {
-  export namespace v1alpha1 {
-    export class Service extends Resource {
-      name: string
-      serviceClass: string
-      plan: string
-      serviceClassType?: string
+import { com_ibm_ibmcloud } from './crds'
 
-      constructor ({ name, serviceClass, plan, serviceClassType }: { name: string, serviceClass: string, plan: string, serviceClassType?: string }) {
-        super()
-        this.name = name
-        this.serviceClass = serviceClass
-        this.plan = plan
-        this.serviceClassType = serviceClassType
+declare module './crds' {
+  namespace com_ibm_ibmcloud {
+    namespace v1alpha1 {
+      interface Service {
+        getBinding ({ name }?: { name?: string }): Binding
       }
-
-      get Binding () {
-        const that = this
-
-        return class extends Binding {
-          constructor ({ name = that.name } = {}) {
-            super({ name, serviceName: that.name })
-          }
-        }
-      }
-
-      getResources () {
-        const obj = {
-          apiVersion: 'ibmcloud.ibm.com/v1alpha1',
-          kind: 'Service',
-          metadata: {
-            name: this.name
-          },
-          spec: {
-            serviceClass: this.serviceClass,
-            plan: this.plan,
-            serviceClassType: this.serviceClassType
-          }
-        }
-        return [{ obj }]
-      }
-    }
-
-    export class Binding extends Resource {
-      name: string
-      serviceName: string
-
-      constructor ({ name, serviceName }: { name: string, serviceName: string }) {
-        super()
-        this.name = name
-        this.serviceName = serviceName
-      }
-
-      getSecret (key: string) {
-        return { valueFrom: { secretKeyRef: { name: this.name, key } } }
-      }
-
-      getResources () {
-        const obj = {
-          apiVersion: 'ibmcloud.ibm.com/v1alpha1',
-          kind: 'Binding',
-          metadata: {
-            name: this.name
-          },
-          spec: {
-            serviceName: this.serviceName
-          }
-        }
-        return [{ obj }]
-      }
-    }
-
-    export class Topic extends Resource {
-      name: string
-      bindingFrom: Binding
-      topicName: string
-
-      constructor ({ name, bindingFrom, topicName = name }: { name: string, bindingFrom: Binding, topicName?: string }) {
-        super()
-        this.name = name
-        this.bindingFrom = bindingFrom
-        this.topicName = topicName
-      }
-
-      get Source () {
-        const that = this
-
-        return class extends KafkaSource {
-          constructor ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
-            const secret = that.bindingFrom.getSecret('kafka_brokers_sasl').valueFrom.secretKeyRef
-            const bootstrapServers = {
-              getValueFrom: {
-                kind: 'Secret',
-                name: secret.name,
-                path: `{.data.${secret.key}}`,
-                'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString']
-              }
-            }
-            const user = that.bindingFrom.getSecret('user').valueFrom
-            const password = that.bindingFrom.getSecret('password').valueFrom
-            super({ name, bootstrapServers, consumerGroup, user, password, topics: that.topicName, sink })
-          }
-        }
-      }
-
-      getResources () {
-        const obj = {
-          apiVersion: 'ibmcloud.ibm.com/v1alpha1',
-          kind: 'Topic',
-          metadata: {
-            name: this.name
-          },
-          spec: {
-            bindingFrom: {
-              name: this.bindingFrom.name
-            },
-            topicName: this.topicName
-          }
-        }
-        return [{ obj }]
+      interface Topic {
+        getSource ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }): KafkaSource
       }
     }
   }
 }
 
+com_ibm_ibmcloud.v1alpha1.Service.prototype.getBinding = function ({ name }: { name?: string } = {}) {
+  return new com_ibm_ibmcloud.v1alpha1.Binding({ metadata: { name: name || this.metadata.name }, spec: { serviceName: this.metadata.name! } })
+}
+
+com_ibm_ibmcloud.v1alpha1.Topic.prototype.getSource = function ({ name, consumerGroup, sink }: { name: string, consumerGroup?: string, sink: { name: string } & dynamic }) {
+  if (this.spec.bindingFrom !== undefined) {
+    const bootstrapServers = {
+      getValueFrom: {
+        kind: 'Secret',
+        name: this.spec.bindingFrom.name,
+        path: `{.data.kafka_brokers_sasl}`,
+        'format-transformers': ['Base64ToString', 'JsonToObject', 'ArrayToCSString']
+      }
+    }
+    const user = { secretKeyRef: { name: this.spec.bindingFrom.name, key: 'user' } }
+    const password = { secretKeyRef: { name: this.spec.bindingFrom.name, key: 'password' } }
+    return new KafkaSource({ name, bootstrapServers, consumerGroup, user, password, topics: this.spec.topicName, sink })
+  } else {
+    // TODO
+    throw new Error('unimplemented')
+  }
+}
+
 export class CloudService extends Bundle {
-  service: ibmcloud.v1alpha1.Service
-  binding: ibmcloud.v1alpha1.Binding
+  service: com_ibm_ibmcloud.v1alpha1.Service
+  binding: com_ibm_ibmcloud.v1alpha1.Binding
 
   constructor ({ name, serviceClass, plan, serviceClassType }: { name: string, serviceClass: string, plan: string, serviceClassType?: string }) {
     super()
-    this.service = new ibmcloud.v1alpha1.Service({ name, serviceClass, plan, serviceClassType })
-    this.binding = new this.service.Binding()
+    this.service = new com_ibm_ibmcloud.v1alpha1.Service({ metadata: { name }, spec: { serviceClass, plan, serviceClassType } })
+    this.binding = this.service.getBinding()
   }
 
   getSecret (key: string) {
-    return this.binding.getSecret(key)
+    return { valueFrom: { secretKeyRef: { name: this.binding.metadata.name, key } } }
   }
 }
 
@@ -166,7 +79,7 @@ class EventStreamsSecret extends Resource {
     this.name = name
   }
 
-  getResources () {
+  toResources () {
     const obj = {
       apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Composable',
@@ -204,29 +117,26 @@ export class EventStreams extends CloudService {
 
   constructor ({ name, plan = 'standard', serviceClassType }: { name: string, plan?: string, serviceClassType?: string }) {
     super({ name, plan, serviceClass: 'messagehub', serviceClassType })
-    this.secret = new EventStreamsSecret(this.binding.name)
+    this.secret = new EventStreamsSecret(name)
   }
 
   getSecret (key: string) {
     if (key === 'kafka_brokers_sasl_flat') {
-      return { valueFrom: { secretKeyRef: { name: this.binding.name + '-kbsf', key } } }
+      return { valueFrom: { secretKeyRef: { name: this.binding.metadata.name + '-kbsf', key } } }
     } else {
       return super.getSecret(key)
     }
   }
 
-  get Topic () {
-    const bindingFrom = this.binding
-
-    return class extends ibmcloud.v1alpha1.Topic {
-      constructor ({ name, topicName }: { name: string, topicName?: string }) {
-        super({ name, topicName, bindingFrom })
-      }
-    }
+  getTopic ({ name, topicName }: { name: string, topicName?: string }) {
+    return new com_ibm_ibmcloud.v1alpha1.Topic({
+      metadata: { name },
+      spec: { topicName: topicName || name, bindingFrom: { name: this.binding.metadata.name! } }
+    })
   }
 
   addTopic (topic: string) {
-    this.topics[topic] = new this.Topic({ name: `${this.service.name}-topic-${this.topicCounter++}`, topicName: topic })
+    this.topics[topic] = new this.Topic({ name: `${this.binding.metadata.name}-topic-${this.topicCounter++}`, topicName: topic })
   }
 }
 

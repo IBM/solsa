@@ -36,7 +36,7 @@ const ext = '.yaml'
 
 /** @param {string} name */
 function solsaYaml (name) {
-  return cp.execSync(`${cli} yaml --config ${config} --cluster test ${path.join(src, name)}`)
+  return cp.execSync(`${cli} yaml --config ${config} --cluster iks ${path.join(src, name)}`)
 }
 
 function test () {
@@ -45,6 +45,12 @@ function test () {
       assert.strictEqual(solsaYaml(name).toString(), fs.readFileSync(path.format({ dir, name, ext })).toString())
     })
   }
+
+  it('helloWorld', function () {
+    assert.strictEqual(
+      cp.execSync(`${cli} yaml --config ${config} --cluster nodeport ${path.join(__dirname, '..', 'samples', 'helloWorld.js')}`).toString(),
+      fs.readFileSync(path.join(__dirname, '..', 'samples', 'helloWorld.yaml')).toString())
+  })
 }
 
 function testgen () {

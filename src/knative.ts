@@ -41,18 +41,12 @@ export class KnativeService extends Resource implements IKnativeService {
     this.ingress = !!ingress
   }
 
-  get Ingress () {
-    const that = this
-
-    return class extends Bundle {
-      constructor () {
-        super()
-        that.ingress = true
-      }
-    }
+  getIngress () {
+    this.ingress = true
+    return new Bundle()
   }
 
-  getResources () {
+  toResources () {
     const obj = {
       apiVersion: 'serving.knative.dev/v1alpha1',
       kind: 'Service',
@@ -74,7 +68,7 @@ export class KnativeService extends Resource implements IKnativeService {
     return [{ obj }]
   }
 
-  getImages () {
+  toImages () {
     return [{ name: this.image, build: this.build, main: this.main }]
   }
 }
@@ -103,7 +97,7 @@ export class KnativeChannel extends Resource implements IKnativeChannel {
     this.name = name
   }
 
-  getResources () {
+  toResources () {
     const obj = {
       apiVersion: 'eventing.knative.dev/v1alpha1',
       kind: 'Channel',
@@ -137,7 +131,7 @@ export class KnativeSubscription extends Resource implements IKnativeSubscriptio
     this.reply = reply
   }
 
-  getResources () {
+  toResources () {
     const obj: dynamic = {
       apiVersion: 'eventing.knative.dev/v1alpha1',
       kind: 'Subscription',
@@ -205,7 +199,7 @@ export class KafkaSource extends Resource implements IKafkaSource {
     this.sink = sink
   }
 
-  getResources () {
+  toResources () {
     const obj = {
       apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Composable',

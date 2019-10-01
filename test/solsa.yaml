@@ -13,9 +13,12 @@
 # limitations under the License.
 
 clusters:
-- name: test
+- name: iks
   ingress:
     iks:
       subdomain: test.test
       tlssecret: test
   registry: test/test
+- name: nodeport
+  ingress:
+    nodePort: true

@@ -35,7 +35,7 @@ export class SchemaTransformer extends Resource {
     this.useExistingOutput = useExistingOutput
   }
 
-  getResources () {
+  toResources () {
     let resources = []
 
     const env = Object.assign({}, this.env)

@@ -53,6 +53,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
     console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
     console.error('      --config <config>      use <config> file instead of default')
     console.error('  -c, --context <context>    use <context> instead of current kubernetes context')
+    console.error('  -d, --debug                output a stack trace on error')
     console.error()
     console.error(`Flags for "yaml" command:`)
     console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
@@ -208,7 +209,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
 
       finalizeImageRenames (context: any, app: Solution) {
         const images: any[] = []
-        for (let name of app.getImages().map(image => image.name)) {
+        for (let name of app.toImages().map(image => image.name)) {
           const pos = name.indexOf(':', name.indexOf('/'))
           let newName = pos === -1 ? name : name.substring(0, pos)
           let newTag = pos === -1 ? undefined : name.substring(pos + 1)
@@ -287,7 +288,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
     const outputRoot = path.join(dir.name, path.basename(argv.output || 'solsa'))
 
     const sa = new SolsaArchiver(outputRoot)
-    for (let item of app.getResources({ config })) {
+    for (let item of app.toResources({ config })) {
       if (item.obj) {
         sa.addResource(item.obj, item.layer)
       } else if (item.JSONPatch) {
@@ -302,22 +303,22 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       cp.execSync(`tar -C ${dir.name} -zcf ${argv.output}.tgz ${path.basename(argv.output)}`, { stdio: [0, 1, 2] })
       console.log(`Generated YAML to ${argv.output}.tgz`)
     } else {
-      try {
-        let selectedLayer
-        if (config.targetContext) {
-          selectedLayer = path.join(outputRoot, 'context', config.targetContext)
-        } else if (config.targetCluster) {
-          selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
-        } else {
-          selectedLayer = path.join(outputRoot, 'base')
-        }
-        cp.execSync(`kustomize build ${selectedLayer}`, { stdio: [0, 1, 2] })
-      } catch (err) {
-        console.log(err)
-        if (!(err.signal === 'SIGPIPE')) {
-          throw err
-        }
+      let selectedLayer
+      if (config.targetContext) {
+        selectedLayer = path.join(outputRoot, 'context', config.targetContext)
+      } else if (config.targetCluster) {
+        selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
+      } else {
+        selectedLayer = path.join(outputRoot, 'base')
       }
+      let kustomize = path.join(__dirname, '..', 'tools', 'kustomize')
+      if (!fs.existsSync(kustomize)) kustomize = 'kustomize' // look for kustomize in PATH
+      try {
+        cp.execSync(`${kustomize}`, { stdio: 'ignore' })
+      } catch (err) {
+        reportError('Cannot find kustomize; please install kustomize to your PATH', true)
+      }
+      cp.execSync(`${kustomize} build ${selectedLayer}`, { stdio: [0, 1, 2] })
     }
     dir.removeCallback()
   }
@@ -350,7 +351,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       dir.removeCallback()
     }
 
-    const images = app.getImages()
+    const images = app.toImages()
 
     new Set(images.map(image => image.name)).forEach(name => build(images.find(image => image.name === name) || { name: 'never' }))
   }
@@ -373,7 +374,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
       return newTag ? newName + ':' + newTag : newName
     }
 
-    const images = app.getImages().filter(image => image.build)
+    const images = app.toImages().filter(image => image.build)
 
     const config = loadConfig(true)
     const context = config.clusters.find(({ name }: any) => name === config.targetCluster)

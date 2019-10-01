@@ -205,13 +205,14 @@
 Apache License 2.0
 ========================================================================
 
-This product bundles a script to install kustomize which is based on
-code snippets from https://github.com/kubernetes-sigs/kustomize
-which are distributed under the Apache License, Version 2.0.
-For details see ./travis/install-kustomize.sh
-
-This product bundles code which is automatically derived from Kubernetes's
-OpenAPI Specification
+This product bundles code and documentation which is automatically
+generated from Kubernetes's OpenAPI Specification found at
 https://github.com/kubernetes/kubernetes/tree/master/api/openapi-spec
-which is distributed under the Apache License, Version 2.0.
+and which is distributed under the Apache License, Version 2.0.
 For details see ./src/core.ts
+
+This product bundles code and documentation which is automatically
+generated from community operators published on OperatorHub.io found
+at at https://github.com/operator-framework/community-operators
+and which is distributed under the Apache License, Version 2.0.
+For details see ./src/operators.ts

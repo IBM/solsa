@@ -16,12 +16,16 @@
 
 export * from './container'
 export * from './core'
+import './core-ext'
 export * from './crds'
 export * from './ibmcloud'
 export * from './ingress'
 export * from './knative'
-export * from './openwhisk'
 export * from './solution'
 export * from './transform'
 
 export { safeLoad as parseYaml } from 'js-yaml'
+
+export function base64Encode (secret: string) {
+  return Buffer.from(secret).toString('base64')
+}

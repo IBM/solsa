@@ -16,15 +16,10 @@
  * limitations under the License.
  */
 
-import * as cp from 'child_process'
 import * as fs from 'fs'
 import * as minimist from 'minimist'
-import * as os from 'os'
-import * as path from 'path'
 import * as util from 'util'
 import * as yaml from 'js-yaml'
-import { Resource, KubernetesResource } from '../solution'
-import { WriteStream } from 'tty'
 
 const commands: { [key: string]: () => void } = { import: importCommand }
 
@@ -32,9 +27,9 @@ const commands: { [key: string]: () => void } = { import: importCommand }
 
 const argv = minimist(process.argv.slice(2), {
   string: ['output', 'dehelm'],
-  boolean: [ 'function' ],
-  alias: { output: 'o', function: 'f' },
-  default: { output: 'myApp', 'dehelm': true, function: false }
+  boolean: ['function', 'extern'],
+  alias: { output: 'o', function: 'f', extern: 'e' },
+  default: { output: 'myApp', 'dehelm': true, function: false, extern: false }
 })
 
 argv.command = argv._[0]
@@ -89,6 +84,7 @@ function snakeToCamel (str: string) {
 
 function writePreamble (outStream: fs.WriteStream) {
   outStream.write('/* eslint-disable no-template-curly-in-string */\n')
+  outStream.write('// @ts-check\n')
   outStream.write('const solsa = require(\'solsa\')\n\n')
 
   if (!argv.function) {
@@ -127,6 +123,49 @@ function mapToSolsaType (apiVersion: string, kind: string): string {
   return `${apiVersion}.${kind}`
 }
 
+class Text {
+  text: string
+  key: string
+
+  static count: number = 0
+
+  constructor (text: string, key: string = '') {
+    this.text = text
+    this.key = key
+  }
+
+  [util.inspect.custom] () {
+    const count = this.text.split('\n').length
+    if (count < 50) return util.inspect(this.text)
+    let filename = `${argv.output}-${++Text.count}`
+    if (/^[0-9a-zA-Z _\-\._]+$/.test(this.key)) {
+      filename += '-' + this.key
+    }
+    if (!this.key.includes('.')) {
+      try {
+        JSON.parse(this.text)
+        filename += '.json'
+      } catch (error) {
+        filename += '.txt'
+      }
+    }
+    fs.writeFileSync(filename, this.text)
+    return `require('fs').readFileSync('${filename}').toString()`
+  }
+}
+
+function wrap (val: any, key?: string): any {
+  if (val == null) return val
+  switch (typeof val) {
+    case 'string':
+      return new Text(val, key)
+    case 'object':
+      if (Array.isArray(val)) return val.map(val => wrap(val)) // return new array
+      for (let key of Object.keys(val)) val[key] = wrap(val[key], key) // update object in place
+  }
+  return val
+}
+
 function importCommand () {
   const inspectOpts = { depth: null, maxArrayLength: null, compact: 4, breakLength: 100 }
   const resources = loadObjects(argv.file).filter(x => x != null)
@@ -160,13 +199,13 @@ function importCommand () {
           }
         }
         outStream.write(`app.${varName} = new solsa.${solsaType}(`)
-        outStream.write(util.inspect(val, inspectOpts))
+        outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
       outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
-      outStream.write(util.inspect(val, inspectOpts))
+      outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }
   })

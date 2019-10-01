@@ -16,7 +16,8 @@
 
 import { Resource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
-import { Ingress, IIngress } from './ingress'
+import { Ingress } from './ingress'
+import * as k8s from './core'
 
 /**
  * A ContainerizedService is a higher-level abstraction for generating matched
@@ -80,26 +81,28 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   }
 
   /**
-   * An Ingress manages external access to this ContainerizedService in a cluster.
+   * Create an Ingress for this ContainerizedService.
    */
-  get Ingress (): typeof ContainerizedServiceIngress {
-    const that = this
-
-    return class extends Ingress {
-      /** @internal */
-      _port?: number
-
-      get port () { return either(this._port, that.port) }
-      set port (val) { this._port = val }
-
-      // see ContainerizedServiceIngress
-      constructor ({ name = that.name, port, endpoints }: IContainerizedServiceIngress = {}) {
-        super({ name, port, endpoints })
+  getIngress ({ name = this.name, vhost = this.name, targetPort }: { name?: string, vhost?: string, targetPort?: number } = {}) {
+    const exposedPort = targetPort ? targetPort : (this.port ? this.port : this.ports[0].port)
+    const rule: k8s.extensions.v1beta1.IngressRule = {
+      host: vhost,
+      http: {
+        paths: [
+          {
+            path: '/',
+            backend: {
+              serviceName: this.name,
+              servicePort: exposedPort
+            }
+          }
+        ]
       }
     }
+    return new Ingress({ name, rules: [rule] })
   }
 
-  getResources () {
+  toResources () {
     const ports = this.port ? [{ port: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
@@ -205,7 +208,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     return objs
   }
 
-  getImages () {
+  toImages () {
     return [{ name: this.image, build: this.build, main: this.main }]
   }
 }
@@ -238,15 +241,3 @@ export interface IContainerizedService {
   /** A persistent volume to be created for each replica of the service. */
   pv?: any // FIXME: Define a more precise type here (complex record).
 }
-
-class ContainerizedServiceIngress extends Ingress {
-  /**
-   * Create an ingress for this ContainerizedService. Omitted properties are
-   * derived from the properties of the ContainerizedService.
-   */
-  constructor ({ name = 'fake', port, endpoints }: IContainerizedServiceIngress) {
-    super({ name, port, endpoints })
-  }
-}
-
-interface IContainerizedServiceIngress extends Partial<IIngress> { }
