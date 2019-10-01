@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { core, apps, extensions, meta } from './core'
+import { core, apps, extensions, meta, batch } from './core'
 import { Ingress } from './ingress'
 
 declare module './core' {
@@ -92,6 +92,17 @@ declare module './core' {
          */
         getService (): core.v1.Service
 
+        /**
+         * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
+         */
+        propogateLabels (): void
+      }
+    }
+  }
+
+  namespace batch {
+    namespace v1 {
+      interface Job {
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
          */
@@ -221,6 +232,7 @@ apps.v1beta2.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype
 apps.v1beta2.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 apps.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 apps.v1beta1.StatefulSet.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
+batch.v1.Job.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 extensions.v1beta1.Deployment.prototype.propogateLabels = apps.v1.Deployment.prototype.propogateLabels
 
 /*
