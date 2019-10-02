@@ -31,6 +31,11 @@ const argv = minimist(args, {
 
 if (argv._.length !== 2) runCommand([]) // usage
 
+if (argv._[0] === 'import') {
+  runCommand(args)
+  process.exit(0)
+}
+
 const file = path.resolve(argv._[1])
 
 // resolve solsa module to current module if not found
