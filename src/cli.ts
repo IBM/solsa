@@ -486,9 +486,10 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
     return val
   }
 
+  const outFile = argv.output ? `${argv.output}.js` : 'importedApp.js'
   const inspectOpts = { depth: null, maxArrayLength: null, compact: 4, breakLength: 100 }
   const resources = loadObjects(argv.file).filter(x => x != null)
-  const outStream = fs.createWriteStream(`${argv.output}.js`)
+  const outStream = fs.createWriteStream(outFile)
   writePreamble(outStream)
 
   resources.forEach(function (val, index) {
