@@ -6,11 +6,10 @@
   "description": "Solution Service Architecture",
   "homepage": "https://github.com/IBM/solsa",
   "bin": {
-    "solsa": "./dist/bin/solsa.js",
-    "solsa-importer": "./dist/bin/solsa-importer.js"
+    "solsa": "./dist/bin/solsa.js"
   },
   "scripts": {
-    "build": "tsc && chmod a+x dist/bin/solsa.js dist/bin/solsa-importer.js",
+    "build": "tsc && chmod a+x dist/bin/solsa.js",
     "clean": "rm -Rf dist || true",
     "codegen-core": "curl https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.14/api/openapi-spec/swagger.json | node dist/codegen.js ' and The Kubernetes Authors' > src/core.ts",
     "codegen": "npm run codegen-core",
