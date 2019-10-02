@@ -33,32 +33,32 @@ if (argv._.length !== 2) runCommand([]) // usage
 
 if (argv._[0] === 'import') {
   runCommand(args)
-  process.exit(0)
-}
+} else {
 
-const file = path.resolve(argv._[1])
+  const file = path.resolve(argv._[1])
 
-// resolve solsa module to current module if not found
-let _resolveFilename = Module._resolveFilename
-Module._resolveFilename = function (request: string, parent: string) {
-  if (request.startsWith('solsa')) {
-    try {
+  // resolve solsa module to current module if not found
+  let _resolveFilename = Module._resolveFilename
+  Module._resolveFilename = function (request: string, parent: string) {
+    if (request.startsWith('solsa')) {
+      try {
+        return _resolveFilename(request, parent)
+      } catch (error) {
+        return require.resolve(request.replace('solsa', '..'))
+      }
+    } else {
       return _resolveFilename(request, parent)
-    } catch (error) {
-      return require.resolve(request.replace('solsa', '..'))
     }
-  } else {
-    return _resolveFilename(request, parent)
   }
-}
 
-let solution: any
+  let solution: any
 
-try {
-  solution = require(file)
-  if (!solution.runCommand) throw new Error(`Module '${file}' does not export a SolSA solution`)
-  solution.runCommand(args, solution)
-} catch (err) {
-  console.error(argv.debug ? err : `Error: ${err.message}`)
-  process.exit(1)
+  try {
+    solution = require(file)
+    if (!solution.runCommand) throw new Error(`Module '${file}' does not export a SolSA solution`)
+    solution.runCommand(args, solution)
+  } catch (err) {
+    console.error(argv.debug ? err : `Error: ${err.message}`)
+    process.exit(1)
+  }
 }
