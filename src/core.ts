@@ -4416,7 +4416,7 @@ export namespace core {
      */
     export class Namespace extends KubernetesResource implements INamespace {
       metadata: meta.v1.ObjectMeta
-      spec: core.v1.NamespaceSpec
+      spec?: core.v1.NamespaceSpec
       /**
        * Namespace provides a scope for Names. Use of multiple namespaces is optional.
        */
@@ -4430,7 +4430,7 @@ export namespace core {
       /** Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata */
       metadata: meta.v1.ObjectMeta
       /** Spec defines the behavior of the Namespace. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status */
-      spec: core.v1.NamespaceSpec
+      spec?: core.v1.NamespaceSpec
     }
     /**
      * NamespaceList is a list of Namespaces.

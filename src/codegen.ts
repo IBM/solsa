@@ -85,7 +85,8 @@ function propertiesOf (resource: Definition): [string, any, boolean][] {
     delete properties.apiVersion
     delete properties.kind
     delete properties.status
-    required.push('spec', 'metadata') // always require spec and metadata
+    required.push('metadata') // always require metadata
+    if (resource['x-kubernetes-group-version-kind'][0].kind !== 'Namespace') required.push('spec') // require spec
   }
   return Object.entries(properties)
     .filter(([key]) => !ignored.includes(key)) // filter ignored property names
