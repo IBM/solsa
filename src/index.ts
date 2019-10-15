@@ -23,6 +23,7 @@ export * from './ingress'
 export * from './knative'
 export * from './solution'
 export * from './transform'
+export * from './xqueuejob'
 
 export { safeLoad as parseYaml } from 'js-yaml'
 
