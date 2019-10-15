@@ -31,7 +31,7 @@ const argv = minimist(args, {
 
 if (argv._.length !== 2) runCommand([]) // usage
 
-if (argv._[0] === 'import') {
+if (argv._[0] === 'import' || argv._[0] === 'normalize') {
   runCommand(args)
 } else {
 

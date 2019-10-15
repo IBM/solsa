@@ -34,6 +34,7 @@ function usage () {
   console.error('  push <solution>            push container images to registries for current kubernetes context')
   console.error('  yaml <solution>            synthesize yaml for current kubernetes context')
   console.error('  import <resources.yaml>    import yaml resources')
+  console.error('  normalize <resources.yaml> normalize yaml syntax')
   console.error()
   console.error('Global flags:')
   console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
@@ -535,7 +536,25 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
   outStream.end()
 }
 
-const commands: { [key: string]: (app: Solution, argv: minimist.ParsedArgs, log: Log) => void } = { yaml: yamlCommand, build: buildCommand, push: pushCommand, import: importCommand }
+function normalizeCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
+  function loadObjects (fileName: string): any[] {
+    try {
+      const inputString = fs.readFileSync(fileName).toString()
+      const pieces = inputString.split(new RegExp('^---+$', 'm'))
+      const resources = pieces.map(x => yaml.safeLoad(x))
+      return resources
+    } catch (err) {
+      log.error(err)
+      return []
+    }
+  }
+
+  process.stdout.write(loadObjects(argv._[1]).map(obj => yaml.safeDump(obj, { noArrayIndent: true, sortKeys: true })).join('---\n'))
+}
+
+const commands: { [key: string]: (app: Solution, argv: minimist.ParsedArgs, log: Log) => void } = {
+  yaml: yamlCommand, build: buildCommand, push: pushCommand, import: importCommand, normalize: normalizeCommand
+}
 
 export function runCommand (args: string[], app: Solution = new Bundle()) {
   tmp.setGracefulCleanup()
