@@ -94,16 +94,11 @@ into the YAML stanza below.
 ### IBM Cloud RedHat OpenShift Cluster
 
 An IBM Cloud RedHat OpenShift Cluster supports defining `Routes` that support TLS termination.
-To enable `solsa` to generate YAML for this style of Ingress you must provide the subdomain
-that was assigned to your cluster. This subdomain will have the format `<cluster_name>-<random_ID>.<region>.containers.appdomain.cloud`
-and can most easily be determined by deploying a service to your cluster, exposing it via a route by `oc create route edge --service=<SOME_SERVICE>`
-and then using `oc get route`.
-Once you have determined your cluster's subdomain, create a YAML stanza as shown below containing its actual value:
+To enable `solsa` to generate YAML for this style of Ingress enable it by adding the
+stanza below to either a `cluster` or `context`:
 ```yaml
   ingress:
-    os:
-      subdomain: '<cluster_name>-<random_ID>.<region>.containers.appdomain.cloud'
-
+    os: true
 ```
 
 ## Image Renames

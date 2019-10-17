@@ -73,16 +73,16 @@ export class Ingress extends Resource {
           const ingressName = this.name
           this.rules.forEach(function (r) {
             if (r.http !== undefined) {
-              const vhost = r.host! + '.' + ingress.os.subdomain
               r.http.paths.forEach(function (p) {
+                const routeName = idx === 0 ? r.host! : `${r.host!}-${idx}`
                 const route = {
                   apiVersion: 'route.openshift.io/v1',
                   kind: 'Route',
                   metadata: {
-                    name: `${ingressName}-${idx}`
+                    name: `${routeName}`
                   },
                   spec: {
-                    host: vhost,
+                    host: '',
                     port: {
                       targetPort: p.backend.servicePort
                     },
