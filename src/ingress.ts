@@ -96,6 +96,9 @@ export class Ingress extends Resource {
                       termination: 'edge'
                     },
                     wildcardPolicy: 'None'
+                  },
+                  status: {
+                    ingress: []
                   }
                 }
                 resources.push({ obj: route, layer })

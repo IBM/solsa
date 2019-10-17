@@ -83,7 +83,7 @@ example configure a Kafka source to dynamically obtain a list of broker urls
 from a Kafka instance deployed at the same time.
 
 SolSA generates pure Kubernetes YAML that can be deployed at once, i.e., with a
-single `kubectl apply` or `oc apply` command. SolSA does not need a server-side
+single `kubectl apply` command. SolSA does not need a server-side
 component.
 
 SolSA includes an optional capability to containerize Node.js code. This
@@ -292,8 +292,6 @@ This solution can be deployed to the current Kubernetes context using the
 ```shell
 solsa yaml helloWorld.js | kubectl apply -f -
 ```
-Always replace `kubectl` with `oc` for an OpenShift cluster.
-
 The YAML synthesized by SolSA for this example depends on the SolSA
 configuration file used. If no configuration file is used, the ingress
 definition is ignored and the CLI outputs a warning message.
