@@ -136,7 +136,7 @@ export class EventStreams extends CloudService {
   }
 
   addTopic (topic: string) {
-    this.topics[topic] = new this.Topic({ name: `${this.binding.metadata.name}-topic-${this.topicCounter++}`, topicName: topic })
+    this.topics[topic] = this.getTopic({ name: `${this.binding.metadata.name}-topic-${this.topicCounter++}`, topicName: topic })
   }
 }
 
