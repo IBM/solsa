@@ -117,6 +117,7 @@ SolSA supports Node.js 8 and above, Kubernetes 1.14 and above.
 The easiest way to use SolSA is to install it _globally_. Run the following
 command:
 ```shell
+cd $HOME
 npm install -g solsa
 ```
 This will add the SolSA CLI to your PATH. This will also download `kustomize` on
