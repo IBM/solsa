@@ -18,7 +18,7 @@
 
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name */
 
-import { KubernetesResource } from './solution'
+import { KubernetesResource, RawKubernetesResource } from './solution'
 import { dynamic } from './helpers'
 
 export namespace admissionregistration {

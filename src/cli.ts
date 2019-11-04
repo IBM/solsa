@@ -525,7 +525,7 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
       }
     }
     if (!specialized) {
-      outStream.write(`app.solutions.rawResource_${index} = new solsa.KubernetesResource(`)
+      outStream.write(`app.solutions.rawResource_${index} = new solsa.RawKubernetesResource(`)
       outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }

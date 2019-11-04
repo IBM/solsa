@@ -18,7 +18,7 @@
 
 /* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name */
 
-import { KubernetesResource } from './solution'
+import { KubernetesResource, RawKubernetesResource } from './solution'
 import { core, meta, misc } from './core'
 import { dynamic } from './helpers'
 
@@ -27,7 +27,7 @@ export namespace io_k8s_helm_charts {
     /**
      * Twistlock Console is installed first and provides policy, API endpoints, GUI, and makes install of Defenders on each node easy through a daemonset.
      */
-    export class TwistlockConsole extends KubernetesResource {
+    export class TwistlockConsole extends RawKubernetesResource {
       /**
        * Twistlock Console is installed first and provides policy, API endpoints, GUI, and makes install of Defenders on each node easy through a daemonset.
        */
@@ -38,7 +38,7 @@ export namespace io_k8s_helm_charts {
     /**
      * A configuration file for a Kong cluster.
      */
-    export class Kong extends KubernetesResource {
+    export class Kong extends RawKubernetesResource {
       /**
        * A configuration file for a Kong cluster.
        */
@@ -49,7 +49,7 @@ export namespace io_k8s_helm_charts {
     /**
      * Turbonomic Workload Automation for Multicloud simultaneously optimizes performance, compliance, and cost in real-time. Workloads are precisely resourced, automatically, to perform while satisfying business constraints.
      */
-    export class Xl extends KubernetesResource {
+    export class Xl extends RawKubernetesResource {
       /**
        * Turbonomic Workload Automation for Multicloud simultaneously optimizes performance, compliance, and cost in real-time. Workloads are precisely resourced, automatically, to perform while satisfying business constraints.
        */
@@ -60,7 +60,7 @@ export namespace io_k8s_helm_charts {
     /**
      * Turbonomic Workload Automation for Multicloud simultaneously optimizes performance, compliance, and cost in real-time. Workloads are precisely resourced, automatically, to perform while satisfying business constraints.
      */
-    export class Kubeturbo extends KubernetesResource {
+    export class Kubeturbo extends RawKubernetesResource {
       /**
        * Turbonomic Workload Automation for Multicloud simultaneously optimizes performance, compliance, and cost in real-time. Workloads are precisely resourced, automatically, to perform while satisfying business constraints.
        */
@@ -71,7 +71,7 @@ export namespace io_k8s_helm_charts {
     /**
      * SpinnakerOperator
      */
-    export class SpinnakerOperator extends KubernetesResource {
+    export class SpinnakerOperator extends RawKubernetesResource {
       /**
        * SpinnakerOperator
        */
@@ -82,7 +82,7 @@ export namespace io_k8s_helm_charts {
     /**
      * Represents a CockroachDB cluster
      */
-    export class Cockroachdb extends KubernetesResource {
+    export class Cockroachdb extends RawKubernetesResource {
       /**
        * Represents a CockroachDB cluster
        */
@@ -93,7 +93,7 @@ export namespace io_k8s_helm_charts {
     /**
      * OpsmxSpinnakerOperator
      */
-    export class OpsmxSpinnakerOperator extends KubernetesResource {
+    export class OpsmxSpinnakerOperator extends RawKubernetesResource {
       /**
        * OpsmxSpinnakerOperator
        */
@@ -136,7 +136,7 @@ export namespace io_halkyon {
     /**
      * A capability or service to be deployed
      */
-    export class Capability extends KubernetesResource {
+    export class Capability extends RawKubernetesResource {
       /**
        * A capability or service to be deployed
        */
@@ -147,7 +147,7 @@ export namespace io_halkyon {
     /**
      * To link the microservices or access secrets
      */
-    export class Link extends KubernetesResource {
+    export class Link extends RawKubernetesResource {
       /**
        * To link the microservices or access secrets
        */
@@ -162,7 +162,7 @@ export namespace com_synopsys {
     /**
      * Manages the OpsSight Connector
      */
-    export class OpsSight extends KubernetesResource {
+    export class OpsSight extends RawKubernetesResource {
       /**
        * Manages the OpsSight Connector
        */
@@ -173,7 +173,7 @@ export namespace com_synopsys {
     /**
      * Manages Black Duck Alert
      */
-    export class Alert extends KubernetesResource {
+    export class Alert extends RawKubernetesResource {
       /**
        * Manages Black Duck Alert
        */
@@ -184,7 +184,7 @@ export namespace com_synopsys {
     /**
      * Manages Black Duck instances
      */
-    export class Blackduck extends KubernetesResource {
+    export class Blackduck extends RawKubernetesResource {
       /**
        * Manages Black Duck instances
        */
@@ -199,7 +199,7 @@ export namespace com_ibm_openaihub {
     /**
      * Fabric for Deep Learning
      */
-    export class FfDL extends KubernetesResource {
+    export class FfDL extends RawKubernetesResource {
       /**
        * Fabric for Deep Learning
        */
@@ -214,7 +214,7 @@ export namespace com_crunchydata {
     /**
      * Represents a Postgres workflow task
      */
-    export class Pgtask extends KubernetesResource {
+    export class Pgtask extends RawKubernetesResource {
       /**
        * Represents a Postgres workflow task
        */
@@ -225,7 +225,7 @@ export namespace com_crunchydata {
     /**
      * Represents a Postgres primary cluster member
      */
-    export class Pgcluster extends KubernetesResource {
+    export class Pgcluster extends RawKubernetesResource {
       /**
        * Represents a Postgres primary cluster member
        */
@@ -236,7 +236,7 @@ export namespace com_crunchydata {
     /**
      * Represents a Postgres sql policy
      */
-    export class Pgpolicy extends KubernetesResource {
+    export class Pgpolicy extends RawKubernetesResource {
       /**
        * Represents a Postgres sql policy
        */
@@ -247,7 +247,7 @@ export namespace com_crunchydata {
     /**
      * Represents a Postgres backup task
      */
-    export class Pgbackup extends KubernetesResource {
+    export class Pgbackup extends RawKubernetesResource {
       /**
        * Represents a Postgres backup task
        */
@@ -258,7 +258,7 @@ export namespace com_crunchydata {
     /**
      * Represents a Postgres replica cluster member
      */
-    export class Pgreplica extends KubernetesResource {
+    export class Pgreplica extends RawKubernetesResource {
       /**
        * Represents a Postgres replica cluster member
        */
@@ -273,7 +273,7 @@ export namespace io_kiali {
     /**
      * A configuration file for a Kiali installation.
      */
-    export class Kiali extends KubernetesResource {
+    export class Kiali extends RawKubernetesResource {
       /**
        * A configuration file for a Kiali installation.
        */
@@ -288,7 +288,7 @@ export namespace io_kiali_monitoring {
     /**
      * A configuration file for defining an individual metric dashboard.
      */
-    export class MonitoringDashboard extends KubernetesResource {
+    export class MonitoringDashboard extends RawKubernetesResource {
       /**
        * A configuration file for defining an individual metric dashboard.
        */
@@ -467,7 +467,7 @@ export namespace io_objectbucket {
     /**
      * instance of an AWS S3 Bucket
      */
-    export class ObjectBucket extends KubernetesResource {
+    export class ObjectBucket extends RawKubernetesResource {
       /**
        * instance of an AWS S3 Bucket
        */
@@ -478,7 +478,7 @@ export namespace io_objectbucket {
     /**
      * Request for an AWS S3 Bucket
      */
-    export class ObjectBucketClaim extends KubernetesResource {
+    export class ObjectBucketClaim extends RawKubernetesResource {
       /**
        * Request for an AWS S3 Bucket
        */
@@ -493,7 +493,7 @@ export namespace com_percona_psmdb {
     /**
      * Instance of a Percona Server for MongoDB Backup
      */
-    export class PerconaServerMongoDBBackup extends KubernetesResource {
+    export class PerconaServerMongoDBBackup extends RawKubernetesResource {
       /**
        * Instance of a Percona Server for MongoDB Backup
        */
@@ -504,7 +504,7 @@ export namespace com_percona_psmdb {
     /**
      * Instance of a Percona Server for MongoDB Restore
      */
-    export class PerconaServerMongoDBRestore extends KubernetesResource {
+    export class PerconaServerMongoDBRestore extends RawKubernetesResource {
       /**
        * Instance of a Percona Server for MongoDB Restore
        */
@@ -515,7 +515,7 @@ export namespace com_percona_psmdb {
     /**
      * Instance of a Percona Server for MongoDB replica set
      */
-    export class PerconaServerMongoDB extends KubernetesResource {
+    export class PerconaServerMongoDB extends RawKubernetesResource {
       /**
        * Instance of a Percona Server for MongoDB replica set
        */
@@ -530,7 +530,7 @@ export namespace com_hazelcast {
     /**
      * Hazelcast Enterprise cluster.
      */
-    export class Hazelcast extends KubernetesResource {
+    export class Hazelcast extends RawKubernetesResource {
       /**
        * Hazelcast Enterprise cluster.
        */
@@ -737,7 +737,7 @@ export namespace com_lightbend_app {
     /**
      * Console
      */
-    export class Console extends KubernetesResource {
+    export class Console extends RawKubernetesResource {
       /**
        * Console
        */
@@ -752,7 +752,7 @@ export namespace com_sysdig {
     /**
      * Represents a Sysdig Agent running on each node of your cluster.
      */
-    export class SysdigAgent extends KubernetesResource {
+    export class SysdigAgent extends RawKubernetesResource {
       /**
        * Represents a Sysdig Agent running on each node of your cluster.
        */
@@ -820,7 +820,7 @@ export namespace io_cloudbulldozer_ripsaw {
     /**
      * The type of benchmark for Ripsaw to be run
      */
-    export class Benchmark extends KubernetesResource {
+    export class Benchmark extends RawKubernetesResource {
       /**
        * The type of benchmark for Ripsaw to be run
        */
@@ -835,7 +835,7 @@ export namespace io_openebs {
     /**
      * Represents a OpenEBS Install Operator
      */
-    export class OpenEBSInstallTemplate extends KubernetesResource {
+    export class OpenEBSInstallTemplate extends RawKubernetesResource {
       /**
        * Represents a OpenEBS Install Operator
        */
@@ -976,7 +976,7 @@ export namespace io_jaegertracing {
     /**
      * A configuration file for a Jaeger custom resource.
      */
-    export class Jaeger extends KubernetesResource {
+    export class Jaeger extends RawKubernetesResource {
       /**
        * A configuration file for a Jaeger custom resource.
        */
@@ -988,7 +988,7 @@ export namespace io_jaegertracing {
 }
 export namespace jaegertracing_io {
   export namespace v1alpha1 {
-    export class Jaeger extends KubernetesResource {
+    export class Jaeger extends RawKubernetesResource {
       constructor (properties: dynamic) {
         super(Object.assign({ apiVersion: 'io.jaegertracing/v1alpha1', kind: 'Jaeger' }, properties))
       }
@@ -1034,7 +1034,7 @@ export namespace io_github_microcks {
     /**
      * Represents a Microcks installation
      */
-    export class MicrocksInstall extends KubernetesResource {
+    export class MicrocksInstall extends RawKubernetesResource {
       /**
        * Represents a Microcks installation
        */
@@ -1299,7 +1299,7 @@ export namespace io_rook_ceph {
     /**
      * Represents a Ceph Object Store.
      */
-    export class CephObjectStore extends KubernetesResource {
+    export class CephObjectStore extends RawKubernetesResource {
       /**
        * Represents a Ceph Object Store.
        */
@@ -1310,7 +1310,7 @@ export namespace io_rook_ceph {
     /**
      * Represents a Ceph Object Store User.
      */
-    export class CephObjectStoreUser extends KubernetesResource {
+    export class CephObjectStoreUser extends RawKubernetesResource {
       /**
        * Represents a Ceph Object Store User.
        */
@@ -1321,7 +1321,7 @@ export namespace io_rook_ceph {
     /**
      * Represents a Ceph Block Pool.
      */
-    export class CephBlockPool extends KubernetesResource {
+    export class CephBlockPool extends RawKubernetesResource {
       /**
        * Represents a Ceph Block Pool.
        */
@@ -1733,7 +1733,7 @@ export namespace com_planetscale {
     /**
      * Instance of a PlanetScale Vitess Cluster
      */
-    export class PsCluster extends KubernetesResource {
+    export class PsCluster extends RawKubernetesResource {
       /**
        * Instance of a PlanetScale Vitess Cluster
        */
@@ -2223,7 +2223,7 @@ export namespace com_mongodb {
     /**
      * MongoDB Deployment
      */
-    export class MongoDB extends KubernetesResource {
+    export class MongoDB extends RawKubernetesResource {
       /**
        * MongoDB Deployment
        */
@@ -2342,7 +2342,7 @@ export namespace com_percona_pxc {
     /**
      * Instance of a Percona XtraDB Cluster
      */
-    export class PerconaXtraDBCluster extends KubernetesResource {
+    export class PerconaXtraDBCluster extends RawKubernetesResource {
       /**
        * Instance of a Percona XtraDB Cluster
        */
@@ -2353,7 +2353,7 @@ export namespace com_percona_pxc {
     /**
      * Instance of a Percona XtraDB Cluster Backup
      */
-    export class PerconaXtraDBClusterBackup extends KubernetesResource {
+    export class PerconaXtraDBClusterBackup extends RawKubernetesResource {
       /**
        * Instance of a Percona XtraDB Cluster Backup
        */
@@ -2364,7 +2364,7 @@ export namespace com_percona_pxc {
     /**
      * Instance of a Percona XtraDB Cluster Restore
      */
-    export class PerconaXtraDBClusterRestore extends KubernetesResource {
+    export class PerconaXtraDBClusterRestore extends RawKubernetesResource {
       /**
        * Instance of a Percona XtraDB Cluster Restore
        */
@@ -2377,7 +2377,7 @@ export namespace com_percona_pxc {
     /**
      * (Legacy) Instance of a Percona XtraDB Cluster Backup
      */
-    export class PerconaXtraDBBackup extends KubernetesResource {
+    export class PerconaXtraDBBackup extends RawKubernetesResource {
       /**
        * (Legacy) Instance of a Percona XtraDB Cluster Backup
        */
@@ -2392,7 +2392,7 @@ export namespace io_seldon_machinelearning {
     /**
      * A seldon engine deployment
      */
-    export class SeldonDeployment extends KubernetesResource {
+    export class SeldonDeployment extends RawKubernetesResource {
       /**
        * A seldon engine deployment
        */
@@ -2407,7 +2407,7 @@ export namespace io_instana {
     /**
      * Instana Agent
      */
-    export class InstanaAgent extends KubernetesResource {
+    export class InstanaAgent extends RawKubernetesResource {
       /**
        * Instana Agent
        */
@@ -2422,7 +2422,7 @@ export namespace io_kubevirt {
     /**
      * Represents a KubeVirt deployment.
      */
-    export class KubeVirt extends KubernetesResource {
+    export class KubeVirt extends RawKubernetesResource {
       /**
        * Represents a KubeVirt deployment.
        */
@@ -2437,7 +2437,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security Enforcer Deployment with Aqua Operator
      */
-    export class AquaEnforcer extends KubernetesResource {
+    export class AquaEnforcer extends RawKubernetesResource {
       /**
        * Aqua Security Enforcer Deployment with Aqua Operator
        */
@@ -2448,7 +2448,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security CSP Deployment with Aqua Operator
      */
-    export class AquaCsp extends KubernetesResource {
+    export class AquaCsp extends RawKubernetesResource {
       /**
        * Aqua Security CSP Deployment with Aqua Operator
        */
@@ -2459,7 +2459,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security Database Deployment with Aqua Operator
      */
-    export class AquaDatabase extends KubernetesResource {
+    export class AquaDatabase extends RawKubernetesResource {
       /**
        * Aqua Security Database Deployment with Aqua Operator
        */
@@ -2470,7 +2470,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security Scanner Deployment with Aqua Operator
      */
-    export class AquaScanner extends KubernetesResource {
+    export class AquaScanner extends RawKubernetesResource {
       /**
        * Aqua Security Scanner Deployment with Aqua Operator
        */
@@ -2481,7 +2481,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security Gateway Deployment with Aqua Operator
      */
-    export class AquaGateway extends KubernetesResource {
+    export class AquaGateway extends RawKubernetesResource {
       /**
        * Aqua Security Gateway Deployment with Aqua Operator
        */
@@ -2492,7 +2492,7 @@ export namespace com_aquasec_operator {
     /**
      * Aqua Security Server Deployment with Aqua Operator
      */
-    export class AquaServer extends KubernetesResource {
+    export class AquaServer extends RawKubernetesResource {
       /**
        * Aqua Security Server Deployment with Aqua Operator
        */
@@ -2507,7 +2507,7 @@ export namespace com_sematext {
     /**
      * Represents a Sematext Agent running on each node of your cluster.
      */
-    export class SematextAgent extends KubernetesResource {
+    export class SematextAgent extends RawKubernetesResource {
       /**
        * Represents a Sematext Agent running on each node of your cluster.
        */
@@ -2522,7 +2522,7 @@ export namespace com_coreos_database_etcd {
     /**
      * Represents a cluster of etcd nodes.
      */
-    export class EtcdCluster extends KubernetesResource {
+    export class EtcdCluster extends RawKubernetesResource {
       /**
        * Represents a cluster of etcd nodes.
        */
@@ -2533,7 +2533,7 @@ export namespace com_coreos_database_etcd {
     /**
      * Represents the intent to restore an etcd cluster from a backup.
      */
-    export class EtcdRestore extends KubernetesResource {
+    export class EtcdRestore extends RawKubernetesResource {
       /**
        * Represents the intent to restore an etcd cluster from a backup.
        */
@@ -2544,7 +2544,7 @@ export namespace com_coreos_database_etcd {
     /**
      * Represents the intent to backup an etcd cluster.
      */
-    export class EtcdBackup extends KubernetesResource {
+    export class EtcdBackup extends RawKubernetesResource {
       /**
        * Represents the intent to backup an etcd cluster.
        */
@@ -2559,7 +2559,7 @@ export namespace org_falco {
     /**
      * Represents a Falco running on each node of your cluster.
      */
-    export class Falco extends KubernetesResource {
+    export class Falco extends RawKubernetesResource {
       /**
        * Represents a Falco running on each node of your cluster.
        */
@@ -2745,7 +2745,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon ECR Repository.
      */
-    export class ECRRepository extends KubernetesResource {
+    export class ECRRepository extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon ECR Repository.
        */
@@ -2756,7 +2756,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon DynamoDB resource.
      */
-    export class DynamoDB extends KubernetesResource {
+    export class DynamoDB extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon DynamoDB resource.
        */
@@ -2767,7 +2767,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing AWS CloudFormation Templates.
      */
-    export class CloudFormationTemplate extends KubernetesResource {
+    export class CloudFormationTemplate extends RawKubernetesResource {
       /**
        * Represents a resource for managing AWS CloudFormation Templates.
        */
@@ -2778,7 +2778,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon Simple Notification Service (SNS).
      */
-    export class SNSTopic extends KubernetesResource {
+    export class SNSTopic extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon Simple Notification Service (SNS).
        */
@@ -2789,7 +2789,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon Simple Notification Service Subscription.
      */
-    export class SNSSubscription extends KubernetesResource {
+    export class SNSSubscription extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon Simple Notification Service Subscription.
        */
@@ -2800,7 +2800,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon S3 Bucket.
      */
-    export class S3Bucket extends KubernetesResource {
+    export class S3Bucket extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon S3 Bucket.
        */
@@ -2811,7 +2811,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon ElastiCache.
      */
-    export class ElastiCache extends KubernetesResource {
+    export class ElastiCache extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon ElastiCache.
        */
@@ -2822,7 +2822,7 @@ export namespace aws_service_operator {
     /**
      * Represents a resource for managing an Amazon Simple Queue Service (SQS).
      */
-    export class SQSQueue extends KubernetesResource {
+    export class SQSQueue extends RawKubernetesResource {
       /**
        * Represents a resource for managing an Amazon Simple Queue Service (SQS).
        */
@@ -3282,7 +3282,7 @@ export namespace org_infinispan {
     /**
      * An Infinispan cluster instance.
      */
-    export class Infinispan extends KubernetesResource {
+    export class Infinispan extends RawKubernetesResource {
       /**
        * An Infinispan cluster instance.
        */
@@ -3297,7 +3297,7 @@ export namespace de_dentrassi_iot {
     /**
      * A new consumer for an existing simulator instance
      */
-    export class SimulatorConsumer extends KubernetesResource {
+    export class SimulatorConsumer extends RawKubernetesResource {
       /**
        * A new consumer for an existing simulator instance
        */
@@ -3308,7 +3308,7 @@ export namespace de_dentrassi_iot {
     /**
      * A new producer for an existing simulator instance
      */
-    export class SimulatorProducer extends KubernetesResource {
+    export class SimulatorProducer extends RawKubernetesResource {
       /**
        * A new producer for an existing simulator instance
        */
@@ -3319,7 +3319,7 @@ export namespace de_dentrassi_iot {
     /**
      * A new simulator instance
      */
-    export class Simulator extends KubernetesResource {
+    export class Simulator extends RawKubernetesResource {
       /**
        * A new simulator instance
        */
@@ -3718,7 +3718,7 @@ export namespace org_apache_camel {
     /**
      * A Camel K integration kit
      */
-    export class IntegrationKit extends KubernetesResource {
+    export class IntegrationKit extends RawKubernetesResource {
       /**
        * A Camel K integration kit
        */
@@ -3729,7 +3729,7 @@ export namespace org_apache_camel {
     /**
      * A Camel K integration
      */
-    export class Integration extends KubernetesResource {
+    export class Integration extends RawKubernetesResource {
       /**
        * A Camel K integration
        */
@@ -3740,7 +3740,7 @@ export namespace org_apache_camel {
     /**
      * A Camel K integration platform
      */
-    export class IntegrationPlatform extends KubernetesResource {
+    export class IntegrationPlatform extends RawKubernetesResource {
       /**
        * A Camel K integration platform
        */
@@ -3751,7 +3751,7 @@ export namespace org_apache_camel {
     /**
      * A Camel catalog
      */
-    export class CamelCatalog extends KubernetesResource {
+    export class CamelCatalog extends RawKubernetesResource {
       /**
        * A Camel catalog
        */
@@ -3759,7 +3759,7 @@ export namespace org_apache_camel {
         super(Object.assign({ apiVersion: 'camel.apache.org/v1alpha1', kind: 'CamelCatalog' }, properties))
       }
     }
-    export class IntegrationContext extends KubernetesResource {
+    export class IntegrationContext extends RawKubernetesResource {
       constructor (properties: dynamic) {
         super(Object.assign({ apiVersion: 'camel.apache.org/v1alpha1', kind: 'IntegrationContext' }, properties))
       }
@@ -3767,7 +3767,7 @@ export namespace org_apache_camel {
     /**
      * A Camel K build
      */
-    export class Build extends KubernetesResource {
+    export class Build extends RawKubernetesResource {
       /**
        * A Camel K build
        */
@@ -4108,7 +4108,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS ISGW service.
      */
-    export class ISGW extends KubernetesResource {
+    export class ISGW extends RawKubernetesResource {
       /**
        * Represents a EdgeFS ISGW service.
        */
@@ -4119,7 +4119,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS ISCSI service.
      */
-    export class ISCSI extends KubernetesResource {
+    export class ISCSI extends RawKubernetesResource {
       /**
        * Represents a EdgeFS ISCSI service.
        */
@@ -4130,7 +4130,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS SWIFT service.
      */
-    export class SWIFT extends KubernetesResource {
+    export class SWIFT extends RawKubernetesResource {
       /**
        * Represents a EdgeFS SWIFT service.
        */
@@ -4141,7 +4141,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS NFS service.
      */
-    export class NFS extends KubernetesResource {
+    export class NFS extends RawKubernetesResource {
       /**
        * Represents a EdgeFS NFS service.
        */
@@ -4182,7 +4182,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS S3X service.
      */
-    export class S3X extends KubernetesResource {
+    export class S3X extends RawKubernetesResource {
       /**
        * Represents a EdgeFS S3X service.
        */
@@ -4193,7 +4193,7 @@ export namespace io_rook_edgefs {
     /**
      * Represents a EdgeFS S3 service.
      */
-    export class S3 extends KubernetesResource {
+    export class S3 extends RawKubernetesResource {
       /**
        * Represents a EdgeFS S3 service.
        */
@@ -4459,7 +4459,7 @@ export namespace io_enmasse_iot {
     /**
      * IoT Infrastructure Configuration Singleton
      */
-    export class IoTConfig extends KubernetesResource {
+    export class IoTConfig extends RawKubernetesResource {
       /**
        * IoT Infrastructure Configuration Singleton
        */
@@ -4474,7 +4474,7 @@ export namespace com_redislabs_app {
     /**
      * Instance of a Redis Enterprise cluster
      */
-    export class RedisEnterpriseCluster extends KubernetesResource {
+    export class RedisEnterpriseCluster extends RawKubernetesResource {
       /**
        * Instance of a Redis Enterprise cluster
        */
@@ -4489,7 +4489,7 @@ export namespace com_dynatrace {
     /**
      * Dyantrace OneAgent for full-stack monitoring
      */
-    export class OneAgent extends KubernetesResource {
+    export class OneAgent extends RawKubernetesResource {
       /**
        * Dyantrace OneAgent for full-stack monitoring
        */
@@ -4504,7 +4504,7 @@ export namespace do_zalan_acid {
     /**
      * Creates a PostgreSQL cluster managed by Postgres-Operator.
      */
-    export class postgresql extends KubernetesResource {
+    export class postgresql extends RawKubernetesResource {
       /**
        * Creates a PostgreSQL cluster managed by Postgres-Operator.
        */
@@ -4515,7 +4515,7 @@ export namespace do_zalan_acid {
     /**
      * Configuration for PostgreSQL cluster managed by Postgres-Operator.
      */
-    export class OperatorConfiguration extends KubernetesResource {
+    export class OperatorConfiguration extends RawKubernetesResource {
       /**
        * Configuration for PostgreSQL cluster managed by Postgres-Operator.
        */
@@ -4610,7 +4610,7 @@ export namespace io_radanalytics {
     /**
      * Server that keeps track of finished Spark jobs
      */
-    export class SparkHistoryServer extends KubernetesResource {
+    export class SparkHistoryServer extends RawKubernetesResource {
       /**
        * Server that keeps track of finished Spark jobs
        */
@@ -4621,7 +4621,7 @@ export namespace io_radanalytics {
     /**
      * Apache Spark application
      */
-    export class SparkApplication extends KubernetesResource {
+    export class SparkApplication extends RawKubernetesResource {
       /**
        * Apache Spark application
        */
@@ -4632,7 +4632,7 @@ export namespace io_radanalytics {
     /**
      * Apache Spark cluster
      */
-    export class SparkCluster extends KubernetesResource {
+    export class SparkCluster extends RawKubernetesResource {
       /**
        * Apache Spark cluster
        */
@@ -4647,7 +4647,7 @@ export namespace che_eclipse_org {
     /**
      * Eclipse Che cluster with DB and Auth Server
      */
-    export class CheCluster extends KubernetesResource {
+    export class CheCluster extends RawKubernetesResource {
       /**
        * Eclipse Che cluster with DB and Auth Server
        */
@@ -4697,7 +4697,7 @@ export namespace com_banzaicloud_vault {
     /**
      * Represents a cluster of Vault nodes.
      */
-    export class Vault extends KubernetesResource {
+    export class Vault extends RawKubernetesResource {
       /**
        * Represents a cluster of Vault nodes.
        */
