@@ -72,32 +72,28 @@ export abstract class Solution {
  */
 
 export class Bundle extends Solution {
-  [k: string]: any
+  solutions: { [k: string]: Solution }
 
   /**
    * Create an extensible resource bundle.
    */
-  constructor (content?: dynamic) {
+  constructor (solutions: { [k: string]: Solution } = {}) {
     super()
-    Object.assign(this, content)
+    this.solutions = solutions
   }
 
   toResources (...args: any[]): dynamic[] {
     const resources = []
-    for (let value of Object.values(this)) {
-      if (value.toResources) {
-        resources.push(...value.toResources(...args))
-      }
+    for (let value of Object.values(this.solutions)) {
+      resources.push(...value.toResources(...args))
     }
     return resources
   }
 
   toImages (): { name: string, build?: string, main?: string }[] {
     const images = []
-    for (let value of Object.values(this)) {
-      if (value.toImages) {
-        images.push(...value.toImages())
-      }
+    for (let value of Object.values(this.solutions)) {
+      images.push(...value.toImages())
     }
     return images
   }

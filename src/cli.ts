@@ -519,13 +519,13 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
             varName = `${varName}_${kind}`
           }
         }
-        outStream.write(`app.${varName} = new solsa.${solsaType}(`)
+        outStream.write(`app.solutions.${varName} = new solsa.${solsaType}(`)
         outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
-      outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
+      outStream.write(`app.solutions.rawResource_${index} = new solsa.KubernetesResource(`)
       outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }

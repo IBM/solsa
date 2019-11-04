@@ -15,8 +15,8 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' })
-bundle.topic = bundle.kafka.getTopic({ name: 'topic', topicName: 'MyTopic' })
+let kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' })
+let topic = kafka.getTopic({ name: 'topic', topicName: 'MyTopic' })
+
+export = new solsa.Bundle({ kafka, topic })

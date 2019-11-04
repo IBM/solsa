@@ -15,10 +15,8 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.translator = new solsa.LanguageTranslator({ name: 'translator', plan: 'lite' })
+export = new solsa.LanguageTranslator({ name: 'translator', plan: 'lite' })
 
 /*
 Try:

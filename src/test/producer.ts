@@ -15,17 +15,17 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' }).useExisting()
-bundle.topic = bundle.kafka.getTopic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
+let kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' }).useExisting()
+let topic = kafka.getTopic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
 
-bundle.producer = new solsa.ContainerizedService({ name: 'producer', image: 'kafka-producer', build: 'kafka-producer' })
+let producer = new solsa.ContainerizedService({ name: 'producer', image: 'kafka-producer', build: 'kafka-producer' })
 
-bundle.producer.env = {
-  BROKERS: bundle.kafka.getSecret('kafka_brokers_sasl'),
-  USER: bundle.kafka.getSecret('user'),
-  PASSWORD: bundle.kafka.getSecret('password'),
-  TOPIC: bundle.topic.spec.topicName
+producer.env = {
+  BROKERS: kafka.getSecret('kafka_brokers_sasl'),
+  USER: kafka.getSecret('user'),
+  PASSWORD: kafka.getSecret('password'),
+  TOPIC: topic.spec.topicName
 }
+
+export = new solsa.Bundle({ kafka, topic, producer })

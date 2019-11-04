@@ -56,7 +56,7 @@ com_ibm_ibmcloud.v1alpha1.Topic.prototype.getSource = function ({ name, consumer
   }
 }
 
-export class CloudService extends Bundle {
+export class CloudService extends Resource {
   service: com_ibm_ibmcloud.v1alpha1.Service
   binding: com_ibm_ibmcloud.v1alpha1.Binding
 
@@ -64,6 +64,10 @@ export class CloudService extends Bundle {
     super()
     this.service = new com_ibm_ibmcloud.v1alpha1.Service({ metadata: { name }, spec: { serviceClass, plan, serviceClassType } })
     this.binding = this.service.getBinding()
+  }
+
+  toResources (...args: any[]): dynamic[] {
+    return [...this.service.toResources(...args), ...this.binding.toResources(...args)]
   }
 
   getSecret (key: string) {
@@ -79,7 +83,7 @@ class EventStreamsSecret extends Resource {
     this.name = name
   }
 
-  toResources () {
+  toResources (...args: any[]) {
     const obj = {
       apiVersion: 'ibmcloud.ibm.com/v1alpha1',
       kind: 'Composable',
@@ -120,6 +124,10 @@ export class EventStreams extends CloudService {
     this.secret = new EventStreamsSecret(name)
   }
 
+  toResources (...args: any[]): dynamic[] {
+    return [...super.toResources(...args), ...this.topics.toResources(...args), ...this.secret.toResources(...args)]
+  }
+
   getSecret (key: string) {
     if (key === 'kafka_brokers_sasl_flat') {
       return { valueFrom: { secretKeyRef: { name: this.binding.metadata.name + '-kbsf', key } } }
@@ -136,7 +144,7 @@ export class EventStreams extends CloudService {
   }
 
   addTopic (topic: string) {
-    this.topics[topic] = this.getTopic({ name: `${this.binding.metadata.name}-topic-${this.topicCounter++}`, topicName: topic })
+    this.topics.solutions[topic] = this.getTopic({ name: `${this.binding.metadata.name}-topic-${this.topicCounter++}`, topicName: topic })
   }
 }
 
