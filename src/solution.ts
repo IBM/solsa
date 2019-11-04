@@ -75,10 +75,11 @@ export class Bundle extends Solution {
   [k: string]: any
 
   /**
-   * Create an empty resource bundle.
+   * Create an extensible resource bundle.
    */
-  constructor () {
+  constructor (content?: dynamic) {
     super()
+    Object.assign(this, content)
   }
 
   toResources (...args: any[]): dynamic[] {

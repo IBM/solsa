@@ -279,11 +279,11 @@ A sample SolSA solution is provided in
 [helloWorld.js](https://github.com/IBM/solsa/blob/master/samples/helloWorld.js).
 ```javascript
 const solsa = require('solsa')
-const bundle = new solsa.Bundle()
-module.exports = bundle
 
-bundle.helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
-bundle.ingress = bundle.helloWorld.getIngress()
+const helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
+const ingress = helloWorld.getIngress()
+
+module.exports = new solsa.Bundle({ helloWorld, ingress })
 ```
 It consists of a single containerized service and an ingress for this service.
 
