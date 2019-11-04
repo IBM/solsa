@@ -91,9 +91,9 @@ into the YAML stanza below.
        tlssecret: <Ingress Secret>
 ```
 
-### IBM Cloud RedHat OpenShift Cluster
+### OpenShift Cluster
 
-An IBM Cloud RedHat OpenShift Cluster supports defining `Routes` that support TLS termination.
+An OpenShift Cluster supports defining `Routes` that support TLS termination.
 To enable `solsa` to generate YAML for this style of Ingress enable it by adding the
 stanza below to either a `cluster` or `context`:
 ```yaml
