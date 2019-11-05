@@ -117,7 +117,7 @@ declare module './core' {
         /**
          * Construct a solsa.Ingress instance for this Service
          */
-        getIngress (): Ingress
+        getIngress ({ name, vhost, targetPort }: { name?: string, vhost?: string, targetPort?: number }): Ingress
       }
     }
   }
