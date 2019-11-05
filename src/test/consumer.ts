@@ -15,11 +15,11 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' }).useExisting()
-bundle.topic = bundle.kafka.getTopic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
+let kafka = new solsa.EventStreams({ name: 'kafka', plan: 'standard' }).useExisting()
+let topic = kafka.getTopic({ name: 'topic', topicName: 'MyTopic' }).useExisting()
 
-bundle.sink = new solsa.KnativeService({ name: 'sink', image: 'gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display' })
-bundle.source = bundle.topic.getSource({ name: 'source', sink: bundle.sink })
+let sink = new solsa.KnativeService({ name: 'sink', image: 'gcr.io/knative-releases/github.com/knative/eventing-sources/cmd/event_display' })
+let source = topic.getSource({ name: 'source', sink })
+
+export = new solsa.Bundle({ kafka, topic, sink, source })

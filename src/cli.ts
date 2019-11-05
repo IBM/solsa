@@ -49,6 +49,7 @@ function usage () {
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
   console.error('      --dehelm               remove helm chart artifacts during import (default true)')
+  console.error('      --extern               externalize large strings (default false)')
   console.error('  -f  --function             export a function that wraps bundle creation (default false)')
   console.error()
 }
@@ -519,13 +520,13 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
             varName = `${varName}_${kind}`
           }
         }
-        outStream.write(`app.${varName} = new solsa.${solsaType}(`)
+        outStream.write(`app.solutions.${varName} = new solsa.${solsaType}(`)
         outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
         outStream.write(')\n')
       }
     }
     if (!specialized) {
-      outStream.write(`app.rawResource_${index} = new solsa.KubernetesResource(`)
+      outStream.write(`app.solutions.rawResource_${index} = new solsa.RawKubernetesResource(`)
       outStream.write(util.inspect(argv.extern ? wrap(val) : val, inspectOpts))
       outStream.write(')\n')
     }

@@ -120,7 +120,7 @@ console.log(`/* tslint:disable:no-unnecessary-qualifier jsdoc-format class-name 
 console.log()
 
 // imports
-console.log(`import { KubernetesResource } from './solution'`)
+console.log(`import { KubernetesResource, RawKubernetesResource } from './solution'`)
 if (!tree.core) console.log(`import { core, meta, misc } from './core'`)
 console.log(`import { dynamic } from './helpers'`)
 console.log()
@@ -146,7 +146,7 @@ for (let [group, g] of Object.entries(tree)) {
       } else {
         if (resource['x-kubernetes-group-version-kind']) { // kube resource, synthesize class
           let apiVersion = resource['x-kubernetes-group-version-kind'][0].group ? resource['x-kubernetes-group-version-kind'][0].group + '/' + version : version
-          console.log(`    export class ${kind} extends KubernetesResource ${resource.properties !== null ? `implements I${kind} ` : ''}{`) // declare class
+          console.log(`    export class ${kind} extends ${resource.properties !== null ? '' : 'Raw'}KubernetesResource ${resource.properties !== null ? `implements I${kind} ` : ''}{`) // declare class
           for (let [key, value, required] of properties) { // field declarations
             console.log(`      ${format([key, value, required])}`) // field declaration
           }

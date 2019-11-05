@@ -15,11 +15,11 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.service = new solsa.KnativeService({ name: 'hello-knative', image: 'docker.io/ibmcom/kn-helloworld', env: { TARGET: 'Knative' } })
-bundle.ingress = bundle.service.getIngress()
+let service = new solsa.KnativeService({ name: 'hello-knative', image: 'docker.io/ibmcom/kn-helloworld', env: { TARGET: 'Knative' } })
+let ingress = service.getIngress()
+
+export = new solsa.Bundle({ service, ingress })
 
 /*
 Try:

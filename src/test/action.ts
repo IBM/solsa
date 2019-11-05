@@ -15,7 +15,5 @@
  */
 
 import * as solsa from '..'
-let bundle = new solsa.Bundle()
-export = bundle
 
-bundle.action = new solsa.com_ibm_ibmcloud.v1alpha1.Function({ metadata: { name: 'echo' }, spec: { code: 'function main (obj) { return obj }', runtime: 'nodejs:default' } })
+export = new solsa.com_ibm_ibmcloud.v1alpha1.Function({ metadata: { name: 'echo' }, spec: { code: 'function main (obj) { return obj }', runtime: 'nodejs:default' } })
