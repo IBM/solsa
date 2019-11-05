@@ -49,6 +49,7 @@ function usage () {
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
   console.error('      --dehelm               remove helm chart artifacts during import (default true)')
+  console.error('      --extern               externalize large strings (default false)')
   console.error('  -f  --function             export a function that wraps bundle creation (default false)')
   console.error()
 }
