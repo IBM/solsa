@@ -14,18 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+KUSTOMIZE_VERSION=3.3.0
+
 case $(uname -ms) in
   'Linux x86_64')
-    echo 'Downloading kustomize for Linux.'
-    curl -L -o tools/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.2.0/kustomize_3.2.0_linux_amd64 && chmod a+x tools/kustomize
+      echo 'Downloading kustomize for Linux.'
+      opsys=linux
     ;;
 
   'Darwin x86_64')
-    echo 'Downloading kustomize for Darwin.'
-    curl -L -o tools/kustomize https://github.com/kubernetes-sigs/kustomize/releases/download/v3.2.0/kustomize_3.2.0_darwin_amd64 && chmod a+x tools/kustomize
+      echo 'Downloading kustomize for Darwin.'
+      opsys=darwin
     ;;
 
   *)
     echo 'Unsupported platform. Please install kustomize and adjust your PATH to include it.'
     ;;
 esac
+
+kustomizetgz=kustomize_v${KUSTOMIZE_VERSION}_${opsys}_amd64.tar.gz
+cd tools
+wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/${kustomizetgz}
+tar xzf ${kustomizetgz}
+rm -f ${kustomizetgz}
+chmod +x kustomize
