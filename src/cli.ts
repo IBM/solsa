@@ -35,6 +35,7 @@ function usage () {
   console.error('  yaml <solution>            synthesize yaml for current kubernetes context')
   console.error('  import <resources.yaml>    import yaml resources')
   console.error('  normalize <resources.yaml> normalize yaml syntax')
+  console.error('  help                       show help')
   console.error()
   console.error('Global flags:')
   console.error('      --cluster <cluster>    use <cluster> instead of current kubernetes cluster')
@@ -552,9 +553,12 @@ function normalizeCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
 
   process.stdout.write(loadObjects(argv._[1]).map(obj => yaml.safeDump(obj, { noArrayIndent: true, sortKeys: true })).join('---\n'))
 }
+function helpCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
+  usage()
+}
 
 const commands: { [key: string]: (app: Solution, argv: minimist.ParsedArgs, log: Log) => void } = {
-  yaml: yamlCommand, build: buildCommand, push: pushCommand, import: importCommand, normalize: normalizeCommand
+  yaml: yamlCommand, build: buildCommand, push: pushCommand, import: importCommand, normalize: normalizeCommand, help: helpCommand
 }
 
 export function runCommand (args: string[], app: Solution = new Bundle()) {
@@ -570,7 +574,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
   argv.command = argv._[0]
   argv.file = argv._[1]
 
-  if (argv._.length !== 2 || !Object.keys(commands).includes(argv.command)) {
+  if ((argv._.length !== 2 && argv.command !== 'help') || !Object.keys(commands).includes(argv.command)) {
     usage()
     process.exit(1)
   }

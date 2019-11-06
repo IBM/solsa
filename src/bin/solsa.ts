@@ -29,12 +29,15 @@ const argv = minimist(args, {
   alias: { debug: 'd' }
 })
 
-if (argv._.length !== 2) runCommand([]) // usage
+if (argv._.length === 0) runCommand([]) // usage
 
-if (argv._[0] === 'import' || argv._[0] === 'normalize') {
+if (argv._[0] === 'help') {
+  runCommand(args)
+} else if (argv._[0] === 'import' || argv._[0] === 'normalize') {
+  if (argv._.length !== 2) runCommand([]) // usage
   runCommand(args)
 } else {
-
+  if (argv._.length !== 2) runCommand([]) // usage
   const file = path.resolve(argv._[1])
 
   // resolve solsa module to current module if not found
