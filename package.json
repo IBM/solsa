@@ -2,7 +2,7 @@
   "name": "solsa",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Solution Service Architecture",
   "homepage": "https://github.com/IBM/solsa",
   "bin": {
