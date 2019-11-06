@@ -32,9 +32,8 @@ case $(uname -ms) in
     ;;
 esac
 
-kustomizetgz=kustomize_v${KUSTOMIZE_VERSION}_${opsys}_amd64.tar.gz
 cd tools
-wget https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/${kustomizetgz}
-tar xzf ${kustomizetgz}
-rm -f ${kustomizetgz}
+curl -L -o kustomize.tgz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_${opsys}_amd64.tar.gz
+tar xzf kustomize.tgz
+rm -f kustomize.tgz
 chmod +x kustomize
