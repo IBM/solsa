@@ -47,7 +47,7 @@ export namespace io_k8s_incubator_arbitrator {
         this.spec.resources.Items.forEach(item => {
           const template: any = item.template
           if (template.kind === 'Deployment') {
-            template.spec.template.metadata!.labels = Object.assign({}, labels, { job_id: template.metadata.namespace }, template.spec.template.metadata!.labels)
+            template.spec.template.metadata.labels = Object.assign({}, labels, { job_id: template.metadata.namespace }, template.spec.template.metadata.labels)
           } else {
             template.metadata.labels = Object.assign({}, labels, { name: template.metadata.name, job_id: template.metadata.namespace }, template.metadata.labels)
           }
