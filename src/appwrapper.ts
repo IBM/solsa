@@ -20,12 +20,12 @@ import { dictionary } from './helpers'
 
 export namespace io_k8s_incubator_arbitrator {
   export namespace v1alpha1 {
-    export class XQueueJob extends KubernetesResource implements IXQueueJob {
+    export class AppWrapper extends KubernetesResource implements IAppWrapper {
       metadata: meta.v1.ObjectMeta
-      spec: XQueueJobSpec
+      spec: AppWrapperSpec
 
-      constructor (properties: IXQueueJob) {
-        super({ apiVersion: 'arbitrator.incubator.k8s.io/v1alpha1', kind: 'XQueueJob' })
+      constructor (properties: IAppWrapper) {
+        super({ apiVersion: 'arbitrator.incubator.k8s.io/v1alpha1', kind: 'AppWrapper' })
         this.metadata = properties.metadata
         this.spec = properties.spec
       }
@@ -61,13 +61,13 @@ export namespace io_k8s_incubator_arbitrator {
       return { Items: resources.map(template => ({ replicas: 1, type: (template as any).kind, template })) }
     }
 
-    export interface IXQueueJob {
+    export interface IAppWrapper {
       /** Standard object metadata. */
       metadata: meta.v1.ObjectMeta
-      spec: XQueueJobSpec
+      spec: AppWrapperSpec
     }
 
-    export interface XQueueJobSpec {
+    export interface AppWrapperSpec {
       schedulingSpec?: { minAvailable?: number }
       resources: { Items: { replicas: number, type: string, template: KubernetesResource }[] }
     }

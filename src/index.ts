@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './appwrapper'
 export * from './container'
 export * from './core'
 import './core-ext'
@@ -23,7 +24,6 @@ export * from './ingress'
 export * from './knative'
 export * from './solution'
 export * from './transform'
-export * from './xqueuejob'
 
 export { safeLoad as parseYaml } from 'js-yaml'
 
