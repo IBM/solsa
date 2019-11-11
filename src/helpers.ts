@@ -32,3 +32,7 @@ export function enumerate (env: dynamic) {
 export function either<T> (x: T | undefined, y: T) {
   return x !== undefined ? x : y
 }
+
+export function mangledLayerName (x: String) {
+  return x.replace('/', '_slash_')
+}
