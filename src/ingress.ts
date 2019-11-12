@@ -15,6 +15,7 @@
  */
 
 import { Resource } from './solution'
+import { mangledLayerName } from './helpers'
 import * as k8s from './core'
 
 /**
@@ -41,8 +42,8 @@ export class Ingress extends Resource {
 
   toResources ({ config = {} }: { config: any }) {
     let resources = []
-    let clusterIngresses = config.clusters.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `cluster/${x.name}`, ingress: x.ingress } })
-    let contextIngresses = config.contexts.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `context/${x.name}`, ingress: x.ingress } })
+    let clusterIngresses = config.clusters.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `cluster/${mangledLayerName(x.name)}`, ingress: x.ingress } })
+    let contextIngresses = config.contexts.filter((x: any) => x.ingress).map(function (x: any) { return { layer: `context/${mangledLayerName(x.name)}`, ingress: x.ingress } })
     let vhosts: string[] = []
     if (this.rules !== undefined) {
       let vhs: Set<string> = new Set()

@@ -23,7 +23,7 @@ import * as tmp from 'tmp'
 import * as util from 'util'
 import * as yaml from 'js-yaml'
 import { Solution, Bundle } from './solution'
-import { dynamic } from './helpers'
+import { dynamic, mangledLayerName } from './helpers'
 
 function usage () {
   console.error('Usage:')
@@ -224,13 +224,13 @@ function yamlCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
 
     finalize (config: any, app: Solution) {
       for (const cluster of config.clusters) {
-        const clusterLayer = this.getLayer(path.join('cluster', cluster.name))
+        const clusterLayer = this.getLayer(path.join('cluster', mangledLayerName(cluster.name)))
         clusterLayer.bases.push('./../../base')
         clusterLayer.images = this.finalizeImageRenames(cluster, app)
       }
       for (const context of config.contexts) {
         const contextLayer = this.getLayer(path.join('context', context.name))
-        contextLayer.bases.push(context.cluster ? `./../../cluster/${context.cluster}` : './../../base')
+        contextLayer.bases.push(context.cluster ? `./../../cluster/${mangledLayerName(context.cluster)}` : './../../base')
         contextLayer.images = this.finalizeImageRenames(context, app)
       }
 
@@ -302,7 +302,7 @@ function yamlCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
     if (config.targetContext) {
       selectedLayer = path.join(outputRoot, 'context', config.targetContext)
     } else if (config.targetCluster) {
-      selectedLayer = path.join(outputRoot, 'cluster', config.targetCluster)
+      selectedLayer = path.join(outputRoot, 'cluster', mangledLayerName(config.targetCluster))
     } else {
       selectedLayer = path.join(outputRoot, 'base')
     }

@@ -36,7 +36,7 @@ const ext = '.yaml'
 
 /** @param {string} name */
 function solsaYaml (name) {
-  return cp.execSync(`${cli} yaml --config ${config} --cluster iks ${path.join(src, name)}`)
+  return cp.execSync(`${cli} yaml --config ${config} --cluster iks/uuid123 ${path.join(src, name)}`)
 }
 
 function test () {

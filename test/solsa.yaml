@@ -13,7 +13,7 @@
 # limitations under the License.
 
 clusters:
-- name: iks
+- name: iks/uuid123
   ingress:
     iks:
       subdomain: test.test

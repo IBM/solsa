@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Resource } from './solution'
+import { Resource, KubernetesResource } from './solution'
 import { enumerate, dynamic, dictionary, either } from './helpers'
 import { Ingress } from './ingress'
 import * as k8s from './core'
@@ -46,11 +46,11 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   /** The name of the entry point to be executed. */
   main?: string
   /** @internal */
-  _readinessProbe?: any // FIXME: Define a more precise type here (complex record).
+  _readinessProbe?: k8s.core.v1.Probe
   /** @internal */
-  _livenessProbe?: any // FIXME: Define a more precise type here (complex record).
+  _livenessProbe?: k8s.core.v1.Probe
   /** A persistent volume to be created for each replica of the service. */
-  pv?: any // FIXME: Define a more precise type here (complex record).
+  pv?: IPersistentVolume
 
   /** The liveness probe for the service. */
   get livenessProbe () { return either(this._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
@@ -106,9 +106,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     const ports = this.port ? [{ port: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
-    const deployment: any = {
-      apiVersion: 'apps/v1',
-      kind: 'Deployment',
+    const deployment = new k8s.apps.v1.Deployment({
       metadata: {
         name: this.name
       },
@@ -131,32 +129,32 @@ export class ContainerizedService extends Resource implements IContainerizedServ
           }
         }
       }
-    }
-    const objs = [{ obj: deployment }]
+    })
+    const objs: [{obj: KubernetesResource }] = [{ obj: deployment }]
     if (this.annotations) {
-      deployment.spec.template.metadata.annotations = this.annotations
+      deployment.spec.template.metadata!.annotations = this.annotations
     }
     if (this.livenessProbe) {
-      deployment.spec.template.spec.containers[0].livenessProbe = this.livenessProbe
+      deployment.spec.template.spec!.containers[0].livenessProbe = this.livenessProbe
     }
     if (this.readinessProbe) {
-      deployment.spec.template.spec.containers[0].readinessProbe = this.readinessProbe
+      deployment.spec.template.spec!.containers[0].readinessProbe = this.readinessProbe
     }
     if (this.pv) {
       // Patch deployment spec with volumeMount/volumeClaim
-      deployment.spec.template.spec.volumes = [{
+      deployment.spec.template.spec!.volumes = [{
         name: 'mypvc',
         persistentVolumeClaim: {
           claimName: this.name
         }
       }]
-      deployment.spec.template.spec.containers[0].volumeMounts = [{
+      deployment.spec.template.spec!.containers[0].volumeMounts = [{
         mountPath: this.pv.mountPath,
         name: 'mypvc'
       }]
       if (this.pv.owner) {
         // HACK: IKS NFS storage is mounted owned by root.  The recommend fix is running an init container to chown the mount.
-        deployment.spec.template.spec.initContainers = [{
+        deployment.spec.template.spec!.initContainers = [{
           name: 'permissions-fix-hack',
           image: 'alpine:latest',
           command: ['/bin/sh', '-c', `chown ${this.pv.owner} /mount`],
@@ -167,9 +165,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
         }]
       }
       // add pvc yaml
-      const pvc = {
-        apiVersion: 'v1',
-        kind: 'PersistentVolumeClaim',
+      const pvc = new k8s.core.v1.PersistentVolumeClaim({
         metadata: {
           name: this.name
         },
@@ -182,14 +178,12 @@ export class ContainerizedService extends Resource implements IContainerizedServ
             }
           }
         }
-      }
+      })
       objs.push({ obj: pvc })
     }
 
     if (ports.length > 0) {
-      const svc: any = {
-        apiVersion: 'v1',
-        kind: 'Service',
+      const svc: any = new k8s.core.v1.Service({
         metadata: {
           name: this.name
         },
@@ -198,7 +192,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
           ports: ports.map(function ({ port, targetPort = port, name }: any) { return name ? { port, targetPort, name } : { port, targetPort } }),
           selector: { 'solsa.ibm.com/pod': this.name }
         }
-      }
+      })
       if (this.annotations) {
         svc.metadata.annotations = this.annotations
       }
@@ -235,9 +229,21 @@ export interface IContainerizedService {
   /** The name of the entry point to be executed. */
   main?: string
   /** The readiness probe for the service. */
-  readinessProbe?: any // FIXME: Define a more precise type here (complex record).
+  readinessProbe?: k8s.core.v1.Probe
   /** The liveness probe for the service. */
-  livenessProbe?: any // FIXME: Define a more precise type here (complex record).
+  livenessProbe?: k8s.core.v1.Probe
   /** A persistent volume to be created for each replica of the service. */
-  pv?: any // FIXME: Define a more precise type here (complex record).
+  pv?: IPersistentVolume // FIXME: Define a more precise type here (complex record).
+}
+
+/** A higher-level abstraction that combines the primary user-provided properties of PersistentVolume and PersistentVolumeClaim */
+export interface IPersistentVolume {
+  /** The path at which to mount the volume in the container */
+  mountPath: string
+  /** The userid that should own the mounted volume (optional) */
+  owner?: string
+  /** The desired storage size */
+  size: string
+  /** The storage class to use when requesting the volume */
+  storageClassName: string
 }
