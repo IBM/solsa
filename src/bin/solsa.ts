@@ -57,6 +57,8 @@ if (argv._[0] === 'help') {
   let solution: any
 
   try {
+    const solutionDir = path.dirname(require.resolve(file))
+    require('solsa').loadSolutionConfig(solutionDir)
     solution = require(file)
     if (!solution.runCommand) throw new Error(`Module '${file}' does not export a SolSA solution`)
     solution.runCommand(args, solution)

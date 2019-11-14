@@ -16,6 +16,10 @@
 
 import { dynamic } from './helpers'
 import { runCommand } from './cli'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as yaml from 'js-yaml'
+import { file } from 'tmp'
 
 /**
  * Solution is the root of SolSA's class hierarchy. A solution is either a SolSA
@@ -139,4 +143,26 @@ export class RawKubernetesResource extends KubernetesResource {
     super({ apiVersion: properties.apiVersion, kind: properties.kind })
     Object.assign(this, properties)
   }
+}
+
+// Support for loading an optional values.yaml for the top-level solution (approx a values.yaml for a Helm chart)
+let _solutionConfig: dynamic = {}
+export function loadSolutionConfig (solutionDir: string) {
+  const valuesFile = path.join(solutionDir, 'values.yaml')
+  if (fs.existsSync(valuesFile)) {
+    try {
+      _solutionConfig = yaml.safeLoad(fs.readFileSync(valuesFile).toString())
+    } catch (err) {
+      console.error('Error loading yaml from file ${valuesFile}')
+      throw err
+    }
+  }
+}
+
+/**
+ * Access the contents of the optional values.yaml file co-located with
+ * the top-level Solution being processed.
+ */
+export function getSolutionConfig (): dynamic {
+  return _solutionConfig
 }
