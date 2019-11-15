@@ -46,13 +46,22 @@ function usage () {
   console.error(`Flags for "yaml" command:`)
   console.error('  -o, --output <file>        output base yaml and context overlays to <file>.tgz')
   console.error('  -a, --appname <name>       add the label solsa.ibm.com/app=<name> to all generated resources')
+  console.error('  -s, --set                  set values on the command line (can specify multiple values with commas: key1=val1,key2=val2)')
+  console.error('  -f --values                specify values in a YAML file (can specify multiple)')
   console.error()
   console.error(`Flags for "import" command:`)
   console.error('  -o, --output <file>        output imported resources to <file>.js')
   console.error('      --dehelm               remove helm chart artifacts during import (default true)')
   console.error('      --extern               externalize large strings (default false)')
-  console.error('  -f  --function             export a function that wraps bundle creation (default false)')
+  console.error('      --function             export a function that wraps bundle creation (default false)')
   console.error()
+}
+
+export const minimistOptions: minimist.Opts = {
+  string: ['cluster', 'config', 'context', 'debug', 'output', 'appname', 'set', 'values'],
+  boolean: ['debug', 'dehelm', 'extern', 'function'],
+  alias: { context: 'c', debug: 'd', output: 'o', appname: 'a', set: 's', values: 'f' },
+  default: { 'dehelm': true, function: false, extern: false, debug: false }
 }
 
 // handle errors and warnings
@@ -565,11 +574,7 @@ export function runCommand (args: string[], app: Solution = new Bundle()) {
   tmp.setGracefulCleanup()
 
   // process command line arguments
-  const argv = minimist(args, {
-    string: ['cluster', 'config', 'context', 'output', 'appname', 'dehelm'],
-    alias: { context: 'c', output: 'o', appname: 'a', function: 'f', extern: 'e' },
-    default: { 'dehelm': true, function: false, extern: false }
-  })
+  const argv = minimist(args, minimistOptions)
 
   argv.command = argv._[0]
   argv.file = argv._[1]

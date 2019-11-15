@@ -18,15 +18,17 @@
     "test": "standard && tsc -p dryrun.json && tslint -p . && mocha"
   },
   "dependencies": {
+    "dot-prop": "5.2.0",
     "js-yaml": "^3.12.1",
     "minimist": "^1.2.0",
+    "mout": "1.2.2",
     "tmp": "^0.1.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",
     "@types/minimist": "^1.2.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.6.2",
+    "@types/node": "^12.12.8",
     "@types/tmp": "^0.1.0",
     "mocha": "^6.1.4",
     "pre-commit": "^1.2.2",
