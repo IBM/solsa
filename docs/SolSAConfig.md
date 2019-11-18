@@ -101,6 +101,13 @@ stanza below to either a `cluster` or `context`:
     os: true
 ```
 
+### Red Hat OpenShift on IBM Cloud Cluster
+
+A Red Hat OpenShift on IBM Cloud cluster supports both Kubernetes Ingress
+and OpenShift Routes.  You can choose which type of ingress you want to generate
+when using SolSA by specifying the ingress for the cluster using one of
+the `iks` or `os` stanzas described immediately above.
+
 ## Image Renames
 
 The SolSA configuration file can also be used to specify a variety of image renaming operations.
@@ -154,8 +161,7 @@ clusters:
     newName: 'docker.io/ibmcom/kn-helloworld'
 - name: 'myrhoscluster'
   ingress:
-    os:
-      subdomain: 'myrhoscluster-0139ae49851705507802c3fbbaa73a82-0001.us-east.containers.appdomain.cloud'
+    os: true
 contexts:
 - name: localdev
   cluster: 'docker-desktop'
