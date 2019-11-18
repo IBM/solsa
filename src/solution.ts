@@ -21,6 +21,7 @@ import * as path from 'path'
 import * as yaml from 'js-yaml'
 import * as dp from 'dot-prop'
 import minimist = require('minimist')
+let deepMixIn = require('mout/object/deepMixIn')
 
 /**
  * Solution is the root of SolSA's class hierarchy. A solution is either a SolSA
@@ -186,7 +187,6 @@ export function loadSolutionConfig (solutionDir: string) {
 
   // process value options
   if (argv.values) {
-    let mixin = require('mout/object/deepMixIn')
     const valArgs: string[] = typeof argv.values === 'string' ? [ argv.values ] : argv.values
     valArgs.forEach(fname => {
       const vf = path.isAbsolute(fname) ? fname : path.join(process.cwd(), fname)
@@ -196,7 +196,7 @@ export function loadSolutionConfig (solutionDir: string) {
           if (argv.debug) {
             console.error(`merging values from ${vf}`)
           }
-          mixin(_solutionConfig, delta)
+          deepMixIn(_solutionConfig, delta)
         } catch (err) {
           console.error(`Error processing ${vf}`)
           throw err
@@ -209,13 +209,27 @@ export function loadSolutionConfig (solutionDir: string) {
     console.error('Final value of Solution Config')
     console.error(yaml.safeDump(_solutionConfig))
   }
-
 }
 
 /**
- * Access the contents of the optional values.yaml file co-located with
- * the top-level Solution being processed.
+ * Access the current SolutionConfiguration object.
+ * This object is initialized from the contents of an optional values.yaml
+ * file co-located with the top-level Solution being processed. These
+ * initial contents may be modified by processing of `--set` and `--values`
+ * command line arguments and may also be programatically modified via
+ * calls to #mergeIntoSolutionConfig.
  */
 export function getSolutionConfig (): dynamic {
   return _solutionConfig
+}
+
+/**
+ * Update the current SolutionCofiguration by performing a
+ * deep merge of `delta` into it. This performs the same merge
+ * operation as the `--values` command line argument to `solsa yaml`.
+ *
+ * @param delta an object to mix into the current SolutionConfiguration
+ */
+export function mergeIntoSolutionConfig (delta: dynamic) {
+  deepMixIn(_solutionConfig, delta)
 }
