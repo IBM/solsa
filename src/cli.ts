@@ -423,7 +423,7 @@ function importCommand (app: Solution, argv: minimist.ParsedArgs, log: Log) {
       outStream.write('const app = new solsa.Bundle()\n')
       outStream.write('module.exports = app\n')
     } else {
-      outStream.write(`module.exports = function ${snakeToCamel(argv.output)} () {\n`)
+      outStream.write(`module.exports = function ${snakeToCamel(argv.output)} (values) {\n`)
       outStream.write('const app = new solsa.Bundle()\n')
     }
   }

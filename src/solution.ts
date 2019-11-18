@@ -15,13 +15,7 @@
  */
 
 import { dynamic } from './helpers'
-import { runCommand, minimistOptions } from './cli'
-import * as fs from 'fs'
-import * as path from 'path'
-import * as yaml from 'js-yaml'
-import * as dp from 'dot-prop'
-import minimist = require('minimist')
-let deepMixIn = require('mout/object/deepMixIn')
+import { runCommand } from './cli'
 
 /**
  * Solution is the root of SolSA's class hierarchy. A solution is either a SolSA
@@ -145,91 +139,4 @@ export class RawKubernetesResource extends KubernetesResource {
     super({ apiVersion: properties.apiVersion, kind: properties.kind })
     Object.assign(this, properties)
   }
-}
-
-// Support for loading an optional values.yaml for the top-level solution (approx a values.yaml for a Helm chart)
-let _solutionConfig: dynamic = {}
-export function loadSolutionConfig (solutionDir: string) {
-  const args = process.argv.slice(2)
-  const argv = minimist(args, minimistOptions)
-
-  const valuesFile = path.join(solutionDir, 'values.yaml')
-  if (fs.existsSync(valuesFile)) {
-    try {
-      _solutionConfig = yaml.safeLoad(fs.readFileSync(valuesFile).toString())
-      if (argv.debug) {
-        console.error(`Loaded ${valuesFile}`)
-        console.error(yaml.safeDump(_solutionConfig))
-      }
-    } catch (err) {
-      console.error('Error loading yaml from file ${valuesFile}')
-      throw err
-    }
-  }
-
-  // process set options
-  if (argv.set) {
-    const setArgs: string[] = typeof argv.set === 'string' ? [ argv.set ] : argv.set
-    setArgs.forEach(element => {
-      element.split(',').forEach(arg => {
-        const idx = arg.indexOf('=')
-        if (idx !== -1) {
-          const path = arg.substr(0, idx)
-          const value = arg.substr(idx + 1)
-          dp.set(_solutionConfig, path, value)
-          if (argv.debug) {
-            console.error(`set ${path} to ${value}`)
-          }
-        }
-      })
-    })
-  }
-
-  // process value options
-  if (argv.values) {
-    const valArgs: string[] = typeof argv.values === 'string' ? [ argv.values ] : argv.values
-    valArgs.forEach(fname => {
-      const vf = path.isAbsolute(fname) ? fname : path.join(process.cwd(), fname)
-      if (fs.existsSync(vf)) {
-        try {
-          const delta = yaml.safeLoad(fs.readFileSync(vf).toString())
-          if (argv.debug) {
-            console.error(`merging values from ${vf}`)
-          }
-          deepMixIn(_solutionConfig, delta)
-        } catch (err) {
-          console.error(`Error processing ${vf}`)
-          throw err
-        }
-      }
-    })
-  }
-
-  if (argv.debug) {
-    console.error('Final value of Solution Config')
-    console.error(yaml.safeDump(_solutionConfig))
-  }
-}
-
-/**
- * Access the current SolutionConfiguration object.
- * This object is initialized from the contents of an optional values.yaml
- * file co-located with the top-level Solution being processed. These
- * initial contents may be modified by processing of `--set` and `--values`
- * command line arguments and may also be programatically modified via
- * calls to #mergeIntoSolutionConfig.
- */
-export function getSolutionConfig (): dynamic {
-  return _solutionConfig
-}
-
-/**
- * Update the current SolutionCofiguration by performing a
- * deep merge of `delta` into it. This performs the same merge
- * operation as the `--values` command line argument to `solsa yaml`.
- *
- * @param delta an object to mix into the current SolutionConfiguration
- */
-export function mergeIntoSolutionConfig (delta: dynamic) {
-  deepMixIn(_solutionConfig, delta)
 }
