@@ -19,14 +19,19 @@
 import * as minimist from 'minimist'
 import * as path from 'path'
 import { runCommand } from '../cli'
+import * as fs from 'fs'
+import * as yaml from 'js-yaml'
+import * as dp from 'dot-prop'
+let deepMixIn = require('mout/object/deepMixIn')
 
 const Module = require('module')
 
 const args = process.argv.slice(2)
 
 const argv = minimist(args, {
+  string: ['values', 'set'],
   boolean: ['debug'],
-  alias: { debug: 'd' }
+  alias: { debug: 'd', set: 's', values: 'f' }
 })
 
 if (argv._.length === 0) runCommand([]) // usage
@@ -58,12 +63,80 @@ if (argv._[0] === 'help') {
 
   try {
     const solutionDir = path.dirname(require.resolve(file))
-    require('solsa').loadSolutionConfig(solutionDir)
+    const solutionContext = constructContext(solutionDir, argv)
     solution = require(file)
-    if (!solution.runCommand) throw new Error(`Module '${file}' does not export a SolSA solution`)
+    if (!solution.runCommand) {
+      // See if the file exports a function that can be applied to construct a Solution.
+      if (typeof solution === 'function') {
+        solution = solution(solutionContext)
+      }
+      if (!solution.runCommand) throw new Error(`A SolSA solution cannot be constructed from '${file}'`)
+    }
     solution.runCommand(args, solution)
   } catch (err) {
     console.error(argv.debug ? err : `Error: ${err.message}`)
     process.exit(1)
   }
+}
+
+function constructContext (solutionDir: string, argv: minimist.ParsedArgs): { [k: string]: any } {
+  let solutionContext = {}
+  const valuesFile = path.join(solutionDir, 'values.yaml')
+  if (fs.existsSync(valuesFile)) {
+    try {
+      solutionContext = yaml.safeLoad(fs.readFileSync(valuesFile).toString())
+      if (argv.debug) {
+        console.error(`Loaded ${valuesFile}`)
+        console.error(yaml.safeDump(solutionContext))
+      }
+    } catch (err) {
+      console.error('Error loading yaml from file ${valuesFile}')
+      throw err
+    }
+  }
+
+  // process set options
+  if (argv.set) {
+    const setArgs: string[] = typeof argv.set === 'string' ? [ argv.set ] : argv.set
+    setArgs.forEach(element => {
+      element.split(',').forEach(arg => {
+        const idx = arg.indexOf('=')
+        if (idx !== -1) {
+          const path = arg.substr(0, idx)
+          const value = arg.substr(idx + 1)
+          dp.set(solutionContext, path, value)
+          if (argv.debug) {
+            console.error(`set ${path} to ${value}`)
+          }
+        }
+      })
+    })
+  }
+
+  // process value options
+  if (argv.values) {
+    const valArgs: string[] = typeof argv.values === 'string' ? [ argv.values ] : argv.values
+    valArgs.forEach(fname => {
+      const vf = path.isAbsolute(fname) ? fname : path.join(process.cwd(), fname)
+      if (fs.existsSync(vf)) {
+        try {
+          const delta = yaml.safeLoad(fs.readFileSync(vf).toString())
+          if (argv.debug) {
+            console.error(`merging values from ${vf}`)
+          }
+          deepMixIn(solutionContext, delta)
+        } catch (err) {
+          console.error(`Error processing ${vf}`)
+          throw err
+        }
+      }
+    })
+  }
+
+  if (argv.debug) {
+    console.error('Final value of Solution Config')
+    console.error(yaml.safeDump(solutionContext))
+  }
+
+  return solutionContext
 }
