@@ -34,7 +34,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   /** If the service exports a single port, its port number. */
   port?: number
   /** If the service exports multiple ports, an array of their names and port numbers. */
-  ports: { name: string, port: number }[]
+  ports: { name: string, containerPort: number, servicePort: number }[]
   /** The desired number of replicas of the container. */
   replicas: number
   /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
@@ -84,7 +84,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
    * Create an Ingress for this ContainerizedService.
    */
   getIngress ({ name = this.name, vhost = this.name, targetPort }: { name?: string, vhost?: string, targetPort?: number } = {}) {
-    const exposedPort = targetPort ? targetPort : (this.port ? this.port : this.ports[0].port)
+    const exposedPort = targetPort ? targetPort : (this.port ? this.port : this.ports[0].servicePort)
     const rule: k8s.extensions.v1beta1.IngressRule = {
       host: vhost,
       http: {
@@ -103,7 +103,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   }
 
   toResources () {
-    const ports = this.port ? [{ port: this.port }].concat(this.ports) : this.ports
+    const ports = this.port ? [{ containerPort: this.port, servicePort: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
     const deployment = new k8s.apps.v1.Deployment({
@@ -123,7 +123,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
             containers: [{
               name: this.name,
               image: this.image,
-              ports: ports.map(function ({ port, name }: any) { return name ? { containerPort: port, name } : { containerPort: port } }),
+              ports: ports.map(function ({ containerPort, name }: any) { return name ? { containerPort, name } : { containerPort } }),
               env: enumerate(env)
             }]
           }
@@ -189,7 +189,9 @@ export class ContainerizedService extends Resource implements IContainerizedServ
         },
         spec: {
           type: 'ClusterIP',
-          ports: ports.map(function ({ port, targetPort = port, name }: any) { return name ? { port, targetPort, name } : { port, targetPort } }),
+          ports: ports.map(function ({ servicePort, containerPort, name }: any) {
+            return name ? { port: servicePort, targetPort: containerPort, name } : { port: servicePort, targetPort: containerPort }
+          }),
           selector: { 'solsa.ibm.com/pod': this.name }
         }
       })
@@ -217,7 +219,7 @@ export interface IContainerizedService {
   /** If the service exports a single port, its port number. */
   port?: number
   /** If the service exports multiple ports, an array of their names and port numbers. */
-  ports?: { name: string, port: number }[]
+  ports?: { name: string, containerPort: number, servicePort: number }[]
   /** The desired number of replicas of the container. */
   replicas?: number
   /** A dictionary of labels to apply to the `Deployment` and `Service` resources. */
