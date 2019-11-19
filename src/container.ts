@@ -84,7 +84,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
    * Create an Ingress for this ContainerizedService.
    */
   getIngress ({ name = this.name, vhost = this.name, targetPort }: { name?: string, vhost?: string, targetPort?: number } = {}) {
-    const exposedPort = targetPort ? targetPort : (this.port ? this.port : this.ports[0].servicePort)
+    const exposedPort = targetPort ? targetPort : (this.port ? this.port : (this.ports[0].name ? this.ports[0].name : this.ports[0].servicePort))
     const rule: k8s.extensions.v1beta1.IngressRule = {
       host: vhost,
       http: {
