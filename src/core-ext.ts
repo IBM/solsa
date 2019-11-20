@@ -162,6 +162,25 @@ namespace coreExt {
     }
     Object.assign(meta.labels, toAdd)
   }
+
+  export function getImages (podspec?: core.v1.PodSpec): { name: string }[] {
+    let ans: { name: string }[] = []
+    if (podspec) {
+      podspec.containers.forEach(container => {
+        if (container.image) {
+          ans.push({ name: container.image })
+        }
+      })
+      if (podspec.initContainers) {
+        podspec.initContainers.forEach(container => {
+          if (container.image) {
+            ans.push({ name: container.image })
+          }
+        })
+      }
+    }
+    return ans
+  }
 }
 
 /*
@@ -259,3 +278,15 @@ core.v1.Service.prototype.getIngress = function ({ name, vhost, targetPort }: { 
   }
   return new Ingress({ name: ingName, rules: [rule] })
 }
+
+/*
+ * toImages
+ */
+apps.v1.Deployment.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+apps.v1.StatefulSet.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+apps.v1beta2.Deployment.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+apps.v1beta2.StatefulSet.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+apps.v1beta1.Deployment.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+apps.v1beta1.StatefulSet.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+batch.v1.Job.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
+extensions.v1beta1.Deployment.prototype.toImages = function () { return coreExt.getImages(this.spec.template.spec) }
