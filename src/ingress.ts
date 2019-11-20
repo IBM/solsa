@@ -26,18 +26,30 @@ export class Ingress extends Resource {
   name: string
   /** The default backend service */
   backend?: k8s.extensions.v1beta1.IngressBackend
-  /** The  */
+  /** The rules mapping the paths under a specified host to target backend services. */
   rules?: k8s.extensions.v1beta1.IngressRule[]
+  /** Should a secret containing the ingress host infromation be generated (default false) */
+  genSecret: boolean
 
   /**
    * Create an Ingress. The `name` is mandatory.
    * Specify at least one rule or default backend.
    */
-  constructor ({ name, rules, backend }: IIngress) {
+  constructor ({ name, rules, backend, genSecret = false }: IIngress) {
     super()
     this.name = name
     this.backend = backend
     this.rules = rules
+    this.genSecret = genSecret
+  }
+
+  /**
+   * Return a `secretKeyRef` reference to the ingress host entry in a Secret generated for this Ingress.
+   * NOTE: Generation of this secret is only supported for `iks` ingresses that define a single vhost.
+   */
+  getIngressHost () {
+    this.genSecret = true
+    return { secretKeyRef: { name: `${this.name}-ingsec`, key: 'ingressHost' } }
   }
 
   toResources ({ config = {} }: { config: any }) {
@@ -68,6 +80,13 @@ export class Ingress extends Resource {
           ing.spec.backend = this.backend
         }
         resources.push({ obj: ing, layer })
+        if (this.genSecret && vhosts.length > 0) {
+          const sec = new k8s.core.v1.Secret({
+            metadata: { name: `${this.name}-ingsec` },
+            stringData: { ingressHost: ing.spec.tls![0].hosts![0] }
+          })
+          resources.push({ obj: sec, layer })
+        }
       } else if (ingress.os) {
         if (this.rules !== undefined) {
           let idx = 0
@@ -135,6 +154,8 @@ export interface IIngress {
   name: string
   /** The default backend service */
   backend?: k8s.extensions.v1beta1.IngressBackend
-  /** The  */
+  /** The rules mapping the paths under a specified host to target backend services. */
   rules?: k8s.extensions.v1beta1.IngressRule[]
+  /** Should a secret containing the ingress host infromation be generated (default false) */
+  genSecret?: boolean
 }
