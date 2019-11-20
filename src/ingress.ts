@@ -15,7 +15,7 @@
  */
 
 import { Resource } from './solution'
-import { mangledLayerName } from './helpers'
+import { mangledLayerName, base64Encode } from './helpers'
 import * as k8s from './core'
 
 /**
@@ -83,7 +83,7 @@ export class Ingress extends Resource {
         if (this.genSecret && vhosts.length > 0) {
           const sec = new k8s.core.v1.Secret({
             metadata: { name: `${this.name}-ingsec` },
-            stringData: { ingressHost: ing.spec.tls![0].hosts![0] }
+            data: { ingressHost: base64Encode(ing.spec.tls![0].hosts![0]) }
           })
           resources.push({ obj: sec, layer })
         }

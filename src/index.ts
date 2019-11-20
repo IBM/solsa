@@ -24,9 +24,6 @@ export * from './ingress'
 export * from './knative'
 export * from './solution'
 export * from './transform'
+export { base64Encode } from './helpers'
 
 export { safeLoad as parseYaml } from 'js-yaml'
-
-export function base64Encode (secret: string) {
-  return Buffer.from(secret).toString('base64')
-}

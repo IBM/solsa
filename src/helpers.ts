@@ -36,3 +36,7 @@ export function either<T> (x: T | undefined, y: T) {
 export function mangledLayerName (x: String) {
   return x.replace('/', '_slash_')
 }
+
+export function base64Encode (secret: string) {
+  return Buffer.from(secret).toString('base64')
+}
