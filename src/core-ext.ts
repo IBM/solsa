@@ -25,7 +25,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -37,7 +37,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -51,7 +51,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -63,7 +63,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -78,7 +78,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -90,7 +90,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -129,7 +129,7 @@ declare module './core' {
          * Construct a core.v1.Service instance for this Deployment
          * @returns the core.v1.Service object for this Deployment
          */
-        getService (): core.v1.Service
+        getService (servicePort?: number): core.v1.Service
 
         /**
          * Propogate all labels defined in metadata.labels down to spec.template.metadata.labels
@@ -144,12 +144,12 @@ declare module './core' {
  * Helper functions
  */
 namespace coreExt {
-  export function servicePorts (containers: core.v1.Container[]): core.v1.ServicePort[] {
+  export function servicePorts (containers: core.v1.Container[], servicePort?: number): core.v1.ServicePort[] {
     let ports: core.v1.ServicePort[] = []
     containers.forEach(function (c: core.v1.Container) {
       if (c.ports !== undefined) {
         c.ports.forEach(function (cp: core.v1.ContainerPort) {
-          ports.push({ name: cp.name, port: cp.containerPort, targetPort: cp.containerPort, protocol: cp.protocol })
+          ports.push({ name: cp.name, port: servicePort ? servicePort : cp.containerPort, targetPort: cp.containerPort, protocol: cp.protocol })
         })
       }
     })
@@ -186,7 +186,7 @@ namespace coreExt {
 /*
  * getService
  */
-apps.v1.Deployment.prototype.getService = function () {
+apps.v1.Deployment.prototype.getService = function (servicePort?: number) {
   if (this.spec.template.spec === undefined) {
     throw new Error('Cannot get a service on Deployment without a spec')
   }
@@ -204,14 +204,14 @@ apps.v1.Deployment.prototype.getService = function () {
   }
   coreExt.augmentLabels(this.spec.template.metadata, selector)
 
-  const ports = coreExt.servicePorts(this.spec.template.spec.containers)
+  const ports = coreExt.servicePorts(this.spec.template.spec.containers, servicePort)
   return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports, selector, type: 'ClusterIP' } })
 }
 apps.v1.StatefulSet.prototype.getService = apps.v1.Deployment.prototype.getService
 apps.v1beta2.Deployment.prototype.getService = apps.v1.Deployment.prototype.getService
 apps.v1beta2.StatefulSet.prototype.getService = apps.v1.Deployment.prototype.getService
 
-apps.v1beta1.Deployment.prototype.getService = function () {
+apps.v1beta1.Deployment.prototype.getService = function (servicePort?: number) {
   if (this.spec.template.spec === undefined) {
     throw new Error('Cannot get a service on Deployment without a spec')
   }
@@ -229,7 +229,7 @@ apps.v1beta1.Deployment.prototype.getService = function () {
   }
   coreExt.augmentLabels(this.spec.template.metadata, selector!)
 
-  const ports = coreExt.servicePorts(this.spec.template.spec.containers)
+  const ports = coreExt.servicePorts(this.spec.template.spec.containers, servicePort)
   return new core.v1.Service({ metadata: { name: this.metadata.name }, spec: { ports, selector, type: 'ClusterIP' } })
 }
 apps.v1beta1.StatefulSet.prototype.getService = apps.v1beta1.Deployment.prototype.getService
@@ -261,7 +261,7 @@ core.v1.Service.prototype.getIngress = function ({ name, vhost, targetPort }: { 
   const ingName = name ? name : this.metadata.name!
   const ingVhost = vhost ? vhost : this.metadata.name!
   const serviceName = this.metadata.name!
-  const servicePort = targetPort ? targetPort : (this.spec.ports![0].port)
+  const servicePort = targetPort ? targetPort : (this.spec.ports![0].name ? this.spec.ports![0].name : this.spec.ports![0].port)
   const rule: extensions.v1beta1.IngressRule = {
     host: ingVhost,
     http: {
