@@ -30,6 +30,8 @@ export class Ingress extends Resource {
   rules?: k8s.extensions.v1beta1.IngressRule[]
   /** Should a secret containing the ingress host infromation be generated (default false) */
   genSecret: boolean
+  /** Annotations to include in Ingress metadata */
+  annotations: { [k: string]: string }
 
   /**
    * Create an Ingress. The `name` is mandatory.
@@ -41,6 +43,7 @@ export class Ingress extends Resource {
     this.backend = backend
     this.rules = rules
     this.genSecret = genSecret
+    this.annotations = {}
   }
 
   /**
@@ -65,7 +68,7 @@ export class Ingress extends Resource {
     for (let { layer, ingress } of clusterIngresses.concat(contextIngresses)) {
       if (ingress.iks) {
         const ing = new k8s.extensions.v1beta1.Ingress({
-          metadata: { name: this.name },
+          metadata: { name: this.name, annotations: this.annotations },
           spec: {
             tls: [{
               hosts: vhosts.map(h => h + '.' + ingress.iks.subdomain),
