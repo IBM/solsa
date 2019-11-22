@@ -55,6 +55,16 @@ export namespace io_k8s_incubator_arbitrator {
         return this
       }
 
+      setScheduler (customSchedulerName: string) {
+        this.spec.resources.Items.forEach(item => {
+          const template: any = item.template
+          if (template.kind === 'Deployment') {
+            template.spec.template.spec = Object.assign({}, { schedulerName : customSchedulerName }, template.spec.template.spec)
+          }
+        })
+        return this
+      }
+
     }
 
     export function pack (...resources: KubernetesResource[]) {
