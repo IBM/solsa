@@ -165,6 +165,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  annotations: {}
   name: productpage
 spec:
   rules:

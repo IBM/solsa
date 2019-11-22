@@ -44,6 +44,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  annotations: {}
   name: hello-john
 spec:
   rules:
