@@ -119,6 +119,24 @@ declare module './core' {
          */
         getIngress ({ name, vhost, targetPort }: { name?: string, vhost?: string, targetPort?: number }): Ingress
       }
+
+      interface Secret {
+        /**
+         * Construct an environment variable binding for `name` to the value stored under `key`.
+         * @param name the name of the environment variable
+         * @param key the desired key
+         */
+        getEnvVar ({ name, key }: { name: string, key: string }): EnvVar
+      }
+
+      interface ConfigMap {
+        /**
+         * Construct an environment variable binding for `name` to the value stored under `key`.
+         * @param name the name of the environment variable
+         * @param key the desired key
+         */
+        getEnvVar ({ name, key }: { name: string, key: string }): EnvVar
+      }
     }
   }
 
@@ -277,6 +295,22 @@ core.v1.Service.prototype.getIngress = function ({ name, vhost, targetPort }: { 
     }
   }
   return new Ingress({ name: ingName, rules: [rule] })
+}
+
+/*
+ * getEnvVar
+ */
+core.v1.Secret.prototype.getEnvVar = function ({ name, key }: { name: string, key: string}) {
+  return {
+    name: name,
+    valueFrom: { secretKeyRef: { name: this.metadata.name, key: key } }
+  }
+}
+core.v1.ConfigMap.prototype.getEnvVar = function ({ name, key }: { name: string, key: string}) {
+  return {
+    name: name,
+    valueFrom: { secretKeyRef: { name: this.metadata.name, key: key } }
+  }
 }
 
 /*
