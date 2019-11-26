@@ -51,6 +51,8 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   _livenessProbe?: k8s.core.v1.Probe
   /** A persistent volume to be created for each replica of the service. */
   pv?: IPersistentVolume
+  /** If true synthesize a default ingress for this microservice. */
+  ingress?: boolean
 
   /** The liveness probe for the service. */
   get livenessProbe () { return either(this._livenessProbe, this.port ? { tcpSocket: { port: this.port } } : undefined) }
@@ -63,7 +65,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
   /**
    * Create a ContainerizedService. The properties `name` and `image` are mandatory.
    */
-  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv }: IContainerizedService) {
+  constructor ({ name, image, env = {}, port, ports = [], replicas = 1, labels = {}, annotations, build, main, livenessProbe, readinessProbe, pv, ingress }: IContainerizedService) {
     super()
     this.name = name
     this.image = image
@@ -78,6 +80,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     this.livenessProbe = livenessProbe
     this.readinessProbe = readinessProbe
     this.pv = pv
+    this.ingress = ingress
   }
 
   /**
@@ -102,7 +105,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
     return new Ingress({ name, rules: [rule] })
   }
 
-  toResources () {
+  toResources ({ config = {} }: { config: any }) {
     const ports = this.port ? [{ containerPort: this.port, servicePort: this.port }].concat(this.ports) : this.ports
     const env = this.port ? Object.assign({ PORT: this.port }, this.env) : this.env
 
@@ -130,7 +133,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
         }
       }
     })
-    const objs: [{obj: KubernetesResource }] = [{ obj: deployment }]
+    const objs: dynamic[] = [{ obj: deployment }]
     if (this.annotations) {
       deployment.spec.template.metadata!.annotations = this.annotations
     }
@@ -201,6 +204,10 @@ export class ContainerizedService extends Resource implements IContainerizedServ
       objs.push({ obj: svc })
     }
 
+    if (this.ingress) {
+      objs.push(...this.getIngress().toResources({ config }))
+    }
+
     return objs
   }
 
@@ -236,6 +243,8 @@ export interface IContainerizedService {
   livenessProbe?: k8s.core.v1.Probe
   /** A persistent volume to be created for each replica of the service. */
   pv?: IPersistentVolume // FIXME: Define a more precise type here (complex record).
+  /** If true synthesize a default ingress for this microservice. */
+  ingress?: boolean
 }
 
 /** A higher-level abstraction that combines the primary user-provided properties of PersistentVolume and PersistentVolumeClaim */
