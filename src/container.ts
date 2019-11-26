@@ -156,7 +156,7 @@ export class ContainerizedService extends Resource implements IContainerizedServ
         // HACK: IKS NFS storage is mounted owned by root.  The recommend fix is running an init container to chown the mount.
         deployment.spec.template.spec!.initContainers = [{
           name: 'permissions-fix-hack',
-          image: 'alpine:latest',
+          image: 'docker.io/library/alpine:latest',
           command: ['/bin/sh', '-c', `chown ${this.pv.owner} /mount`],
           volumeMounts: [{
             name: 'mypvc',
