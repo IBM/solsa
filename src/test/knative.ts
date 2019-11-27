@@ -16,10 +16,7 @@
 
 import * as solsa from '..'
 
-let service = new solsa.KnativeService({ name: 'hello-knative', image: 'docker.io/ibmcom/kn-helloworld', env: { TARGET: 'Knative' } })
-let ingress = service.getIngress()
-
-export = new solsa.Bundle({ service, ingress })
+export = new solsa.KnativeService({ name: 'hello-knative', image: 'docker.io/ibmcom/kn-helloworld', env: { TARGET: 'Knative' }, ingress: true })
 
 /*
 Try:

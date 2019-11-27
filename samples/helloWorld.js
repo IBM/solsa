@@ -18,7 +18,4 @@
 
 const solsa = require('solsa')
 
-const helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
-const ingress = helloWorld.getIngress()
-
-module.exports = new solsa.Bundle({ helloWorld, ingress })
+module.exports = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080, ingress: true })

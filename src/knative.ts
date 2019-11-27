@@ -41,11 +41,6 @@ export class KnativeService extends Resource implements IKnativeService {
     this.ingress = !!ingress
   }
 
-  getIngress () {
-    this.ingress = true
-    return new Bundle()
-  }
-
   toResources () {
     const obj = {
       apiVersion: 'serving.knative.dev/v1alpha1',

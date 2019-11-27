@@ -16,10 +16,7 @@
 
 import * as solsa from '..'
 
-let service = new solsa.ContainerizedService({ name: 'hello-john', image: 'docker.io/ibmcom/kn-helloworld', port: 8080, env: { TARGET: 'John' } })
-let ingress = service.getIngress()
-
-export = new solsa.Bundle({ service, ingress })
+export = new solsa.ContainerizedService({ name: 'hello-john', image: 'docker.io/ibmcom/kn-helloworld', port: 8080, ingress: true, env: { TARGET: 'John' } })
 
 /*
 Try:

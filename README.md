@@ -280,12 +280,9 @@ A sample SolSA solution is provided in
 ```javascript
 const solsa = require('solsa')
 
-const helloWorld = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080 })
-const ingress = helloWorld.getIngress()
-
-module.exports = new solsa.Bundle({ helloWorld, ingress })
+module.exports = new solsa.ContainerizedService({ name: 'hello-world', image: 'docker.io/ibmcom/kn-helloworld', port: 8080, ingress:true })
 ```
-It consists of a single containerized service and an ingress for this service.
+It consists of a single containerized service which when deployed will be exposed via an ingress.
 
 This solution can be deployed to the current Kubernetes context using the
 `solsa` CLI and either `kubectl` or `oc` as follows.
@@ -294,7 +291,7 @@ solsa yaml helloWorld.js | kubectl apply -f -
 ```
 The YAML synthesized by SolSA for this example depends on the SolSA
 configuration file used. If no configuration file is used, the ingress
-definition is ignored and the CLI outputs a warning message.
+request is ignored and the CLI outputs a warning message.
 
 Assuming the configuration file provided in the previous section, the YAML
 synthesized when targeting cluster `docker-desktop` is
