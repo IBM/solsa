@@ -279,7 +279,14 @@ core.v1.Service.prototype.getIngress = function ({ name, vhost, targetPort }: { 
   const ingName = name ? name : this.metadata.name!
   const ingVhost = vhost ? vhost : this.metadata.name!
   const serviceName = this.metadata.name!
-  const servicePort = targetPort ? targetPort : (this.spec.ports![0].name ? this.spec.ports![0].name : this.spec.ports![0].port)
+  let servicePort: number | string
+  if (targetPort) {
+    servicePort = targetPort
+  } else if (this.spec.ports && this.spec.ports[0]) {
+    servicePort = this.spec.ports[0].name ? this.spec.ports[0].name : this.spec.ports[0].port
+  } else {
+    throw new Error(`getIngress: Service "${this.metadata.name}" does not specifiy a port to expose`)
+  }
   const rule: extensions.v1beta1.IngressRule = {
     host: ingVhost,
     http: {
