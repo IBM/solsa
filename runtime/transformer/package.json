@@ -3,7 +3,7 @@
   "main": "transformer.js",
   "version": "0.1.0",
   "dependencies": {
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "@kubernetes/client-node": "^0.8.2"
   }
 }
